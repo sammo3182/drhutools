@@ -1,11 +1,10 @@
 Package: drhutools
 Type: Package
-Title: Toolbox for Writing An Academic Paper of Empirical Research with Rmarkdown
+Title: Toolbox for Writing an Academic Paper of Empirical Research with Rmarkdown
 Version: 0.1.0
 Authors@R: person("Yue", "Hu", role = c("aut", "cre"), email = "yuehu@tsinghua.edu.cn")
 Maintainer: Yue Hu <yuehu@tsinghua.edu.cn>
-Description: A toolbox for writing an academic paper with rmarkdown. The tools includes
-    data analyses, visualization, and documenting.
+Description: A toolbox for conducting empirical research with rmarkdown and its extensions. The package includes tools for data analyses, visualization, and documenting.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
