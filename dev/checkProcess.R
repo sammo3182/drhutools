@@ -18,6 +18,7 @@ check_rhub(email = "yuehu@tsinghua.edu.cn")
 
 
 # Package website building
+library(devtools)
 
 usethis::git_vaccinate() #Adds .DS_Store, .Rproj.user, .Rdata, .Rhistory, and .httr-oauth to your global (a.k.a. user-level) .gitignore. This is good practice as it decreases the chance that you will accidentally leak credentials to GitHub.
 
