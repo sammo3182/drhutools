@@ -1,3 +1,5 @@
+# drhutools <img src="https://user-images.githubusercontent.com/6463211/109007445-13676c00-76e7-11eb-9fe1-da281e69cf0b.png" align="right" alt="" width="120" />
+
 <!-- badges: start -->
 
 [![CRAN version](http://www.r-pkg.org/badges/version/drhutools)](https://cran.r-project.org/package=drhutools) ![](http://cranlogs.r-pkg.org/badges/grand-total/drhutools)
@@ -5,15 +7,11 @@
 [![R-CMD-check](https://github.com/sammo3182/drhutools/workflows/R-CMD-check/badge.svg)](https://github.com/sammo3182/drhutools/actions)
 <!-- badges: end -->
 
-------------------------------------------------------------------------
-drhutools
-=========
 
 A toolbox for writing an academic paper with rmarkdown. The tools includes data analyses, visualization, and documenting.
 
 To install:
 
-* the latest released version: `install.packages("drhutools")`.
 * the latest developing version: `remotes::install_github("sammo3182/drhutools")`.
 
 
