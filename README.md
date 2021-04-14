@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/58319029/113224989-33c6af80-92bf-11eb-8846-37dd51fa737e.png" align="right" alt="" width="120" />
+<img src="https://user-images.githubusercontent.com/58319029/114663100-59769e80-9d2c-11eb-912b-64303aad256d.png" align="right" alt="" width="120" />
 
 <!-- badges: start -->
 
