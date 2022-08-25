@@ -3,7 +3,7 @@
 export(fitPage)
 export(gb_cols)
 export(gb_pal)
-export(plotKS)
+export(ksplot)
 export(scale_color_gb)
 export(scale_fill_gb)
 export(text_wrapper)

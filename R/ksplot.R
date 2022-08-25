@@ -1,8 +1,11 @@
-#' @name plotKS
+#' @name ksplot
 #' @title Packed \code{ggplot2} function to present the empirical cumulative distribution functions
 #' 
 #' @param comparison A list of numeric vectors for distribution comparison, e.g., the records of the subjects' responses in a control-treatment experiment.
 #' @param ls_title A list of three names, the first two control and treatment groups, and the third is a caption line of the Kolmogorov-Smirnov test result.
+#' @param point_size An integer to indicate the size of the points at the largest difference. The default value is 3.
+#' @param point_color An character or function to indicate the color of the points at the largest difference. The default value is `gb_cols("red")`.
+#' @param link_color An character or function to indicate the color of the link at the largest difference. The default value is `gb_cols("red")`.
 #' 
 #' @importFrom stats ecdf median
 #' @import ggplot2
@@ -43,7 +46,10 @@
 #' 
 #' @export
 
-plotKS <- function(comparison, ls_title) {
+ksplot <- function(comparison, ls_title, 
+                   point_size = 3,
+                   point_color = gb_cols("red"),
+                   link_color = gb_cols("red")) {
   sample1 <- comparison[[1]]
   sample2 <- comparison[[2]]
   group <-
@@ -75,14 +81,14 @@ plotKS <- function(comparison, ls_title) {
         yend = y1[1]
       ),
       linetype = "dashed",
-      color = "red"
+      color = link_color
     ) +
     geom_point(aes(x = median(x0), y = y0[1]),
-               color = gb_cols("red"),
-               size = 3) +
+               color = point_color,
+               size = point_size) +
     geom_point(aes(x = median(x0), y = y1[1]),
-               color = gb_cols("red"),
-               size = 3) +
+               color = point_color,
+               size = point_size) +
     scale_color_gb(labels = c(ls_title[1], ls_title[2])) +
     labs(caption = ls_title[3]) +
     theme(legend.title = element_blank())
