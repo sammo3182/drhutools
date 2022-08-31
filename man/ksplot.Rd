@@ -9,7 +9,8 @@ ksplot(
   ls_title,
   point_size = 3,
   point_color = gb_cols("red"),
-  link_color = gb_cols("red")
+  link_color = gb_cols("red"),
+  ...
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ ksplot(
 \item{point_color}{An character or function to indicate the color of the points at the largest difference. The default value is \code{gb_cols("red")}.}
 
 \item{link_color}{An character or function to indicate the color of the link at the largest difference. The default value is \code{gb_cols("red")}.}
+
+\item{...}{Arguments parsing to the \code{ks.test} function.}
 }
 \value{
 A ggplot object.

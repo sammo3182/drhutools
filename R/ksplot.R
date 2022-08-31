@@ -6,6 +6,7 @@
 #' @param point_size An integer to indicate the size of the points at the largest difference. The default value is 3.
 #' @param point_color An character or function to indicate the color of the points at the largest difference. The default value is `gb_cols("red")`.
 #' @param link_color An character or function to indicate the color of the link at the largest difference. The default value is `gb_cols("red")`.
+#' @param ... Arguments parsing to the `ks.test` function.
 #' 
 #' @importFrom stats ecdf median
 #' @import ggplot2
@@ -49,7 +50,8 @@
 ksplot <- function(comparison, ls_title, 
                    point_size = 3,
                    point_color = gb_cols("red"),
-                   link_color = gb_cols("red")) {
+                   link_color = gb_cols("red"),
+                   ...) {
   sample1 <- comparison[[1]]
   sample2 <- comparison[[2]]
   group <-
@@ -70,7 +72,6 @@ ksplot <- function(comparison, ls_title,
   
   ggplot(dat, aes(x = KSD, group = group, color = group)) +
     stat_ecdf(size = 1) +
-    theme(legend.position = "top") +
     xlab("Values") +
     ylab("ECDF") +
     geom_segment(
