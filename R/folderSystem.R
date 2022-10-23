@@ -21,11 +21,19 @@ folderSystem <- function() {
       "data",
       "output",
       "paper",
+      "docs",
       "paper/images",
       "paper/submission",
+      "paper/workingPaper",
       "document")
   
   walk(ls_dir, ~ if (!dir.exists(.))
     dir.create(file.path(.), recursive = TRUE))
+  
+  download.file("https://cloud.tsinghua.edu.cn/f/ff08000d4ca546ddb0b5/?dl=1", paste0(getwd(), "/paper/woringPaper.zip"))
+  unzip(paste0(getwd(), "/paper/woringPaper.zip"), exdir = paste0(getwd(), "/paper/workingPaper"))
+  unlink(paste0(getwd(), "/paper/woringPaper.zip"))
+  download.file("https://cloud.tsinghua.edu.cn/f/bf8e9a7fef3a4913b096/?dl=1", paste0(getwd(), "/docs/docs.zip"))
+  unzip(paste0(getwd(), "/docs/docs.zip"), exdir = paste0(getwd(), "/docs"))
+  unlink(paste0(getwd(), "/docs/docs.zip"))
 }
-
