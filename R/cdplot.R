@@ -96,7 +96,7 @@ cd_plot <- function(comparison, labels,
                     point_size = point_size,
                     point_color = point_color,
                     link_color = link_color, 
-                    ks_test = FALSE) {
+                    ks_test = ks_test) {
   sample1 <- comparison[[1]]
   sample2 <- comparison[[2]]
   group <-
@@ -112,6 +112,9 @@ cd_plot <- function(comparison, labels,
         length.out = length(sample1))
   x0 <-
     minMax[which(abs(cdf1(minMax) - cdf2(minMax)) == max(abs(cdf1(minMax) - cdf2(minMax))))]
+  
+  if(length(x0) > 3) x0 <- median(x0)
+  
   y0 <- cdf1(x0)
   y1 <- cdf2(x0)
   
