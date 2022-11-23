@@ -1,5 +1,5 @@
 #' @name cdplot
-#' @title Packed \code{ggplot2} function to compare the empirical cumulative distribution functions of two groups
+#' @title Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) of two groups
 #' 
 #' @param data A data.frame including two columns, one recording the outcome and the other recording the assignment. The assignment column must be named as `group`.
 #' @param ks_test A logical option to indicate whether to show the Kolmogorov-Smirnov test result in the bottom-right corner. The default value is FALSE.
@@ -15,7 +15,7 @@
 #' @importFrom utils globalVariables
 #' @importFrom utils combn
 #' 
-#' @return A list of `ggplot2` objects.
+#' @return A list of `ggplot2` objects comparing the ECDFs between the control and treatment groups and identifying at most three largest differences.
 #' 
 #' @examples 
 #' 

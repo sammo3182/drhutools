@@ -2,7 +2,7 @@
 % Please edit documentation in R/cdplot.R
 \name{cdplot}
 \alias{cdplot}
-\title{Packed \code{ggplot2} function to compare the empirical cumulative distribution functions of two groups}
+\title{Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) of two groups}
 \arguments{
 \item{data}{A data.frame including two columns, one recording the outcome and the other recording the assignment. The assignment column must be named as \code{group}.}
 
@@ -15,10 +15,10 @@
 \item{link_color}{An character or function to indicate the color of the link at the largest difference. The default value is \code{drhutools::gb_cols("red")}.}
 }
 \value{
-A list of \code{ggplot2} objects.
+A list of \code{ggplot2} objects comparing the ECDFs between the control and treatment groups and identifying at most three largest differences.
 }
 \description{
-Packed \code{ggplot2} function to compare the empirical cumulative distribution functions of two groups
+Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) of two groups
 }
 \examples{
 
