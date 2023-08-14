@@ -1,3 +1,7 @@
+# drhutools 0.1.2
+
+- `folderSystem` create the folder system automatically at the project's root directory.
+
 # drhutools 0.1.0
 
 The initial release of the package.

@@ -4,6 +4,7 @@
 #' @details The system contains specific places to store codes, output, data, manuscript (referred images and submission versions), and miscellaneous documents. It helps researchers to organize materials and drafts during the whole process of academic writing from data collection to manuscript publication. This is the recommanded folder structure for cooperative projects with members of Dr.Hu's Amazing Team.
 #' 
 #' @importFrom purrr walk
+#' @import here
 #' 
 #' @return A set of folders under the working directory.
 #' 
@@ -24,6 +25,8 @@ folderSystem <- function() {
       "paper/images",
       "paper/submission",
       "document")
+  
+  setwd(here::here())
   
   walk(ls_dir, ~ if (!dir.exists(.))
     dir.create(file.path(.), recursive = TRUE))
