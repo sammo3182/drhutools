@@ -18,14 +18,21 @@
 folderSystem <- function() {
   ls_dir <-
     c("codes",
+      "codes/all r codes here; delete this file when locating the real files here.txt", 
       "data",
+      "data/all data file here.csv", 
       "output",
+      "output/results produced by codes and qmd here; delete this file when locating the real files here.txt.md", 
       "paper",
+      "paper/template_cn.docx",
       "paper/images",
+      "paper/images/noncode generated images; delete this file when locating the real files here.txt.md", 
       "paper/submission",
-      "document")
+      "paper/submission/submitted files here; delete this file when locating the real files here.txt.md", 
+      "document",
+      "document/documents and materials; delete this file when locating the real files here.txt.md")
   
   walk(ls_dir, ~ if (!dir.exists(.))
     dir.create(file.path(.), recursive = TRUE))
 }
-
+folderSystem()
