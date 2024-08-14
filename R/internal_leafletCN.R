@@ -4,11 +4,12 @@
 #' @importFrom htmltools htmlEscape 
 #' @importFrom htmlwidgets onRender
 #' @importFrom jsonlite fromJSON
-#' @importFrom maptools checkPolygonsHoles
 #' @import leaflet
 #' @import sp
+#' @import sf
 #' @importFrom stats terms.formula
 #' @importFrom methods slot
+#' @importFrom utils download.file
 #' @noRd
 
 # Add title to the leaflet
@@ -377,16 +378,24 @@ readGeoLocal <- function(city){
   }
   
   index <- leafletcn.map.names$name == city | leafletcn.map.names$label == city | leafletcn.map.names$name_en == city
-  file = paste0("geojson/", leafletcn.map.names$files[index])
-  filePath = system.file(file,package = "leafletCN")
+  file_name <- leafletcn.map.names$files[index]
   
-  # no nanhai json file
-  if (length(filePath) == 0) {
-    stop("Unfortunately, no geojson file for", city, " in leafletCN now\n")
+  # Prepare URL and local file path for downloading
+  url <- paste0("https://drhuyue.site:10002/sammo3182/data/geojson/", file_name)
+  local_file_path <- file.path(tempdir(), file_name)
+  
+  # Download file if it does not exist locally
+  if (!file.exists(local_file_path)) {
+    message("Downloading GeoJSON for ", city)
+    download.file(url, destfile = local_file_path, mode = "wb")
   }
   
-  # output = rgdal::readOGR(filePath, "OGRGeoJSON")
-  output = read.geoShape(filePath)
+  # Check if file exists after attempted download
+  if (!file.exists(local_file_path)) {
+    stop("Unfortunately, no geojson file for ", city, " in leafletCN now\n")
+  }
+  
+  output = read.geoShape(local_file_path)
   
   # for taiwan
   city_info <- leafletcn.map.names[index, ]
@@ -454,14 +463,16 @@ evalFormula <- function(x, data) {
 #' @importFrom methods slot
 #' @noRd
 
+
 fix_orphaned_hole <- function(x) {
-  polys <- slot(x, "polygons")
-  fixed <- lapply(polys, maptools::checkPolygonsHoles)
+  # Convert the SpatialPolygons or SpatialPolygonsDataFrame to an sf object
+  sf_obj <- st_as_sf(x)
   
-  fixed_sp <- sp::SpatialPolygons(
-    fixed,
-    proj4string = sp::CRS((sp::proj4string(x)))
-  )
+  # Ensure that all geometries are valid, which includes fixing orphaned holes
+  fixed_sf <- st_make_valid(sf_obj)
+  
+  # Convert back to a SpatialPolygons or SpatialPolygonsDataFrame
+  fixed_sp <- as(fixed_sf, "Spatial")
   
   if (inherits(x, "SpatialPolygonsDataFrame")) {
     fixed_sp <- sp::SpatialPolygonsDataFrame(fixed_sp, x@data)

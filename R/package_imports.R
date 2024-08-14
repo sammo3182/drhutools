@@ -1,9 +1,10 @@
 #' @importFrom htmltools htmlEscape 
 #' @importFrom htmlwidgets onRender
 #' @importFrom jsonlite fromJSON
-#' @importFrom maptools checkPolygonsHoles
 #' @import leaflet
 #' @import sp
+#' @import sf
 #' @importFrom stats terms.formula
-#' @importFrom methods slot
+#' @importFrom methods slot as
+#' @importFrom utils download.file
 NULL
