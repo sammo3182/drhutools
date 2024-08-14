@@ -1,7 +1,7 @@
 #' @name  gb_cols
 #' @title Function to extract colors as hex codes.
 #'
-#' @param ... A character vector indicating the names of colors. Options includes "gold", "black", "orange", "red", "light gree", "green", "light blue", "blue", "light grey", "grey", and "dark grey".
+#' @param ... A character vector indicating the names of colors. Options includes "gold", "black", "orange", "red", "light green", "green", "light blue", "blue", "light grey", "grey", and "dark grey".
 #'
 #' @importFrom grDevices colorRampPalette dev.size
 #'
@@ -13,7 +13,7 @@ gb_cols <- function(...) {
     cols <- c(...)
     
     if (is.null(cols))
-        return (gb_colors)
+        return(gb_colors)
     
     gb_colors[cols]
 }
@@ -32,7 +32,7 @@ gb_colors <- c(
 )
 
 #' @name gb_pal
-#' @title Function to interpolate a gold & black color palette.
+#' @title Function to interpolate a gold-black color palette.
 #'
 #' @param palette A character vector indicating the name of palette in gb_palettes. Available palettes:
 #' \itemize{
@@ -61,13 +61,11 @@ gb_pal <- function(palette = "main",
     colorRampPalette(pal, ...)
 }
 
+
 gb_palettes <- list(
     `tricol`  = gb_cols("gold", "dark grey", "black"),
-    
     `main`  = gb_cols("gold", "black"),
-    
     `digitMixed`   = gb_cols("gold", "red", "green", "blue", "dark grey", "black"),
-    
     `printMixed` = gb_cols(
         "gold",
         "orange",
