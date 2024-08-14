@@ -2,7 +2,7 @@
 % Please edit documentation in R/palette_goldenBlack.R
 \name{gb_pal}
 \alias{gb_pal}
-\title{Function to interpolate a gold & black color palette.}
+\title{Function to interpolate a gold-black color palette.}
 \usage{
 gb_pal(palette = "main", reverse = FALSE, ...)
 }
@@ -24,5 +24,5 @@ gb_pal(palette = "main", reverse = FALSE, ...)
 A function that takes an integer argument (the required number of colors) and returns a character vector of colors interpolating the given sequence.
 }
 \description{
-Function to interpolate a gold & black color palette.
+Function to interpolate a gold-black color palette.
 }

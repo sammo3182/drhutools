@@ -2,23 +2,16 @@
 % Please edit documentation in R/folderSystem.R
 \name{folderSystem}
 \alias{folderSystem}
-\title{Create Dr.Hu recommanded folder system for an academic paper project}
+\title{Folder hierarchy creator for academic research}
 \usage{
 folderSystem()
 }
 \value{
-A set of folders under the working directory.
+Local folders under the project's working directory.
 }
 \description{
-Create Dr.Hu recommanded folder system for an academic paper project
+Folder hierarchy creator for academic research
 }
 \details{
-The system contains specific places to store codes, output, data, manuscript (referred images and submission versions), and miscellaneous documents. It helps researchers to organize materials and drafts during the whole process of academic writing from data collection to manuscript publication. This is the recommanded folder structure for cooperative projects with members of Dr.Hu's Amazing Team.
-}
-\examples{
-
-# Not run
-
-# folderSystem()
-
+The function constructs a standardized folder hierarchy encompassing \verb{codes/}, \verb{data/}, \verb{output/}, \verb{paper/}, and \verb{document/}. These directories are designated for storing programming scripts, data sets, processed outputs, manuscript drafts (including related images and submission documents), and assorted materials, respectively. This organization facilitates easy retrieval of project components, ensuring that members of Dr. Hu's Amazing Team can efficiently navigate and manage shared resources. This structure is advocated for collaborative projects to maintain uniformity across team operations.
 }

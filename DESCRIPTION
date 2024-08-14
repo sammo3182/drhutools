@@ -1,7 +1,7 @@
 Package: drhutools
 Type: Package
 Title: Toolbox for Writing Academic Paper and Organizing Research Project in Political Science and Other Social Science disciplines
-Version: 0.1.1
+Version: 1.0.0
 Authors@R: person("Yue", "Hu", role = c("aut", "cre"), email = "yuehu@tsinghua.edu.cn")
 Maintainer: Yue Hu <yuehu@tsinghua.edu.cn>
 Description: A toolbox for conducting empirical research in political science and other social science disciplines.
@@ -12,7 +12,15 @@ Depends:
 Imports:
   dplyr,
   ggplot2,
-  purrr
+  purrr,
+  htmltools,
+  maptools,
+  htmlwidgets,
+  jsonlite,
+  leaflet,
+  sp,
+  stats,
+  methods
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

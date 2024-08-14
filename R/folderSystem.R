@@ -39,5 +39,3 @@ folderSystem <- function() {
     }
   })
 }
-
-folderSystem()

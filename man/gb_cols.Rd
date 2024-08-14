@@ -7,7 +7,7 @@
 gb_cols(...)
 }
 \arguments{
-\item{...}{A character vector indicating the names of colors. Options includes "gold", "black", "orange", "red", "light gree", "green", "light blue", "blue", "light grey", "grey", and "dark grey".}
+\item{...}{A character vector indicating the names of colors. Options includes "gold", "black", "orange", "red", "light green", "green", "light blue", "blue", "light grey", "grey", and "dark grey".}
 }
 \value{
 A character of hex codes.
