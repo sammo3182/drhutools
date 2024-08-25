@@ -9,6 +9,7 @@
 #' @import sf
 #' @importFrom stats terms.formula
 #' @importFrom methods slot
+#' @importFrom utils download.file
 #' @noRd
 
 # Add title to the leaflet
@@ -377,16 +378,24 @@ readGeoLocal <- function(city){
   }
   
   index <- leafletcn.map.names$name == city | leafletcn.map.names$label == city | leafletcn.map.names$name_en == city
-  file = paste0("geojson/", leafletcn.map.names$files[index])
-  filePath = system.file(file,package = "leafletCN")
+  file_name <- leafletcn.map.names$files[index]
   
-  # no nanhai json file
-  if (length(filePath) == 0) {
-    stop("Unfortunately, no geojson file for", city, " in leafletCN now\n")
+  # Prepare URL and local file path for downloading
+  url <- paste0("https://drhuyue.site:10002/sammo3182/data/geojson/", file_name)
+  local_file_path <- file.path(tempdir(), file_name)
+  
+  # Download file if it does not exist locally
+  if (!file.exists(local_file_path)) {
+    message("Downloading GeoJSON for ", city)
+    download.file(url, destfile = local_file_path, mode = "wb")
   }
   
-  # output = rgdal::readOGR(filePath, "OGRGeoJSON")
-  output = read.geoShape(filePath)
+  # Check if file exists after attempted download
+  if (!file.exists(local_file_path)) {
+    stop("Unfortunately, no geojson file for ", city, " in leafletCN now\n")
+  }
+  
+  output = read.geoShape(local_file_path)
   
   # for taiwan
   city_info <- leafletcn.map.names[index, ]

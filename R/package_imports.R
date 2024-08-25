@@ -5,5 +5,6 @@
 #' @import sp
 #' @import sf
 #' @importFrom stats terms.formula
-#' @importFrom methods slot
+#' @importFrom methods slot as
+#' @importFrom utils download.file
 NULL
