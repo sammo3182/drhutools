@@ -14,7 +14,7 @@ Imports:
   ggplot2,
   purrr,
   htmltools,
-  maptools,
+  sf,
   htmlwidgets,
   jsonlite,
   leaflet,

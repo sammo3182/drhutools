@@ -4,9 +4,9 @@
 #' @importFrom htmltools htmlEscape 
 #' @importFrom htmlwidgets onRender
 #' @importFrom jsonlite fromJSON
-#' @importFrom maptools checkPolygonsHoles
 #' @import leaflet
 #' @import sp
+#' @import sf
 #' @importFrom stats terms.formula
 #' @importFrom methods slot
 #' @noRd
@@ -454,14 +454,16 @@ evalFormula <- function(x, data) {
 #' @importFrom methods slot
 #' @noRd
 
+
 fix_orphaned_hole <- function(x) {
-  polys <- slot(x, "polygons")
-  fixed <- lapply(polys, maptools::checkPolygonsHoles)
+  # Convert the SpatialPolygons or SpatialPolygonsDataFrame to an sf object
+  sf_obj <- st_as_sf(x)
   
-  fixed_sp <- sp::SpatialPolygons(
-    fixed,
-    proj4string = sp::CRS((sp::proj4string(x)))
-  )
+  # Ensure that all geometries are valid, which includes fixing orphaned holes
+  fixed_sf <- st_make_valid(sf_obj)
+  
+  # Convert back to a SpatialPolygons or SpatialPolygonsDataFrame
+  fixed_sp <- as(fixed_sf, "Spatial")
   
   if (inherits(x, "SpatialPolygonsDataFrame")) {
     fixed_sp <- sp::SpatialPolygonsDataFrame(fixed_sp, x@data)
