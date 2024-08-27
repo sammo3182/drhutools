@@ -33,8 +33,20 @@
 #' @return The function saves the generated map images and animated GIF to the specified output directory.
 #' 
 #' @examples
+#' dataframe
+#' 
+#'   wave                 name year_set    g_lat    g_lon  g_pro g_city type
+#' 1    7 中国共产党历史展览馆     2021 40.00379 116.3994 北京市 北京市    7
+#' 2    7 中央礼品文物管理中心     2021 39.89785 116.4109 北京市 北京市    7
+#' 3    7           中国美术馆     2021 39.92535 116.4090 北京市 北京市    8
+#' 4    7       中国电影博物馆     2021 39.99636 116.5206 北京市 北京市    8
+#' 5    7   中国邮政邮票博物馆     2021 39.91081 116.4311 北京市 北京市    8
+#' 6    7       中国钱币博物馆     2021 39.90215 116.3949 北京市 北京市    8
+#' 
+#' file_path <- ".../file.csv"
+#' data <- read.csv(file_path)
 #' years <- c(1997, 2001, 2005, 2009, 2017, 2019, 2021)
-#' generate_maps_and_animation("data_file.csv", years)
+#' generate_maps_and_animation("data", years)
 #' 
 #' @export
 generate_maps_and_animation <- function(data_file, years, output_dir = "output", map_center = c(35.8617, 104.1954), zoom_level = 4) {
@@ -75,3 +87,4 @@ generate_maps_and_animation <- function(data_file, years, output_dir = "output",
 }
 years <- c(1997, 2001, 2005, 2009, 2017, 2019, 2021)
 generate_maps_and_animation("file.csv", years)
+

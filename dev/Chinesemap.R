@@ -131,3 +131,4 @@ save_maps_as_png <- function(map_list, suffixes, output_dir = "output") {
     )
   })
 }
+
