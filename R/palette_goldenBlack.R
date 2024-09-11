@@ -150,3 +150,4 @@ scale_fill_gb <-
             scale_fill_gradientn(colours = pal(256), ...)
         }
     }
+
