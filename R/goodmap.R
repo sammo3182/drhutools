@@ -53,7 +53,8 @@
 #'
 #' @examples
 #' #' Example dataset when 'type = "polygon"'
-#'
+#' system setting before library the package: Sys.setlocale(, "Chinese")
+#' 
 #' id   city              prov year   variable
 #' 1 乌鲁木齐 新疆维吾尔自治区 2010   0.2861395
 #' 2     拉萨       西藏自治区 2010   0.3881083
@@ -71,6 +72,8 @@
 #'         animate_var = "year", years = c(2011, 2012))
 #'
 #' Example dataset when type = "point"
+#' system setting before library the package: Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
+#' 
 #'   wave                 name year_set    g_lat    g_lon  g_pro g_city type
 #' 1    7 中国共产党历史展览馆     2021 40.00379 116.3994 北京市 北京市    7
 #' 2    7 中央礼品文物管理中心     2021 39.89785 116.4109 北京市 北京市    7
@@ -85,25 +88,25 @@
 #'
 #' @import dplyr
 #' @import leaflet
-#' @import leafletCN
 #' @import readr
 #' @import htmlwidgets
 #' @import mapview
 #' @import purrr
 #' @import gganimate
 #' @import magick
+#' @import sf
 #' @export
 
 
 library(dplyr)
 library(leaflet)
-library(leafletCN)
 library(readr)
 library(htmlwidgets)
 library(mapview)
 library(purrr)
 library(gganimate)
 library(magick)
+library(sf)
 
 goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, animate_var = NULL, years = NULL,
                     saveDir = "output", map_center = c(35.8617, 104.1954), zoom_level = 4,
@@ -130,10 +133,10 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
   } else {
     stop("未知的地图类型，请选择 'point' 或 'polygon'。")
   }
-
+  
   # 定义颜色
   type_colors <- colorFactor(palette = gb_pal(palette = palette, reverse = reverse_palette)(2), domain = plot_data$type)
-
+  
   # 根据类型生成地图
   generate_map <- function(year) {
     filtered_data <- plot_data |>
@@ -171,8 +174,9 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
           group_by(prov) |>
           summarise(value_var = mean(variable, na.rm = TRUE)) |>
           ungroup() |>
-          right_join(data.frame(name = regionNames("china")), by = c("prov" = "name"))
-
+          right_join(data.frame(name = regionNames("china")), by = c("prov" = "name"))|>
+          filter(!is.na(value_var))
+        
         plot_prov_var <- select(plot_prov, prov, value_var) |>
           rename(value = value_var) |>
           as.data.frame()
@@ -180,8 +184,7 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
         map <- geojsonMap(plot_prov_var, mapName = "china",
                           palette = gb_pal(palette = "main", reverse = TRUE)(2),
                           colorMethod = "numeric",
-                          legendTitle = paste("Variable", year),
-                          domain = range(plot_prov_var$value, na.rm = TRUE))
+                          legendTitle = paste("Variable", year))
 
       } else if (level == "city") {
         plot_city <- plot_data |>
@@ -190,17 +193,17 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
           group_by(city) |>
           summarise(value_var = mean(variable, na.rm = TRUE)) |>
           ungroup() |>
-          right_join(data.frame(name = regionNames("city")), by = c("city" = "name"))
+          right_join(data.frame(name = regionNames("city")), by = c("city" = "name"))|>
+          filter(!is.na(value_var))
 
         plot_city_var <- select(plot_city, city, value_var) |>
           rename(value = value_var) |>
           as.data.frame()
-
+        
         map <- geojsonMap(plot_city_var, mapName = "city",
                           palette = gb_pal(palette = "full", reverse = TRUE)(2),
                           colorMethod = "numeric",
-                          legendTitle = paste("variable", year),
-                          domain = range(plot_city_var$value, na.rm = TRUE))
+                          legendTitle = paste("variable", year))
       }
     }
 
@@ -227,12 +230,19 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
   # 生成动画
   if (animate) {
     # 使用与地图生成时相同的文件名前缀
-    name_prefix <- switch(type,
-                          "point" = "point_map",
-                          "polygon" = ifelse(level == "province", "province_map", "city_map"),
-                          "map") # 默认情况
+    name_prefix <- switch(
+      type,
+      "point" = "point_map_",
+      "polygon" = switch(
+        level,
+        "province" = "province_map_",
+        "city" = "city_map_",
+        "unknown_level"  # 用于处理其他或未知的 level 值
+      ),
+      "unknown_type"  # 用于处理其他或未知的 type 值
+    )
     
-    image_files <- file.path(saveDir, paste0(name_prefix, "_", years, ".png"))
+    image_files <- file.path(saveDir, paste0(name_prefix, years, ".png"))
     image_files <- image_files[file.exists(image_files)]
     
     if (length(image_files) == 0) {
