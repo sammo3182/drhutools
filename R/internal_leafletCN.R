@@ -104,7 +104,7 @@ geojsonMap <- function(dat,
                      weight = 1,
                      fillOpacity = 0.7,
                      legendTitle = "Legend",
-                     tileType = NULL,
+                     tileType = amap,
                      ...){
   if(!is.data.frame(dat)){
     stop("dat should be a data.frame")
@@ -332,7 +332,7 @@ read.geoShape <- function(txt) {
 
 # Show regions in submaps
 
-regionNames <- function(mapName=NULL){
+regionNames <-  function(mapName=NULL){
   # city = 'china'
   if(is.null(mapName)){
     print(leafletcn.map.names$name)
