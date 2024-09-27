@@ -88,6 +88,9 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
                     saveDir = "output", map_center = c(35.8617, 104.1954), zoom_level = 4,
                     palette = "main", reverse_palette = TRUE, base_radius = 1, radius_factor = 1,
                     legend_opacity = 0.7, width = 800, height = 900) {
+  
+  if(webshot::is_phantomjs_installed()) webshot::install_phantomjs()
+  
   plot_data <- read.csv(data_file, header = TRUE, na.strings = c("NA"))
 
   if (type == "point") {
