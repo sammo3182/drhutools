@@ -137,7 +137,8 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
           opacity = legend_opacity
         )
     } else if (type == "polygon") {
-      if (level == "province") {
+      suppressWarnings({
+        if (level == "province") {
         plot_prov <- plot_data |>
           filter(year == year) |>
           select(prov, variable) |>
@@ -157,7 +158,8 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
           colorMethod = "numeric",
           legendTitle = paste("Variable", year)
         )
-      } else if (level == "city") {
+        
+        } else if (level == "city") {
         plot_city <- plot_data |>
           filter(year == year) |>
           select(city, variable) |>
@@ -175,9 +177,9 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = FALSE, an
           mapName = "city",
           palette = gb_pal(palette = "full", reverse = TRUE)(2),
           colorMethod = "numeric",
-          legendTitle = paste("variable", year)
-        )
+          legendTitle = paste("variable", year))
       }
+      })
     }
 
     name_prefix <- switch(type,
