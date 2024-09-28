@@ -2,8 +2,8 @@
 % Please edit documentation in R/goodmap.R
 \name{goodmap}
 \alias{goodmap}
-\title{The \code{goodmap} Function for Generating Maps and Animations
-The \code{goodmap} function is designed to create interactive maps and animations
+\title{The \code{goodmap} Function for Generating GIF Map
+The \code{goodmap} function is designed to create interactive map animations
 based on the provided file. It supports two types of maps: \code{point} and \code{polygon}.
 The function can visualize data by either plotting points based on geographical coordinates
 or highlighting regions based on their administrative boundaries (province or city level).
@@ -13,10 +13,9 @@ goodmap(
   data_file,
   type = "point",
   level = NULL,
-  animate = FALSE,
+  animate = TRUE,
   animate_var = NULL,
   years = NULL,
-  saveDir = "output",
   map_center = c(35.8617, 104.1954),
   zoom_level = 4,
   palette = "main",
@@ -29,10 +28,9 @@ goodmap(
 )
 }
 \arguments{
-\item{data_file}{A string specifying the path to the CSV file containing the data.
-The file should include required columns such as \code{g_lat} and \code{g_lon} for point maps,
-and \code{prov} or \code{city} column for polygon maps.
-The function uses the \code{read.csv} function from the \code{readr} package to load the data.
+\item{data_file}{Dataframe.
+If generate point map, \code{data_file} should include required columns such as \code{g_lat} and \code{g_lon}.
+If generate polygon map, \code{data_file} should include required columns such as \code{prov} or \code{city}.
 Ensure the file is formatted correctly with appropriate column headers.}
 
 \item{type}{A string specifying the type of map to generate. Options are \code{point}for point maps using \code{g_lat} and \code{g_lon},
@@ -41,15 +39,12 @@ or \code{polygon} for maps with administrative boundaries.}
 \item{level}{A string specifying the level of administrative boundaries for polygon maps.
 Acceptable values are \code{province} or \code{city}. This parameter is required if \code{type} is \code{polygon}.}
 
-\item{animate}{A logical value indicating whether to generate an animation from the maps.}
+\item{animate}{A logical value indicating whether to generate an animation from the maps, Default is TRUE.}
 
 \item{animate_var}{A string specifying the variable to animate over (typically \code{year}).}
 
 \item{years}{A numeric vector specifying the years for which maps should be generated.
-Each map will be saved as a separate image file.}
-
-\item{saveDir}{A string specifying the directory where map images and animations will be saved.
-The default is \code{output}.}
+Each map will be saved as a temporary file.}
 
 \item{map_center}{A numeric vector of length 2 specifying the latitude and longitude
 for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which is approximately the center of China.}
@@ -60,21 +55,19 @@ for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which is
 
 \item{reverse_palette}{A logical value indicating whether to reverse the color palette. Default is TRUE.}
 
-\item{base_radius}{A numeric value specifying the base radius for point markers on point maps.
-Default is 1.}
+\item{base_radius}{A numeric value specifying the base radius for point markers on point maps. Default is 1.}
 
 \item{radius_factor}{A numeric value specifying the multiplier for adjusting the radius of
 point markers based on the type. Default is 1.}
 
 \item{legend_opacity}{A numeric value specifying the opacity of the legend. Default is 0.7.}
 
-\item{width}{A numeric value specifying the width of the saved map images. Default is 800.}
+\item{width}{A numeric value specifying the width of the map images. Default is 800.}
 
-\item{height}{A numeric value specifying the height of the saved map images. Default is 900.}
+\item{height}{A numeric value specifying the height of the map images. Default is 900.}
 }
 \value{
-The function saves the generated maps as PNG files in the specified \code{saveDir}
-and, if \code{animate = TRUE}, creates an animated GIF showcasing changes over time.
+Image in the viewer.
 }
 \description{
 If the map type is \code{point}, the color and size of the points will be determined by the \code{type} column in the data file.
@@ -94,10 +87,8 @@ data_file <- data.frame(
   city = c("北京市", "北京市", "北京市", "北京市", "北京市", "北京市"),
   type = c(7, 7, 8, 8, 8, 8)
 )
-  csv_file_path <- file.path(getwd(), "data_file.csv")
-  write.csv(data_file, csv_file_path, row.names = FALSE)
 Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
-goodmap(data_file = csv_file_path,
+goodmap(data_file = data_file,
   type = "point", animate = TRUE,
   animate_var = "year", years = 2021, base_radius = 1, radius_factor = 1
 )

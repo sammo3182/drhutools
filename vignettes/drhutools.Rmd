@@ -26,7 +26,7 @@ To install:
 
 # Basic Usage of `goodmap`
 
-The `goodmap` function is designed to create interactive maps and animations based on data provided in a CSV file. It supports both point and polygon maps, allowing for versatile data visualization. This vignette will guide you through using the `goodmap` function with practical examples.
+The `goodmap` function is designed to create interactive map animations based on giving dataframe. It supports both point and polygon maps, allowing for versatile data visualization. This vignette will guide you through using the `goodmap` function with practical examples.
 
 ## Example of Polygon Map
 
@@ -41,7 +41,7 @@ If the map type is `polygon`, the CSV file should follow the structure below:
 | 5  | 成都      | 四川省             | 2011 | 0.4622928  |
 | 6  | 哈尔滨    | 黑龙江省           | 2011 | 0.1387102  |
 
-Before running this function, please set the environment language:
+Before loading this function, please set the environment language:
 
 ```{r, eval = FALSE}
 Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
@@ -53,19 +53,9 @@ goodmap(data_file, type = "polygon", level = "province", animate = TRUE, animate
 
 The function returns the file path of the saved map image. The map is also saved as an HTML file for interactive viewing.
 
-### Figure: Province Map for 2011
+### Figure: Animation for 2011 and 2012
 ```{r out.width = '70%', echo = FALSE}
-knitr::include_graphics("province_map_2011.png")
-```
-
-### Figure: Province Map for 2012
-```{r out.width = '70%', echo = FALSE}
-knitr::include_graphics("province_map_2012.png")
-```
-
-### Figure: Animation for Years
-```{r out.width = '70%', echo = FALSE}
-knitr::include_graphics("animation_year.gif")
+knitr::include_graphics("preview_polygon.gif")
 ```
 
 ## CSV File Example for Point Type
@@ -81,7 +71,7 @@ If the map type is `point`, the CSV file should follow the structure below:
 | 中国邮政邮票博物馆        | 2021     | 39.91081| 116.4311 | 北京市 | 北京市  | 8    |
 | 中国钱币博物馆            | 2021     | 39.90215| 116.3949 | 北京市 | 北京市  | 8    |
 
-Before running this function, please set the environment language:
+Before loading this function, please set the environment language:
 
 ```{r, eval = FALSE}
 Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
@@ -93,9 +83,9 @@ goodmap(data_file, type = "point", animate = TRUE, animate_var = "year", years =
 
 The function returns the file path of the saved map image. The map is also saved as an HTML file for interactive viewing.
 
-### Figure: Point Map for 2021
+### Figure: Animation for 2021
 ```{r out.width = '70%', echo = FALSE}
-knitr::include_graphics("point_map_2021.png")
+knitr::include_graphics("preview_point.gif")
 ```
 
 # Conclusion

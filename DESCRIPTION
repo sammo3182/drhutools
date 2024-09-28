@@ -24,7 +24,6 @@ Imports:
     gganimate,
     magick,
     mapview,
-    readr,
     webshot
 LazyData: true
 Roxygen: list(markdown = TRUE)
