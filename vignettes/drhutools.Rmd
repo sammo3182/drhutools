@@ -1,7 +1,8 @@
 ---
 title: ""
 author: 
-  - 
+  - HU Yue
+  - DENG Wen
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -11,20 +12,27 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE
+  # dpi = 300,
+  # fig.dim = c(2.2, 2.5)
+)
 
-if (!require(drhutools)) install.packages("drhutools")
-library(drhutools)
+library(parameters)
+library(ggplot2)
 ```
-# Installation
-
-To install:
-
--  The latest released version: `install.packages("drhutools")`.
--  The latest developing version: `remotes::install_github("sammo3182/drhutools")`.
 
 
-# Basic Usage of `goodmap`
+# Efficient file organization: `folderSystem`
+
+# Psychological scale scoring: `traits`
+
+# Experimental result visulaization: `cdplot`
+
+# Color blind friendly palette: `palette_goldenBlack`
+
+# Standard Map of China: `goodmap`
 
 The `goodmap` function is designed to create interactive map animations based on giving dataframe. It supports both point and polygon maps, allowing for versatile data visualization. This vignette will guide you through using the `goodmap` function with practical examples.
 
@@ -92,3 +100,25 @@ knitr::include_graphics("preview_point.gif")
 The `goodmap` function offers a flexible way to visualize data geographically. By following the examples above, you can create both point and polygon maps, as well as animations that showcase changes over time. For further details on customizing the maps, refer to the function's documentation.
 
 # Affiliation
+
+Yue Hu
+
+Department of Political Science,
+
+Tsinghua University, 
+
+Email: <yuehu@tsinghua.edu.cn>
+
+Website: <https://www.drhuyue.site>
+
+<br>
+
+Wen Deng
+
+College of Public Administration,
+
+Huazhong University of Science and  Technology,
+
+Email: <dengwenjoy@outlook.com>
+
+## References
