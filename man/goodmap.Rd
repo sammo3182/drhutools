@@ -29,11 +29,14 @@ goodmap(
 }
 \arguments{
 \item{data_file}{Dataframe.
-If generate point map, \code{data_file} should include required columns such as \code{g_lat} and \code{g_lon}.
-If generate polygon map, \code{data_file} should include required columns such as \code{prov} or \code{city}.
+If generate point map, \code{data_file} should include required columns such
+as \code{g_lat} and \code{g_lon}.
+If generate polygon map, \code{data_file} should include required columns such
+as \code{prov} or \code{city}.
 Ensure the file is formatted correctly with appropriate column headers.}
 
-\item{type}{A string specifying the type of map to generate. Options are \code{point}for point maps using \code{g_lat} and \code{g_lon},
+\item{type}{A string specifying the type of map to generate. Options are \code{point}for point
+maps using \code{g_lat} and \code{g_lon},
 or \code{polygon} for maps with administrative boundaries.}
 
 \item{level}{A string specifying the level of administrative boundaries for polygon maps.
@@ -47,7 +50,8 @@ Acceptable values are \code{province} or \code{city}. This parameter is required
 Each map will be saved as a temporary file.}
 
 \item{map_center}{A numeric vector of length 2 specifying the latitude and longitude
-for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which is approximately the center of China.}
+for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which
+is approximately the center of China.}
 
 \item{zoom_level}{A numeric value specifying the zoom level for the map. Default is 4.}
 
@@ -70,8 +74,10 @@ point markers based on the type. Default is 1.}
 Image in the viewer.
 }
 \description{
-If the map type is \code{point}, the color and size of the points will be determined by the \code{type} column in the data file.
-If the map type is \code{polygon}, the color of the polygons will be determined by the average value of the \code{variable} column
+If the map type is \code{point}, the color and size of the points will be determined by the
+\code{type} column in the data file.
+If the map type is \code{polygon}, the color of the polygons will be determined by the average
+value of the \code{variable} column
 for each city or province in the data file.
 }
 \examples{
@@ -90,7 +96,7 @@ data_file <- data.frame(
 Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 goodmap(data_file = data_file,
   type = "point", animate = TRUE,
-  animate_var = "year", years = 2021, base_radius = 1, radius_factor = 1
-)
+  animate_var = "year", years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
+  base_radius = 1, radius_factor = 1)
 
 }

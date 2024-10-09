@@ -22,7 +22,6 @@ knitr::opts_chunk$set(
   # fig.dim = c(2.2, 2.5)
 )
 
-library(parameters)
 library(ggplot2)
 library(dir2json)
 ```
@@ -113,16 +112,16 @@ The `goodmap` function is designed to create interactive map animations based on
 
 ## Example of Polygon Map
 
-If the map type is `polygon`, the CSV file should follow the structure below:
+If the map type is `polygon`, the dataframe should follow the structure below:
 
-| id | city       | prov               | year | variable   |
-|----|------------|--------------------|------|------------|
-| 1  | 乌鲁木齐  | 新疆维吾尔自治区   | 2010 | 0.2861395  |
-| 2  | 拉萨      | 西藏自治区         | 2010 | 0.3881083  |
-| 3  | 呼和浩特  | 内蒙古自治区       | 2010 | 0.9466682  |
-| 4  | 西宁      | 青海省             | 2011 | 0.8360043  |
-| 5  | 成都      | 四川省             | 2011 | 0.4622928  |
-| 6  | 哈尔滨    | 黑龙江省           | 2011 | 0.1387102  |
+| id | city       | prov               | year_set | variable   |
+|----|------------|--------------------|----------|------------|
+| 1  | 乌鲁木齐  | 新疆维吾尔自治区    | 2010     | 0.2861395  |
+| 2  | 拉萨      | 西藏自治区          | 2010     | 0.3881083  |
+| 3  | 呼和浩特  | 内蒙古自治区        | 2010     | 0.9466682  |
+| 4  | 西宁      | 青海省              | 2011     | 0.8360043  |
+| 5  | 成都      | 四川省              | 2011     | 0.4622928  |
+| 6  | 哈尔滨    | 黑龙江省            | 2011     | 0.1387102  |
 
 Before loading this function, please set the environment language:
 
@@ -141,9 +140,9 @@ The function returns the file path of the saved map image. The map is also saved
 knitr::include_graphics("preview_polygon.gif")
 ```
 
-## CSV File Example for Point Type
+## Example for Point Type
 
-If the map type is `point`, the CSV file should follow the structure below:
+If the map type is `point`, the dataframe should follow the structure below:
 
 | name                      | year_set | g_lat   | g_lon    | g_pro  | g_city  | type |
 |---------------------------|----------|---------|----------|--------|---------|------|
@@ -161,12 +160,12 @@ Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 
 #Run the function with the data file:
 
-goodmap(data_file, type = "point", animate = TRUE, animate_var = "year", years = 2021)
+goodmap(data_file, type = "point", animate = TRUE, animate_var = "year", years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021)
 ```
 
-The function returns the file path of the saved map image. The map is also saved as an HTML file for interactive viewing.
+The function returns the file path of the saved maps GIF. The map is also saved as an HTML file for interactive viewing.
 
-### Figure: Animation for 2021
+### Figure: Animation for 1997, 2001, 2005, 2009, 2017, 2019, 2021
 ```{r out.width = '70%', echo = FALSE}
 knitr::include_graphics("preview_point.gif")
 ```
