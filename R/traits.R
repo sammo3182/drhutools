@@ -42,7 +42,7 @@ traits <- function(survey) {
     rowSums()
 
   # Calculate score_grit using columns that end with ".1"
-  score_grit <- survey[, grep(".*\\.1$", names(survey))] |>
+  score_grit <- survey[, grep(".*\\|1$", names(survey))] |>
     rowMeans()
 
   # Create a data frame with the results

@@ -5,6 +5,9 @@ author:
   - DENG Wen
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+
+bibliography: s_drhutools.bib
+
 vignette: >
   %\VignetteIndexEntry{Use of goodmap}
   %\VignetteEngine{knitr::rmarkdown}
@@ -21,16 +24,88 @@ knitr::opts_chunk$set(
 
 library(parameters)
 library(ggplot2)
+library(dir2json)
 ```
 
 
 # Efficient file organization: `folderSystem`
 
+An efficient folder system can produce an organized environment for research and a smooth flow to pick up what you left from another moment. 
+`folderSystem` provides a consistent folder categorization for a research project, especially, of empirical studies in social science. 
+
+Once the function is called, it will create the folders shown as following in the working directory. 
+In each folder, there is a short document indicating what it is suggested to be used.
+Users are free to remove this illustration document after locating the real files in.
+If the folders with the same name already exist in the directory, it would not be recreated or overwritten.
+
+```{r foldersystem_setup, include=FALSE}
+library(drhutools)
+
+wd_original <- getwd()
+
+# Create a temporary directory
+temp_dir <- tempfile() 
+dir.create(temp_dir)
+setwd(temp_dir)
+
+folderSystem()
+```
+
+```{r folderSystem, eval=FALSE}
+folderSystem()
+```
+
+
+```{r folderSystem_tree, echo=FALSE}
+# Show the dendrogram of the folder structure using dir2tree
+dir2tree(temp_dir) |> 
+  cat()
+```
+
+```{r folderSystem_resetwd, include=FALSE}
+setwd(wd_original)
+```
+
 # Psychological scale scoring: `traits`
+
+`traits` is used for calculating personality traits based on psychological surveys.
+The current version can calculate the TOSCA-3SC scores and Grit-O score.
+The TOSCA-3SC (Test of Self-Conscious Affect—Short Version) is created by @Tangney1990 for measuring self-conscious emotions, particularly *shame* and *guilt* []. 
+Participants are presented with hypothetical scenarios, and their responses are analyzed to assess the intensity of shame or guilt reactions. 
+The Grit-O scale is created by @DuckworthEtAl2007 to measure *grit*, which refers to an individual's perseverance and passion for long-term goals.
+
+Users need to fit the survey data with specific column names as illustrated below: 
+
+- TOSCA-3SC: `Q3|R3` ~ `Q13|R4`
+- Grit-O: `Q14|1` ~ `Q25|1`
+
+```{r traits}
+column_names <- c("Q3|R3", "Q3|R4", "Q4|R3", "Q4|R4", "Q5|R5", "Q5|R6", "Q6|R3", "Q6|R4", "Q7|R3", 
+"Q7|R4", "Q8|R5", "Q8|R6", "Q9|R5", "Q9|R6", "Q10|R5", "Q10|R6", "Q11|R5", "Q11|R6", "Q12|R3", 
+"Q12|R4", "Q13|R3", "Q13|R4", "Q14|1", "Q15|1", "Q16|1", "Q17|1", "Q18|1", "Q19|1", "Q20|1", 
+"Q21|1", "Q22|1", "Q23|1", "Q24|1", "Q25|1")
+
+toy_data <- data.frame(matrix(sample(1:5, 10 * length(column_names), replace = TRUE), 
+ncol = length(column_names)))
+
+names(toy_data) <- column_names
+
+traits(toy_data)
+```
+
 
 # Experimental result visulaization: `cdplot`
 
-# Color blind friendly palette: `palette_goldenBlack`
+```{r cdplot}
+data("PlantGrowth")
+
+plot_plant <- cdplot(PlantGrowth, ks_test = TRUE)
+plot_plant
+```
+
+# Color blind friendly palette
+
+
 
 # Standard Map of China: `goodmap`
 
@@ -96,8 +171,6 @@ The function returns the file path of the saved map image. The map is also saved
 knitr::include_graphics("preview_point.gif")
 ```
 
-# Conclusion
-The `goodmap` function offers a flexible way to visualize data geographically. By following the examples above, you can create both point and polygon maps, as well as animations that showcase changes over time. For further details on customizing the maps, refer to the function's documentation.
 
 # Affiliation
 
