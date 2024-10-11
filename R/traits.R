@@ -35,7 +35,7 @@
 traits <- function(survey) {
   # Calculate score_shame using columns that match ".*R(3|5)"
   score_shame <- survey[, grep(".*R(3|5)", names(survey))] |>
-    rowSums()
+    rowSums(na.rm = TRUE)
 
   # Calculate score_guilt using columns that match ".*R(4|6)"
   score_guilt <- survey[, grep(".*R(4|6)", names(survey))] |>
