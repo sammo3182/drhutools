@@ -1,7 +1,7 @@
 ---
 title: "`drhutools`: Toolbox for Political Science Academic Life"
 author: 
-  - HU Yue
+  - HU Yue, Tsinghua University
   - DENG Wen
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -22,8 +22,15 @@ knitr::opts_chunk$set(
   # fig.dim = c(2.2, 2.5)
 )
 
+if(!require(dir2json)) remotes::install_github("stla/dir2json")
+
 library(ggplot2)
 library(dir2json)
+library(drhutools)
+
+# Functions preload
+theme_set(theme_minimal())
+set.seed(313)
 ```
 
 
@@ -95,14 +102,32 @@ traits(toy_data)
 
 # Experimental result visulaization: `cdplot`
 
+`cdplot` provides a function to compare the empirical cumulative distribution functions (ECDF) between the treatment and control groups in an experiment or quasi-experiment.
+Comparing with conventional bar plots or difference-in-mean statistics, ECDF offers a fuller, non-parametric picture of the difference between treatment and control groups. 
+
+The function will produce a `ggplot` object showing the entire distribution between the experimental groups.
+The plot will show the ECDF of both the control and treatment groups.
+It also identify with points and dash lines the value at which the treatment group is different from the control the most.
+For multi-group experiment, the function will produce multiple plots for the comparison between the control group and each treatment.
+
+Users should put experimental data into a "long" format storing the outcome in the first column and assignment in the second column.
+The assign groups should be stored as levels of a factor.
+The first category will be regarded as the control group.
+
+
+Users can alter the argument in `point_size`, `point_color`, and `link_color` to customize the size of points and lines in the plot.
+The function also provide the Kolmogorov-Smirnov test result between the control and treatment groups.
+Users can set `ks_test` to `TRUE` to appear the result at the bottom-right corner of the plot.
+
+The following example illustrates the results of an  experiment to compare yields (as measured by dried weight of plants) obtained under a control and two different treatment conditions, a dataset from @Dobson1983 and freely access by `datasets::PlantGrowh`.
+
+
 ```{r cdplot}
 data("PlantGrowth")
 
 plot_plant <- cdplot(PlantGrowth, ks_test = TRUE)
 plot_plant
 ```
-
-# Color blind friendly palette
 
 
 
@@ -170,6 +195,35 @@ The function returns the file path of the saved maps GIF. The map is also saved 
 knitr::include_graphics("preview_point.gif")
 ```
 
+# Color blind friendly palette
+
+Everyone has their favorite colors. 
+This package provides a palette that I personally like and use all the time. 
+The primary colors are gold (#FFCD00) and black (#000000).
+So the palette is named as `_gb`. 
+
+Users can use the palette as any other palettes when visualizing with `ggplot2`.
+All the above visualizing elements are drawn with this palette. 
+An extra example with codes are shown below to illustrate how users can use it.
+
+```{r gb}
+ggplot(mtcars, aes(wt, mpg, color = cyl)) + 
+  geom_point() +
+  scale_color_gb(discrete = FALSE)
+
+ggplot(mpg, aes(y = class, fill = drv)) + 
+  geom_bar() +
+  scale_fill_gb()
+```
+
+Except for the primary palette (named as `main`), users are given four alternatives with more color options, as following.
+
+- `tricol`: Gold, black, and dark grey to create a gradual effect.
+- `digitMixed`: Five-pack colors specified for digital publications.
+- `printMixed`: Five-pack colors specified for printed publications.
+- `full`: A palette including all the colors gb_cols can call.
+
+I would actually like to open this function to my users for adding your favorite palette, as long as you give them a special name and a list of colors.
 
 # Affiliation
 
@@ -189,7 +243,7 @@ Wen Deng
 
 College of Public Administration,
 
-Huazhong University of Science and  Technology,
+Huazhong University of Science and Technology,
 
 Email: <dengwenjoy@outlook.com>
 

@@ -39,11 +39,11 @@ traits <- function(survey) {
 
   # Calculate score_guilt using columns that match ".*R(4|6)"
   score_guilt <- survey[, grep(".*R(4|6)", names(survey))] |>
-    rowSums()
+    rowSums(na.rm = TRUE)
 
   # Calculate score_grit using columns that end with ".1"
   score_grit <- survey[, grep(".*\\|1$", names(survey))] |>
-    rowMeans()
+    rowMeans(na.rm = TRUE)
 
   # Create a data frame with the results
   df_result <- data.frame(score_shame = score_shame, score_guilt = score_guilt, score_grit = score_grit)
