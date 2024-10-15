@@ -163,6 +163,7 @@ toy_map <- data.frame(
 ```{r}
 toy_map2010 <- toy_map[, toy_map$year_set == 2010]
 
+goodmap(toy_map2010, type = "polygon", level = "province")
 
 goodmap(toy_map2010, type = "polygon", level = "province", animate = TRUE, animate_var = "year", years = c(2011, 2012))
 ```
