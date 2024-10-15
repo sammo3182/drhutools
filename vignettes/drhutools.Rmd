@@ -133,9 +133,40 @@ plot_plant
 
 # Standard Map of China: `goodmap`
 
-The `goodmap` function is designed to create interactive map animations based on giving dataframe. It supports both point and polygon maps, allowing for versatile data visualization. This vignette will guide you through using the `goodmap` function with practical examples.
+Using map is not only a visualization but political issue for Chinese scolars. 
+The `goodmap` function is designed to draw national maps based on the template released by [Amap.com](https://ditu.amap.com/?amapexchange=%2F) (高德地图).
+We were inspired by Dawei Lang's ([Lchiffon](https://github.com/Lchiffon)) excellent package [`leafletCN`](https://github.com/Lchiffon/leafletCN) and optimize `leafletCN::geojsonMap` to concentrate on drawing national maps. 
+Moreover, we adopted [Yang Cao](https://caoyang.tech/)'s geodata [updated](https://github.com/Lchiffon/leafletCN/issues/12) in 2020 when drawing the map. 
 
-## Example of Polygon Map
+The current version of `goodmap` enables users to draw points or fill polygons based on full names of prefectures or provinces, as illustrated in the following example.
+For data does not have full city or provincial names, users can consider use tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) to convert the data to the required format.
+
+```{r}
+default_locate <- Sys.getlocale(category = "LC_CTYPE")
+
+if(!(default_locate == "English_United States.utf8"))
+  Sys.setlocale(category = "LC_CTYPE", locate = "en_US.UTF-8")
+```
+
+
+```{r}
+toy_map <- data.frame(
+  id = c(1, 2, 3, 4, 5, 6),
+  city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
+  prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
+  year_set = c(2010, 2010, 2010, 2011, 2011, 2011),
+  variable = c(0.2861395, 0.3881083, 0.9466682, 0.8360043, 0.4622928, 0.1387102)
+)
+```
+
+
+```{r}
+toy_map2010 <- toy_map[, toy_map$year_set == 2010]
+
+
+goodmap(toy_map2010, type = "polygon", level = "province", animate = TRUE, animate_var = "year", years = c(2011, 2012))
+```
+
 
 If the map type is `polygon`, the dataframe should follow the structure below:
 
@@ -151,7 +182,7 @@ If the map type is `polygon`, the dataframe should follow the structure below:
 Before loading this function, please set the environment language:
 
 ```{r, eval = FALSE}
-Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
+Sys.setlocale(category = "LC_CTYPE", locate = "en_US.UTF-8")
 
 #Run the function with the data file:
 

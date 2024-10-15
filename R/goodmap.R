@@ -82,14 +82,25 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #'
 #' @export
 
-goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, animate_var = NULL, years = NULL,
-                    map_center = c(35.8617, 104.1954), zoom_level = 4,
-                    palette = "main", reverse_palette = TRUE, base_radius = 1, radius_factor = 1,
-                    legend_opacity = 0.7, width = 800, height = 900) {
-
+goodmap <- function(data_file,
+                    type = "point",
+                    level = NULL,
+                    animate = FALSE,
+                    animate_var = NULL,
+                    years = NULL,
+                    map_center = c(35.8617, 104.1954),
+                    zoom_level = 4,
+                    palette = "main",
+                    reverse_palette = TRUE,
+                    base_radius = 1,
+                    radius_factor = 1,
+                    legend_opacity = 0.7,
+                    width = 800,
+                    height = 900) {
   temp_saveDir <- tempdir()
   
-  if(webshot::is_phantomjs_installed()) webshot::install_phantomjs()
+  if (webshot::is_phantomjs_installed())
+    webshot::install_phantomjs()
   
   if (type == "point") {
     if (!all(c("g_lat", "g_lon") %in% colnames(data_file))) {
@@ -101,125 +112,141 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, ani
     }
     if (level == "province" && !("prov" %in% colnames(data_file))) {
       stop("The data must include a 'prov' column to specify the province.")
-    } else if (level == "city" && !("city" %in% colnames(data_file))) {
+    } else if (level == "city" &&
+               !("city" %in% colnames(data_file))) {
       stop("The data must include a 'city' column to specify the city.")
     }
   } else {
     stop("Unknown map type, please select either 'point' or 'polygon'.")
   }
-
-  type_colors <- colorFactor(palette = gb_pal(palette = palette, reverse = reverse_palette)(2), domain = data_file$type)
-
+  
+  type_colors <- colorFactor(
+    palette = gb_pal(palette = palette, reverse = reverse_palette)(2),
+    domain = data_file$type
+  )
+  
   generate_map <- function(input_year) {
     filtered_data <- data_file |>
       filter(year_set == input_year)
-
+    
     if (type == "point") {
       filtered_data <- filtered_data |>
         select(g_lat, g_lon, type) |>
         mutate(radius = base_radius + (as.numeric(type) * radius_factor))
-
+      
       map <- leaflet(filtered_data) |>
         amap() |>
-        setView(lng = map_center[2], lat = map_center[1], zoom = zoom_level) |>
+        setView(lng = map_center[2],
+                lat = map_center[1],
+                zoom = zoom_level) |>
         addCircleMarkers(
-          lng = ~g_lon, lat = ~g_lat,
+          lng = ~ g_lon,
+          lat = ~ g_lat,
           color = ~ type_colors(type),
           fillOpacity = 1,
           stroke = FALSE,
           popup = ~ paste("Type:", type),
-          radius = ~radius
+          radius = ~ radius
         ) |>
         addLegend(
           "bottomright",
           pal = type_colors,
-          values = ~type,
+          values = ~ type,
           title = paste("Type", input_year),
           opacity = legend_opacity
         )
     } else if (type == "polygon") {
       suppressWarnings({
         if (level == "province") {
-        plot_prov <- data_file |>
-          filter(year_set == input_year) |>
-          select(prov, variable) |>
-          group_by(prov) |>
-          summarise(value_var = mean(variable, na.rm = TRUE)) |>
-          ungroup() |>
-          right_join(data.frame(name = regionNames("china")), by = c("prov" = "name")) |>
-          filter(!is.na(value_var))
-
-        plot_prov_var <- select(plot_prov, prov, value_var) |>
-          rename(value = value_var) |>
-          as.data.frame()
-
-        map <- geojsonMap(plot_prov_var,
-          mapName = "china",
-          palette = gb_pal(palette = "main", reverse = TRUE)(2),
-          colorMethod = "numeric",
-          legendTitle = paste("Variable", input_year)
-        )
-        
+          plot_prov <- data_file |>
+            filter(year_set == input_year) |>
+            select(prov, variable) |>
+            group_by(prov) |>
+            summarise(value_var = mean(variable, na.rm = TRUE)) |>
+            ungroup() |>
+            right_join(data.frame(name = regionNames("china")), by = c("prov" = "name")) |>
+            filter(!is.na(value_var))
+          
+          plot_prov_var <- select(plot_prov, prov, value_var) |>
+            rename(value = value_var) |>
+            as.data.frame()
+          
+          map <- geojsonMap(
+            plot_prov_var,
+            mapName = "china",
+            palette = gb_pal(palette = "main", reverse = TRUE)(2),
+            colorMethod = "numeric",
+            legendTitle = paste("Variable", input_year)
+          )
+          
         } else if (level == "city") {
-        plot_city <- data_file |>
-          filter(year_set == input_year) |>
-          select(city, variable) |>
-          group_by(city) |>
-          summarise(value_var = mean(variable, na.rm = TRUE)) |>
-          ungroup() |>
-          right_join(data.frame(name = regionNames("city")), by = c("city" = "name")) |>
-          filter(!is.na(value_var))
-
-        plot_city_var <- select(plot_city, city, value_var) |>
-          rename(value = value_var) |>
-          as.data.frame()
-
-        map <- geojsonMap(plot_city_var,
-          mapName = "city",
-          palette = gb_pal(palette = "full", reverse = TRUE)(2),
-          colorMethod = "numeric",
-          legendTitle = paste("variable", input_year))
-      }
+          plot_city <- data_file |>
+            filter(year_set == input_year) |>
+            select(city, variable) |>
+            group_by(city) |>
+            summarise(value_var = mean(variable, na.rm = TRUE)) |>
+            ungroup() |>
+            right_join(data.frame(name = regionNames("city")), by = c("city" = "name")) |>
+            filter(!is.na(value_var))
+          
+          plot_city_var <- select(plot_city, city, value_var) |>
+            rename(value = value_var) |>
+            as.data.frame()
+          
+          map <- geojsonMap(
+            plot_city_var,
+            mapName = "city",
+            palette = gb_pal(palette = "full", reverse = TRUE)(2),
+            colorMethod = "numeric",
+            legendTitle = paste("variable", input_year)
+          )
+        }
       })
     }
-
-    name_prefix <- switch(type,
+    
+    name_prefix <- switch(
+      type,
       "point" = "point_map",
       "polygon" = ifelse(level == "province", "province_map", "city_map"),
       "map"
     )
-
+    
     name_file <- paste0(name_prefix, "_", input_year, ".png")
     image_file <- file.path(temp_saveDir, name_file)
-    mapshot(map, file = file.path(temp_saveDir, name_file), vwidth = width, vheight = height)
-
+    mapshot(
+      map,
+      file = file.path(temp_saveDir, name_file),
+      vwidth = width,
+      vheight = height
+    )
+    
     return(name_file)
   }
-
+  
   if (!is.null(years)) {
     map_files <- lapply(years, generate_map)
   } else {
     stop("Please provide the 'years' parameter.")
   }
-
+  
   if (animate) {
     name_prefix <- switch(type,
-      "point" = "point_map_",
-      "polygon" = switch(level,
-        "province" = "province_map_",
-        "city" = "city_map_",
-        "unknown_level"
-      ),
-      "unknown_type"
-    )
-
+                          "point" = "point_map_",
+                          "polygon" = switch(
+                            level,
+                            "province" = "province_map_",
+                            "city" = "city_map_",
+                            "unknown_level"
+                          ),
+                          "unknown_type")
+    
     image_files <- file.path(temp_saveDir, paste0(name_prefix, years, ".png"))
     image_files <- image_files[file.exists(image_files)]
-
+    
     if (length(image_files) == 0) {
       stop("No map files found, unable to create animation.")
     }
-
+    
     images <- image_read(image_files)
     animation <- image_animate(images, fps = 0.5, loop = ifelse(TRUE, 0, 1))
     
