@@ -27,7 +27,9 @@ gb_colors <- c(
     `light blue` = "#00A9E0",
     `blue`       = "#00558C",
     `light grey` = "#BBBCBC",
-    `dark grey`  = "#63666A",
+    `light gray` = "#BBBCBC",
+    `grey`  = "#63666A",
+    `gray` = "#63666A",
     `black`      = "#000000"
 )
 
