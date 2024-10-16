@@ -74,14 +74,24 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #'
 #' @export
 
-goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, years = NULL,
-                    map_center = c(35.8617, 104.1954), zoom_level = 4,
-                    custom_colors = NULL, base_radius = 1, radius_factor = 1,
-                    legend_opacity = 0.7, width = 800, height = 900) {
+goodmap <- function(data_file, 
+                    type = "point", 
+                    level = NULL, 
+                    animate = TRUE, 
+                    years = NULL,
+                    map_center = c(35.8617, 104.1954), 
+                    zoom_level = 4,
+                    custom_colors = NULL, 
+                    base_radius = 1, 
+                    radius_factor = 1,
+                    legend_opacity = 0.7, 
+                    width = 800, 
+                    height = 900) {
 
   temp_saveDir <- tempdir()
   
-  if(webshot::is_phantomjs_installed()) webshot::install_phantomjs()
+  if (webshot::is_phantomjs_installed())
+    webshot::install_phantomjs()
   
   if (type == "point") {
     if (!all(c("g_lat", "g_lon") %in% colnames(data_file))) {
@@ -93,7 +103,8 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, yea
     }
     if (level == "province" && !("prov" %in% colnames(data_file))) {
       stop("The data must include a 'prov' column to specify the province.")
-    } else if (level == "city" && !("city" %in% colnames(data_file))) {
+    } else if (level == "city" &&
+               !("city" %in% colnames(data_file))) {
       stop("The data must include a 'city' column to specify the city.")
     }
   } else {
@@ -113,27 +124,30 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, yea
   generate_map <- function(input_year) {
     filtered_data <- data_file |>
       filter(year_set == input_year)
-
+    
     if (type == "point") {
       filtered_data <- filtered_data |>
         select(g_lat, g_lon, type) |>
         mutate(radius = base_radius + (as.numeric(type) * radius_factor))
-
+      
       map <- leaflet(filtered_data) |>
         amap() |>
-        setView(lng = map_center[2], lat = map_center[1], zoom = zoom_level) |>
+        setView(lng = map_center[2],
+                lat = map_center[1],
+                zoom = zoom_level) |>
         addCircleMarkers(
-          lng = ~g_lon, lat = ~g_lat,
+          lng = ~ g_lon,
+          lat = ~ g_lat,
           color = ~ type_colors(type),
           fillOpacity = 1,
           stroke = FALSE,
           popup = ~ paste("Type:", type),
-          radius = ~radius
+          radius = ~ radius
         ) |>
         addLegend(
           "bottomright",
           pal = type_colors,
-          values = ~type,
+          values = ~ type,
           title = paste("Type", input_year),
           opacity = legend_opacity
         )
@@ -199,44 +213,50 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, yea
       }
       })
     }
-
-    name_prefix <- switch(type,
+    
+    name_prefix <- switch(
+      type,
       "point" = "point_map",
       "polygon" = ifelse(level == "province", "province_map", "city_map"),
       "map"
     )
-
+    
     name_file <- paste0(name_prefix, "_", input_year, ".png")
     image_file <- file.path(temp_saveDir, name_file)
-    mapshot(map, file = file.path(temp_saveDir, name_file), vwidth = width, vheight = height)
-
+    mapshot(
+      map,
+      file = file.path(temp_saveDir, name_file),
+      vwidth = width,
+      vheight = height
+    )
+    
     return(name_file)
   }
-
+  
   if (!is.null(years)) {
     map_files <- lapply(years, generate_map)
   } else {
     stop("Please provide the 'years' parameter.")
   }
-
+  
   if (animate) {
     name_prefix <- switch(type,
-      "point" = "point_map_",
-      "polygon" = switch(level,
-        "province" = "province_map_",
-        "city" = "city_map_",
-        "unknown_level"
-      ),
-      "unknown_type"
-    )
-
+                          "point" = "point_map_",
+                          "polygon" = switch(
+                            level,
+                            "province" = "province_map_",
+                            "city" = "city_map_",
+                            "unknown_level"
+                          ),
+                          "unknown_type")
+    
     image_files <- file.path(temp_saveDir, paste0(name_prefix, years, ".png"))
     image_files <- image_files[file.exists(image_files)]
-
+    
     if (length(image_files) == 0) {
       stop("No map files found, unable to create animation.")
     }
-
+    
     images <- image_read(image_files)
     animation <- image_animate(images, fps = 0.5, loop = ifelse(TRUE, 0, 1))
     

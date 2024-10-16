@@ -1,6 +1,7 @@
 #' @name cdplot
-#' @title Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) between the treatment and control groups in an experiment or quasi-experiment
-#'
+#' @title Visualizing the experimental outcome with cumulative distribution functions.
+#' @description Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) between the treatment and control groups in an experiment or quasi-experiment.
+#' 
 #' @param data A data.frame including two columns, one recording the outcome and the other recording the assignment. The assignment column must be named as `group`.
 #' @param ks_test A logical option to indicate whether to show the Kolmogorov-Smirnov test result in the bottom-right corner. The default value is FALSE.
 #' @param point_size An integer to indicate the size of the points at the largest difference. The default value is 3.
