@@ -68,13 +68,14 @@ file.copy(province_to_json, "inst/geojson/")
 # city json ---------------------------------------------------------------
 
 ## mac os
-path <- file.path("data-raw/chinaMapJsonData-master",  province_map_files)
-lapply(path,function(x)system(paste("unrar x", x, "data-raw/map/")))
+path <- file.path("data-raw/chinaMapJsonData-master", province_map_files)
+lapply(path, function(x) system(paste("unrar x", x, "data-raw/map/")))
 provinces <- tools::file_path_sans_ext(province_map_files)
 # remove zhixiashi and gangaotai
 provinces <- setdiff(
   provinces,
-  c("澳门特别行政区", "香港特别行政区", "台湾省",
+  c(
+    "澳门特别行政区", "香港特别行政区", "台湾省",
     "北京市", "天津市", "上海市", "重庆市"
   )
 )
@@ -88,7 +89,7 @@ city_missed$city_short <- c(
   "乐东", "临高", "陵水", "琼海", "琼中", "三沙", "屯昌", "万宁",
   "文昌", "五指山", "济源", "潜江", "神农架", "天门", "仙桃", "襄阳",
   "淮安", "阿拉尔", "北屯", "哈密", "可克达拉", "昆玉", "石河子",
-  "双河", "铁门关", "图木舒克","五家渠"
+  "双河", "铁门关", "图木舒克", "五家渠"
 )
 
 city_missed$province <- substr(city_missed$province, 1, 2)
@@ -100,7 +101,7 @@ city_missed <- dplyr::transmute(
 )
 
 # generate city en name using pinyin
-mydic <- pydic(method = 'toneless', dic = "pinyin2")
+mydic <- pydic(method = "toneless", dic = "pinyin2")
 city_missed$City_EN <- pinyin::py(city_missed$City, dic = mypy, sep = "") %>%
   conv_firstletter()
 
@@ -164,11 +165,12 @@ get_china_cities <- function() {
       Province_EN == "hubei" ~ "Hubei",
       Province_EN == "xinjiang" ~ "Xinjiang",
       TRUE ~ Province_EN
-    ))
+    )
+  )
   china_cities
 }
 
-conv_firstletter <- function(x){
+conv_firstletter <- function(x) {
   paste(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)), sep = "")
 }
 
@@ -201,7 +203,7 @@ copy_provicne_json <- function(province) {
   )
   city_to_json <- file.path(
     "inst/geojson",
-    paste0(city_en, '.json')
+    paste0(city_en, ".json")
   )
 
   file.copy(city_from_json, city_to_json, overwrite = TRUE)

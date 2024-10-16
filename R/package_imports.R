@@ -1,4 +1,4 @@
-#' @importFrom htmltools htmlEscape 
+#' @importFrom htmltools htmlEscape
 #' @importFrom htmlwidgets onRender
 #' @importFrom jsonlite fromJSON
 #' @import leaflet

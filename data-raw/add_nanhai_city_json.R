@@ -13,4 +13,3 @@ china_city <- rbind(china_city, st_sf(nanhai))
 st_write(china_city, "data-raw/city.geojson")
 file.copy("data-raw/city.geojson", "inst/geojson/city.json")
 unlink("data-raw/city.geojson")
-
