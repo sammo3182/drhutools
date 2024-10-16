@@ -69,7 +69,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #' goodmap(data_file = data_file,
 #'   type = "point",
 #'   years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
-#'   custom_colors = "red", 
+#'   custom_colors = "pink", 
 #'   base_radius = 1, radius_factor = 1)
 #'
 #' @export
