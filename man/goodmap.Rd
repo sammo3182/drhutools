@@ -2,9 +2,9 @@
 % Please edit documentation in R/goodmap.R
 \name{goodmap}
 \alias{goodmap}
-\title{The \code{goodmap} Function for Generating GIF Map
-The \code{goodmap} function is designed to create interactive map animations
-based on the provided file. It supports two types of maps: \code{point} and \code{polygon}.
+\title{The \code{goodmap} function is designed to create interactive GIF Map
+The \code{goodmap} function creates interactive map animations from a provided data file.
+It supports two types of maps: \code{point} and \code{polygon}.
 The function can visualize data by either plotting points based on geographical coordinates
 or highlighting regions based on their administrative boundaries (province or city level).
 Additionally, the function can generate animated that showcase changes over time.}
@@ -14,12 +14,10 @@ goodmap(
   type = "point",
   level = NULL,
   animate = TRUE,
-  animate_var = NULL,
   years = NULL,
   map_center = c(35.8617, 104.1954),
   zoom_level = 4,
-  palette = "main",
-  reverse_palette = TRUE,
+  custom_colors = NULL,
   base_radius = 1,
   radius_factor = 1,
   legend_opacity = 0.7,
@@ -44,8 +42,6 @@ Acceptable values are \code{province} or \code{city}. This parameter is required
 
 \item{animate}{A logical value indicating whether to generate an animation from the maps, Default is TRUE.}
 
-\item{animate_var}{A string specifying the variable to animate over (typically \code{year}).}
-
 \item{years}{A numeric vector specifying the years for which maps should be generated.
 Each map will be saved as a temporary file.}
 
@@ -55,9 +51,8 @@ is approximately the center of China.}
 
 \item{zoom_level}{A numeric value specifying the zoom level for the map. Default is 4.}
 
-\item{palette}{A string specifying the color palette to use for the map. Default is \code{main}.}
-
-\item{reverse_palette}{A logical value indicating whether to reverse the color palette. Default is TRUE.}
+\item{custom_colors}{A vector of colors for customizing the color gradient. Default is \code{NULL},
+which uses the predefined color palette.}
 
 \item{base_radius}{A numeric value specifying the base radius for point markers on point maps. Default is 1.}
 
@@ -95,8 +90,9 @@ data_file <- data.frame(
 )
 Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 goodmap(data_file = data_file,
-  type = "point", animate = TRUE,
-  animate_var = "year", years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
+  type = "point",
+  years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
+  custom_colors = "red", 
   base_radius = 1, radius_factor = 1)
 
 }

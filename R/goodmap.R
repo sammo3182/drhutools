@@ -1,8 +1,8 @@
 utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable", "value_var"))
 
-#' The `goodmap` Function for Generating GIF Map
-#' The `goodmap` function is designed to create interactive map animations
-#' based on the provided file. It supports two types of maps: `point` and `polygon`.
+#' The `goodmap` function is designed to create interactive GIF Map
+#' The `goodmap` function creates interactive map animations from a provided data file.
+#' It supports two types of maps: `point` and `polygon`.
 #' The function can visualize data by either plotting points based on geographical coordinates 
 #' or highlighting regions based on their administrative boundaries (province or city level). 
 #' Additionally, the function can generate animated that showcase changes over time.
@@ -20,28 +20,19 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #'                  as `prov` or `city`.
 #'                  Ensure the file is formatted correctly with appropriate column headers.
 #' @param type A string specifying the type of map to generate. Options are `point`for point 
-#' maps using `g_lat` and `g_lon`, 
+#'             maps using `g_lat` and `g_lon`, 
 #'             or `polygon` for maps with administrative boundaries.
 #' @param level A string specifying the level of administrative boundaries for polygon maps.
 #'              Acceptable values are `province` or `city`. This parameter is required if `type` is `polygon`.
-#' @param palette A character vector indicating the name of palette in `gb_palettes`. Available palettes:
-#' \itemize{
-#'   \item \code{main}: Gold and black colors.
-#'   \item \code{tricol}: Gold, black, and dark grey to create a gradual effect.
-#'   \item \code{digitMixed}: Five-pack colors specified for digital publications.
-#'   \item \code{printMixed}: Five-pack colors specified for printed publications.
-#'   \item \code{full}: A palette including all the colors \code{gb_cols}.
-#' }
 #' @param animate A logical value indicating whether to generate an animation from the maps, Default is TRUE.
-#' @param animate_var A string specifying the variable to animate over (typically `year`).
 #' @param years A numeric vector specifying the years for which maps should be generated.
 #'              Each map will be saved as a temporary file.
 #' @param map_center A numeric vector of length 2 specifying the latitude and longitude
 #'                   for the center of the map view. Default is `c(35.8617, 104.1954)`, which 
 #'                   is approximately the center of China.
 #' @param zoom_level A numeric value specifying the zoom level for the map. Default is 4.
-#' @param palette A string specifying the color palette to use for the map. Default is `main`.
-#' @param reverse_palette A logical value indicating whether to reverse the color palette. Default is TRUE.
+#' @param custom_colors A vector of colors for customizing the color gradient. Default is `NULL`, 
+#'                      which uses the predefined color palette.
 #' @param base_radius A numeric value specifying the base radius for point markers on point maps. Default is 1.
 #' @param radius_factor A numeric value specifying the multiplier for adjusting the radius of
 #'                      point markers based on the type. Default is 1.
@@ -76,15 +67,16 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #' )
 #' Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 #' goodmap(data_file = data_file,
-#'   type = "point", animate = TRUE,
-#'   animate_var = "year", years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
+#'   type = "point",
+#'   years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
+#'   custom_colors = "red", 
 #'   base_radius = 1, radius_factor = 1)
 #'
 #' @export
 
-goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, animate_var = NULL, years = NULL,
+goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, years = NULL,
                     map_center = c(35.8617, 104.1954), zoom_level = 4,
-                    palette = "main", reverse_palette = TRUE, base_radius = 1, radius_factor = 1,
+                    custom_colors = NULL, base_radius = 1, radius_factor = 1,
                     legend_opacity = 0.7, width = 800, height = 900) {
 
   temp_saveDir <- tempdir()
@@ -108,7 +100,15 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, ani
     stop("Unknown map type, please select either 'point' or 'polygon'.")
   }
 
-  type_colors <- colorFactor(palette = gb_pal(palette = palette, reverse = reverse_palette)(2), domain = data_file$type)
+  if (!is.null(custom_colors)) {
+    type_colors <- colorRampPalette(c("black", custom_colors))(length(unique(data_file$type)))
+  } else {
+    type_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(data_file$type)))
+  }
+  
+  domain <- unique(data_file$type)
+  color_mapping <- type_colors
+  type_colors <- colorFactor(palette = color_mapping, domain = domain)
 
   generate_map <- function(input_year) {
     filtered_data <- data_file |>
@@ -152,13 +152,21 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, ani
         plot_prov_var <- select(plot_prov, prov, value_var) |>
           rename(value = value_var) |>
           as.data.frame()
-
-        map <- geojsonMap(plot_prov_var,
-          mapName = "china",
-          palette = gb_pal(palette = "main", reverse = TRUE)(2),
-          colorMethod = "numeric",
-          legendTitle = paste("Variable", input_year)
-        )
+        
+        if (!is.null(custom_colors)) {
+          value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_prov_var$value)))
+        } else {
+          value_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(plot_prov_var$value)))
+        }
+        
+        domain <- unique(plot_prov_var$value)
+        
+        value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
+        
+        map <- geojsonMap(plot_prov_var, mapName = "china",
+                          palette = value_colors,
+                          colorMethod = "numeric",
+                          legendTitle = paste("Variable", input_year))
         
         } else if (level == "city") {
         plot_city <- data_file |>
@@ -174,11 +182,20 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, ani
           rename(value = value_var) |>
           as.data.frame()
 
-        map <- geojsonMap(plot_city_var,
-          mapName = "city",
-          palette = gb_pal(palette = "full", reverse = TRUE)(2),
-          colorMethod = "numeric",
-          legendTitle = paste("variable", input_year))
+        if (!is.null(custom_colors)) {
+          value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
+        } else {
+          value_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(plot_city_var$value)))
+        }
+
+        domain <- unique(plot_city_var$value)
+        
+        value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
+        
+        map <- geojsonMap(plot_city_var, mapName = "city",
+                          palette = value_colors,
+                          colorMethod = "numeric",
+                          legendTitle = paste("variable", input_year))
       }
       })
     }
@@ -223,7 +240,7 @@ goodmap <- function(data_file, type = "point", level = NULL, animate = TRUE, ani
     images <- image_read(image_files)
     animation <- image_animate(images, fps = 0.5, loop = ifelse(TRUE, 0, 1))
     
-    image_write(animation, file.path(temp_saveDir, paste0("animation_", animate_var, ".gif")))
+    image_write(animation, file.path(temp_saveDir, paste0("animation_", years[1], ".gif")))
     
     return(animation)
   }

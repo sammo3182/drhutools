@@ -55,7 +55,7 @@ Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 
 #Run the function with the data file:
 
-goodmap(data_file, type = "polygon", level = "province", animate = TRUE, animate_var = "year", years = c(2011, 2012))
+goodmap(data_file, type = "polygon", level = "province", years = c(2011, 2012))
 ```
 
 The function returns the file path of the saved map image. The map is also saved as an HTML file for interactive viewing.
@@ -85,7 +85,7 @@ Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 
 #Run the function with the data file:
 
-goodmap(data_file, type = "point", animate = TRUE, animate_var = "year", years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021)
+goodmap(data_file, type = "point", years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), custom_colors = "pink", base_radius = 1, radius_factor = 1)
 ```
 
 The function returns the file path of the saved maps GIF. The map is also saved as an HTML file for interactive viewing.
