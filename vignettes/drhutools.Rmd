@@ -141,11 +141,11 @@ Moreover, we adopted [Yang Cao](https://caoyang.tech/)'s geodata [updated](https
 The current version of `goodmap` enables users to draw points or fill polygons based on full names of prefectures or provinces, as illustrated in the following example.
 For data does not have full city or provincial names, users can consider use tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) to convert the data to the required format.
 
-```{r}
+```{r locate, eval=FALSE}
 default_locate <- Sys.getlocale(category = "LC_CTYPE")
 
 if(!(default_locate == "English_United States.utf8"))
-  Sys.setlocale(category = "LC_CTYPE", locate = "en_US.UTF-8")
+  Sys.setlocale(category = "LC_CTYPE", locate = "English_United States.utf8")
 ```
 
 
