@@ -2,7 +2,7 @@
 % Please edit documentation in R/goodmap.R
 \name{goodmap}
 \alias{goodmap}
-\title{The \code{goodmap} function is designed to create interactive GIF Map
+\title{The \code{goodmap} function is designed to create interactive PNG Map or GIF Map
 The \code{goodmap} function creates interactive map animations from a provided data file.
 It supports two types of maps: \code{point} and \code{polygon}.
 The function can visualize data by either plotting points based on geographical coordinates
@@ -13,8 +13,8 @@ goodmap(
   data_file,
   type = "point",
   level = NULL,
-  animate = TRUE,
-  years = NULL,
+  animate = FALSE,
+  animate_var = "year_set",
   map_center = c(35.8617, 104.1954),
   zoom_level = 4,
   custom_colors = NULL,
@@ -40,10 +40,11 @@ or \code{polygon} for maps with administrative boundaries.}
 \item{level}{A string specifying the level of administrative boundaries for polygon maps.
 Acceptable values are \code{province} or \code{city}. This parameter is required if \code{type} is \code{polygon}.}
 
-\item{animate}{A logical value indicating whether to generate an animation from the maps, Default is TRUE.}
+\item{animate}{A logical value indicating whether to generate an animation from the maps. The default is FALSE.
+If animate is FALSE, the map for the latest year will be generated as a PNG file.
+If animate is TRUE, an animation will be generated from all panel data.}
 
-\item{years}{A numeric vector specifying the years for which maps should be generated.
-Each map will be saved as a temporary file.}
+\item{animate_var}{A string specifying the variable to animate over. The default is \code{year_set}.}
 
 \item{map_center}{A numeric vector of length 2 specifying the latitude and longitude
 for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which
@@ -84,15 +85,16 @@ data_file <- data.frame(
   year_set = c(2021, 2021, 2021, 2021, 2021, 2021),
   g_lat = c(40.00379, 39.89785, 39.92535, 39.99636, 39.91081, 39.90215),
   g_lon = c(116.3994, 116.4109, 116.4090, 116.5206, 116.4311, 116.3949),
-  prov = c("北京市", "北京市", "北京市", "北京市", "北京市", "北京市"),
-  city = c("北京市", "北京市", "北京市", "北京市", "北京市", "北京市"),
+  prov = c("北京", "北京", "北京", "北京", "北京", "北京"),
+  city = c("北京", "北京", "北京", "北京", "北京", "北京"),
   type = c(7, 7, 8, 8, 8, 8)
 )
 Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 goodmap(data_file = data_file,
   type = "point",
-  years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
-  custom_colors = "red", 
+  animate = TRUE,
+  animate_var = "year_set",
+  custom_colors = "pink", 
   base_radius = 1, radius_factor = 1)
 
 }

@@ -153,7 +153,7 @@ if(!(default_locate == "English_United States.utf8"))
 toy_map <- data.frame(
   id = c(1, 2, 3, 4, 5, 6),
   city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
-  prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
+  prov = c("新疆", "西藏", "内蒙古", "青海", "四川", "黑龙江"),
   year_set = c(2010, 2010, 2010, 2011, 2011, 2011),
   variable = c(0.2861395, 0.3881083, 0.9466682, 0.8360043, 0.4622928, 0.1387102)
 )
@@ -161,54 +161,54 @@ toy_map <- data.frame(
 
 
 ```{r}
-toy_map2010 <- toy_map[, toy_map$year_set == 2010]
+toy_map2010 <- toy_map[toy_map$year_set == 2010, ]
 
 goodmap(toy_map2010, type = "polygon", level = "province")
 
-goodmap(toy_map2010, type = "polygon", level = "province", animate = TRUE, animate_var = "year", years = c(2011, 2012))
+goodmap(toy_map, type = "polygon", level = "province", animate = TRUE, animate_var = "year_set")
 ```
 
 
 If the map type is `polygon`, the dataframe should follow the structure below:
 
-| id | city       | prov               | year_set | variable   |
-|----|------------|--------------------|----------|------------|
-| 1  | 乌鲁木齐  | 新疆维吾尔自治区    | 2010     | 0.2861395  |
-| 2  | 拉萨      | 西藏自治区          | 2010     | 0.3881083  |
-| 3  | 呼和浩特  | 内蒙古自治区        | 2010     | 0.9466682  |
-| 4  | 西宁      | 青海省              | 2011     | 0.8360043  |
-| 5  | 成都      | 四川省              | 2011     | 0.4622928  |
-| 6  | 哈尔滨    | 黑龙江省            | 2011     | 0.1387102  |
+| id | city       | pro       | year_set | variable   |
+|----|------------------------|----------|------------|
+| 1  | 乌鲁木齐  | 新疆       | 2011     | 0.2861395  |
+| 2  | 拉萨      | 西藏       | 2011     | 0.3881083  |
+| 3  | 呼和浩特  | 内蒙       | 2011     | 0.9466682  |
+| 4  | 西宁      | 青海       | 2012     | 0.8360043  |
+| 5  | 成都      | 四川       | 2012     | 0.4622928  |
+| 6  | 哈尔滨    | 黑龙江     | 2012     | 0.1387102  |
 
 Before loading this function, please set the environment language:
 
 ```{r, eval = FALSE}
-Sys.setlocale(category = "LC_CTYPE", locate = "en_US.UTF-8")
+Sys.setlocale(, "Chinese")
 
 #Run the function with the data file:
 
-goodmap(data_file, type = "polygon", level = "province", years = c(2011, 2012))
+goodmap(data_file, type = "polygon", level = "province")
 ```
 
 The function returns the file path of the saved map image. The map is also saved as an HTML file for interactive viewing.
 
-### Figure: Animation for 2011 and 2012
+### Figure: Animation for 2012
 ```{r out.width = '70%', echo = FALSE}
-knitr::include_graphics("preview_polygon.gif")
+knitr::include_graphics("province_map_2012.png")
 ```
 
 ## Example for Point Type
 
 If the map type is `point`, the dataframe should follow the structure below:
 
-| name                      | year_set | g_lat   | g_lon    | g_pro  | g_city  | type |
-|---------------------------|----------|---------|----------|--------|---------|------|
-| 中国共产党历史展览馆      | 2021     | 40.00379| 116.3994 | 北京市 | 北京市  | 7    |
-| 中央礼品文物管理中心      | 2021     | 39.89785| 116.4109 | 北京市 | 北京市  | 7    |
-| 中国美术馆                | 2021     | 39.92535| 116.4090 | 北京市 | 北京市  | 8    |
-| 中国电影博物馆            | 2021     | 39.99636| 116.5206 | 北京市 | 北京市  | 8    |
-| 中国邮政邮票博物馆        | 2021     | 39.91081| 116.4311 | 北京市 | 北京市  | 8    |
-| 中国钱币博物馆            | 2021     | 39.90215| 116.3949 | 北京市 | 北京市  | 8    |
+| name                      | year_set | g_lat   | g_lon    | g_pro | g_city | type |
+|---------------------------|----------|---------|----------|-------|--------|------|
+| 中国共产党历史展览馆      | 2021     | 40.00379| 116.3994 | 北京  | 北京   | 7    |
+| 中央礼品文物管理中心      | 2021     | 39.89785| 116.4109 | 北京  | 北京   | 7    |
+| 中国美术馆                | 2021     | 39.92535| 116.4090 | 北京  | 北京   | 8    |
+| 中国电影博物馆            | 2021     | 39.99636| 116.5206 | 北京  | 北京   | 8    |
+| 中国邮政邮票博物馆        | 2021     | 39.91081| 116.4311 | 北京  | 北京   | 8    |
+| 中国钱币博物馆            | 2021     | 39.90215| 116.3949 | 北京  | 北京   | 8    |
 
 Before loading this function, please set the environment language:
 
@@ -217,12 +217,12 @@ Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 
 #Run the function with the data file:
 
-goodmap(data_file, type = "point", years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), custom_colors = "pink", base_radius = 1, radius_factor = 1)
+goodmap(data_file, type = "point", animate = TRUE, animate_var = "year_set", custom_colors = "pink",base_radius = 1, radius_factor = 1)
 ```
 
 The function returns the file path of the saved maps GIF. The map is also saved as an HTML file for interactive viewing.
 
-### Figure: Animation for 1997, 2001, 2005, 2009, 2017, 2019, 2021
+### Figure: Animation for all panel data
 ```{r out.width = '70%', echo = FALSE}
 knitr::include_graphics("preview_point.gif")
 ```

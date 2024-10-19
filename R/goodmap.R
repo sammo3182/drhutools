@@ -1,6 +1,6 @@
 utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable", "value_var"))
 
-#' The `goodmap` function is designed to create interactive GIF Map
+#' The `goodmap` function is designed to create interactive PNG Map or GIF Map
 #' The `goodmap` function creates interactive map animations from a provided data file.
 #' It supports two types of maps: `point` and `polygon`.
 #' The function can visualize data by either plotting points based on geographical coordinates 
@@ -24,9 +24,10 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #'             or `polygon` for maps with administrative boundaries.
 #' @param level A string specifying the level of administrative boundaries for polygon maps.
 #'              Acceptable values are `province` or `city`. This parameter is required if `type` is `polygon`.
-#' @param animate A logical value indicating whether to generate an animation from the maps, Default is TRUE.
-#' @param years A numeric vector specifying the years for which maps should be generated.
-#'              Each map will be saved as a temporary file.
+#' @param animate A logical value indicating whether to generate an animation from the maps. The default is FALSE.
+#'                If animate is FALSE, the map for the latest year will be generated as a PNG file. 
+#'                If animate is TRUE, an animation will be generated from all panel data. 
+#' @param animate_var A string specifying the variable to animate over. The default is `year_set`.
 #' @param map_center A numeric vector of length 2 specifying the latitude and longitude
 #'                   for the center of the map view. Default is `c(35.8617, 104.1954)`, which 
 #'                   is approximately the center of China.
@@ -51,6 +52,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #' @import purrr
 #' @import gganimate
 #' @import sf
+#' @import rlang
 #'
 #' @examples
 #' data_file <- data.frame(
@@ -61,14 +63,15 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #'   year_set = c(2021, 2021, 2021, 2021, 2021, 2021),
 #'   g_lat = c(40.00379, 39.89785, 39.92535, 39.99636, 39.91081, 39.90215),
 #'   g_lon = c(116.3994, 116.4109, 116.4090, 116.5206, 116.4311, 116.3949),
-#'   prov = c("北京市", "北京市", "北京市", "北京市", "北京市", "北京市"),
-#'   city = c("北京市", "北京市", "北京市", "北京市", "北京市", "北京市"),
+#'   prov = c("北京", "北京", "北京", "北京", "北京", "北京"),
+#'   city = c("北京", "北京", "北京", "北京", "北京", "北京"),
 #'   type = c(7, 7, 8, 8, 8, 8)
 #' )
 #' Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 #' goodmap(data_file = data_file,
 #'   type = "point",
-#'   years = c(1997, 2001, 2005, 2009, 2017, 2019, 2021), 
+#'   animate = TRUE,
+#'   animate_var = "year_set",
 #'   custom_colors = "pink", 
 #'   base_radius = 1, radius_factor = 1)
 #'
@@ -77,8 +80,8 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 goodmap <- function(data_file, 
                     type = "point", 
                     level = NULL, 
-                    animate = TRUE, 
-                    years = NULL,
+                    animate = FALSE, 
+                    animate_var = "year_set",
                     map_center = c(35.8617, 104.1954), 
                     zoom_level = 4,
                     custom_colors = NULL, 
@@ -87,11 +90,11 @@ goodmap <- function(data_file,
                     legend_opacity = 0.7, 
                     width = 800, 
                     height = 900) {
-
   temp_saveDir <- tempdir()
   
-  if (webshot::is_phantomjs_installed())
+  if (!webshot::is_phantomjs_installed()) {
     webshot::install_phantomjs()
+  }
   
   if (type == "point") {
     if (!all(c("g_lat", "g_lon") %in% colnames(data_file))) {
@@ -110,7 +113,16 @@ goodmap <- function(data_file,
   } else {
     stop("Unknown map type, please select either 'point' or 'polygon'.")
   }
-
+  
+  generate_map <- function(input_var_value) {
+    filtered_data <- data_file |>
+      filter(!!sym(animate_var) == input_var_value)
+    
+    if (type == "point") {
+      filtered_data <- filtered_data |>
+        select(g_lat, g_lon, type) |>
+        mutate(radius = base_radius + (as.numeric(type) * radius_factor))
+      
   if (!is.null(custom_colors)) {
     type_colors <- colorRampPalette(c("black", custom_colors))(length(unique(data_file$type)))
   } else {
@@ -120,15 +132,6 @@ goodmap <- function(data_file,
   domain <- unique(data_file$type)
   color_mapping <- type_colors
   type_colors <- colorFactor(palette = color_mapping, domain = domain)
-
-  generate_map <- function(input_year) {
-    filtered_data <- data_file |>
-      filter(year_set == input_year)
-    
-    if (type == "point") {
-      filtered_data <- filtered_data |>
-        select(g_lat, g_lon, type) |>
-        mutate(radius = base_radius + (as.numeric(type) * radius_factor))
       
       map <- leaflet(filtered_data) |>
         amap() |>
@@ -148,21 +151,22 @@ goodmap <- function(data_file,
           "bottomright",
           pal = type_colors,
           values = ~ type,
-          title = paste("Type", input_year),
+          title = paste("Type", input_var_value),
           opacity = legend_opacity
         )
+      
     } else if (type == "polygon") {
       suppressWarnings({
         if (level == "province") {
         plot_prov <- data_file |>
-          filter(year_set == input_year) |>
+          filter(!!sym(animate_var) == input_var_value) |>
           select(prov, variable) |>
           group_by(prov) |>
           summarise(value_var = mean(variable, na.rm = TRUE)) |>
           ungroup() |>
           right_join(data.frame(name = regionNames("china")), by = c("prov" = "name")) |>
           filter(!is.na(value_var))
-
+        
         plot_prov_var <- select(plot_prov, prov, value_var) |>
           rename(value = value_var) |>
           as.data.frame()
@@ -172,45 +176,41 @@ goodmap <- function(data_file,
         } else {
           value_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(plot_prov_var$value)))
         }
-        
         domain <- unique(plot_prov_var$value)
-        
         value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
-        
         map <- geojsonMap(plot_prov_var, mapName = "china",
                           palette = value_colors,
                           colorMethod = "numeric",
-                          legendTitle = paste("Variable", input_year))
+                          legendTitle = paste("Variable", input_var_value),
+                          na.color = "transparent")
         
         } else if (level == "city") {
-        plot_city <- data_file |>
-          filter(year_set == input_year) |>
-          select(city, variable) |>
-          group_by(city) |>
-          summarise(value_var = mean(variable, na.rm = TRUE)) |>
-          ungroup() |>
-          right_join(data.frame(name = regionNames("city")), by = c("city" = "name")) |>
-          filter(!is.na(value_var))
-
-        plot_city_var <- select(plot_city, city, value_var) |>
-          rename(value = value_var) |>
-          as.data.frame()
-
-        if (!is.null(custom_colors)) {
-          value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
-        } else {
-          value_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(plot_city_var$value)))
+          plot_city <- data_file |>
+            filter(!!sym(animate_var) == input_var_value) |>
+            select(city, variable) |>
+            group_by(city) |>
+            summarise(value_var = mean(variable, na.rm = TRUE)) |>
+            ungroup() |>
+            right_join(data.frame(name = regionNames("city")), by = c("city" = "name")) |>
+            filter(!is.na(value_var))
+          
+          plot_city_var <- select(plot_city, city, value_var) |>
+            rename(value = value_var) |>
+            as.data.frame()
+          if (!is.null(custom_colors)) {
+            value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
+          } else {
+            value_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(plot_city_var$value)))
+          }
+          
+          domain <- unique(plot_city_var$value)
+          value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
+          map <- geojsonMap(plot_city_var, mapName = "city",
+                            palette = value_colors,
+                            colorMethod = "numeric",
+                            legendTitle = paste("Variable", input_var_value),
+                            na.color = "transparent")
         }
-
-        domain <- unique(plot_city_var$value)
-        
-        value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
-        
-        map <- geojsonMap(plot_city_var, mapName = "city",
-                          palette = value_colors,
-                          colorMethod = "numeric",
-                          legendTitle = paste("variable", input_year))
-      }
       })
     }
     
@@ -221,7 +221,7 @@ goodmap <- function(data_file,
       "map"
     )
     
-    name_file <- paste0(name_prefix, "_", input_year, ".png")
+    name_file <- paste0(name_prefix, "_", input_var_value, ".png")
     image_file <- file.path(temp_saveDir, name_file)
     mapshot(
       map,
@@ -230,13 +230,23 @@ goodmap <- function(data_file,
       vheight = height
     )
     
-    return(name_file)
+    return(map)
   }
   
-  if (!is.null(years)) {
-    map_files <- lapply(years, generate_map)
+  if (animate) {
+    if (!(animate_var %in% colnames(data_file))) {
+      stop(paste("The specified 'animate_var' column does not exist in the data:", animate_var))
+    }
+    unique_vars <- unique(data_file[[animate_var]])
+    map_files <- lapply(unique_vars, generate_map)
   } else {
-    stop("Please provide the 'years' parameter.")
+    if  (!(animate_var %in% colnames(data_file))) {
+      stop(paste("The specified 'animate_var' column does not exist in the data:", animate_var))
+    }
+    
+    latest_var <- max(data_file[[animate_var]], na.rm = TRUE)
+    map_file <- generate_map(latest_var)
+    return(map_file)
   }
   
   if (animate) {
@@ -250,7 +260,7 @@ goodmap <- function(data_file,
                           ),
                           "unknown_type")
     
-    image_files <- file.path(temp_saveDir, paste0(name_prefix, years, ".png"))
+    image_files <- file.path(temp_saveDir, paste0(name_prefix, unique(data_file[[animate_var]]), ".png"))
     image_files <- image_files[file.exists(image_files)]
     
     if (length(image_files) == 0) {
@@ -260,8 +270,8 @@ goodmap <- function(data_file,
     images <- image_read(image_files)
     animation <- image_animate(images, fps = 0.5, loop = ifelse(TRUE, 0, 1))
     
-    image_write(animation, file.path(temp_saveDir, paste0("animation_", years[1], ".gif")))
-    
+    animation_file <- file.path(temp_saveDir, paste0("animation_", unique(data_file[[animate_var]])[1], ".gif"))
+    image_write(animation, animation_file)
     return(animation)
   }
 }
