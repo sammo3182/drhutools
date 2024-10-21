@@ -14,10 +14,13 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #' for each city or province in the data file.
 #'
 #' @param data_file Dataframe.
-#'                  If generate point map, `data_file` should include required columns such 
+#'                  When generate point map, `data_file` should include required columns such 
 #'                  as `g_lat` and `g_lon`.
-#'                  If generate polygon map, `data_file` should include required columns such 
+#'                  When generate polygon map, `data_file` should include required columns such 
 #'                  as `prov` or `city`.
+#'                  The `prov` columns must be complete names, such as “内蒙古自治区” instead of “内蒙古”.
+#'                  If there is only incomplete names or geocodes in your data_file, we recommend you to use function `regioncode` 
+#'                  as a one-step solution to these conversion from incomplete names.
 #'                  Ensure the file is formatted correctly with appropriate column headers.
 #' @param type A string specifying the type of map to generate. Options are `point`for point 
 #'             maps using `g_lat` and `g_lon`, 
@@ -63,7 +66,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "year_set", "variable
 #'   year_set = c(2021, 2021, 2021, 2021, 2021, 2021),
 #'   g_lat = c(40.00379, 39.89785, 39.92535, 39.99636, 39.91081, 39.90215),
 #'   g_lon = c(116.3994, 116.4109, 116.4090, 116.5206, 116.4311, 116.3949),
-#'   prov = c("北京", "北京", "北京", "北京", "北京", "北京"),
+#'   prov = c("北京市", "北京市", "北京市", "北京市", "北京市", "北京市"),
 #'   city = c("北京", "北京", "北京", "北京", "北京", "北京"),
 #'   type = c(7, 7, 8, 8, 8, 8)
 #' )

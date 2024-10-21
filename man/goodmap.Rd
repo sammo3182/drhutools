@@ -27,10 +27,13 @@ goodmap(
 }
 \arguments{
 \item{data_file}{Dataframe.
-If generate point map, \code{data_file} should include required columns such
+When generate point map, \code{data_file} should include required columns such
 as \code{g_lat} and \code{g_lon}.
-If generate polygon map, \code{data_file} should include required columns such
+When generate polygon map, \code{data_file} should include required columns such
 as \code{prov} or \code{city}.
+The \code{prov} columns must be complete names, such as “内蒙古自治区” instead of “内蒙古”.
+If there is only incomplete names or geocodes in your data_file, we recommend you to use function \code{regioncode}
+as a one-step solution to these conversion from incomplete names.
 Ensure the file is formatted correctly with appropriate column headers.}
 
 \item{type}{A string specifying the type of map to generate. Options are \code{point}for point
@@ -85,7 +88,7 @@ data_file <- data.frame(
   year_set = c(2021, 2021, 2021, 2021, 2021, 2021),
   g_lat = c(40.00379, 39.89785, 39.92535, 39.99636, 39.91081, 39.90215),
   g_lon = c(116.3994, 116.4109, 116.4090, 116.5206, 116.4311, 116.3949),
-  prov = c("北京", "北京", "北京", "北京", "北京", "北京"),
+  prov = c("北京市", "北京市", "北京市", "北京市", "北京市", "北京市"),
   city = c("北京", "北京", "北京", "北京", "北京", "北京"),
   type = c(7, 7, 8, 8, 8, 8)
 )
