@@ -72,33 +72,6 @@ dir2tree(temp_dir) |>
 setwd(wd_original)
 ```
 
-# Psychological scale scoring: `traits`
-
-`traits` is used for calculating personality traits based on psychological surveys.
-The current version can calculate the TOSCA-3SC scores and Grit-O score.
-The TOSCA-3SC (Test of Self-Conscious Affect—Short Version) is created by @Tangney1990 for measuring self-conscious emotions, particularly *shame* and *guilt* []. 
-Participants are presented with hypothetical scenarios, and their responses are analyzed to assess the intensity of shame or guilt reactions. 
-The Grit-O scale is created by @DuckworthEtAl2007 to measure *grit*, which refers to an individual's perseverance and passion for long-term goals.
-
-Users need to fit the survey data with specific column names as illustrated below: 
-
-- TOSCA-3SC: `Q3|R3` ~ `Q13|R4`
-- Grit-O: `Q14|1` ~ `Q25|1`
-
-```{r traits}
-column_names <- c("Q3|R3", "Q3|R4", "Q4|R3", "Q4|R4", "Q5|R5", "Q5|R6", "Q6|R3", "Q6|R4", "Q7|R3", 
-"Q7|R4", "Q8|R5", "Q8|R6", "Q9|R5", "Q9|R6", "Q10|R5", "Q10|R6", "Q11|R5", "Q11|R6", "Q12|R3", 
-"Q12|R4", "Q13|R3", "Q13|R4", "Q14|1", "Q15|1", "Q16|1", "Q17|1", "Q18|1", "Q19|1", "Q20|1", 
-"Q21|1", "Q22|1", "Q23|1", "Q24|1", "Q25|1")
-
-toy_data <- data.frame(matrix(sample(1:5, 10 * length(column_names), replace = TRUE), 
-ncol = length(column_names)))
-
-names(toy_data) <- column_names
-
-traits(toy_data)
-```
-
 
 # Experimental result visulaization: `cdplot`
 
@@ -129,47 +102,16 @@ plot_plant <- cdplot(PlantGrowth, ks_test = TRUE)
 plot_plant
 ```
 
-
-
 # Standard Map of China: `goodmap`
 
-Using map is not only a visualization but political issue for Chinese scolars. 
-The `goodmap` function is designed to draw national maps based on the template released by [Amap.com](https://ditu.amap.com/?amapexchange=%2F) (高德地图).
+Drawing maps is more than often painful for Chinese scholars. 
+The `goodmap` function is designed to draw national maps based on a template released by [Amap.com](https://ditu.amap.com/?amapexchange=%2F).
 We were inspired by Dawei Lang's ([Lchiffon](https://github.com/Lchiffon)) excellent package [`leafletCN`](https://github.com/Lchiffon/leafletCN) and optimize `leafletCN::geojsonMap` to concentrate on drawing national maps. 
 Moreover, we adopted [Yang Cao](https://caoyang.tech/)'s geodata [updated](https://github.com/Lchiffon/leafletCN/issues/12) in 2020 when drawing the map. 
 
 The current version of `goodmap` enables users to draw points or fill polygons based on full names of prefectures or provinces, as illustrated in the following example.
 For data does not have full city or provincial names, users can consider use tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) to convert the data to the required format.
-
-```{r locate, eval=FALSE}
-default_locate <- Sys.getlocale(category = "LC_CTYPE")
-
-if(!(default_locate == "English_United States.utf8"))
-  Sys.setlocale(category = "LC_CTYPE", locate = "English_United States.utf8")
-```
-
-
-```{r}
-toy_map <- data.frame(
-  id = c(1, 2, 3, 4, 5, 6),
-  city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
-  prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
-  year_set = c(2010, 2010, 2010, 2011, 2011, 2011),
-  variable = c(0.2861395, 0.3881083, 0.9466682, 0.8360043, 0.4622928, 0.1387102)
-)
-```
-
-
-```{r}
-toy_map2010 <- toy_map[toy_map$year_set == 2010, ]
-
-goodmap(toy_map2010, type = "polygon", level = "province")
-
-goodmap(toy_map, type = "polygon", level = "province", animate = TRUE, animate_var = "year_set")
-```
-
-
-If the map type is `polygon`, the dataframe should follow the structure below:
+If `type = "polygon"`, the data frame should follow the exemplary structure below:
 
 | id | city       | pro               | year_set | variable   |
 |----|--------------------------------|----------|------------|
@@ -180,49 +122,57 @@ If the map type is `polygon`, the dataframe should follow the structure below:
 | 5  | 成都      | 四川省             | 2012     | 0.4622928  |
 | 6  | 哈尔滨    | 黑龙江省           | 2012     | 0.1387102  |
 
-Before loading this function, please set the environment language:
 
-```{r, eval = FALSE}
-Sys.setlocale(, "Chinese")
+```{r polygon}
+toy_map <- data.frame(
+  id = c(1, 2, 3, 4, 5, 6),
+  city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
+  prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
+  year_set = c(2010, 2010, 2010, 2011, 2011, 2011),
+  variable = c(0.2861395, 0.3881083, 0.9466682, 0.8360043, 0.4622928, 0.1387102)
+)
 
-#Run the function with the data file:
+toy_map2010 <- toy_map[toy_map$year_set == 2010, ]
 
-goodmap(data_file, type = "polygon", level = "province")
+
+goodmap(
+  toy_map,
+  type = "polygon",
+  level = "province"
+)
 ```
 
-The function returns the file path of the saved map image. The map is also saved as an HTML file for interactive viewing.
+Note: If users encounter errors or unreadable output, adjusting the encoding may help.
 
-### Figure: Animation for 2012
-```{r out.width = '70%', echo = FALSE}
+If `type = "point"`, the latitudes and longitudes are required as following
+
+| name                 |   g_lat |   g_lon |
+|----------------------|---------|---------|
+| 中国共产党历史展览馆 | 40.0038 | 116.399 |
+| 中央礼品文物管理中心 | 39.8978 | 116.411 |
+| 中国美术馆           | 39.9254 | 116.409 |
+| 中国电影博物馆       | 39.9964 | 116.521 |
+| 中国邮政邮票博物馆   | 39.9108 | 116.431 |
+| 中国钱币博物馆       | 39.9021 | 116.395 |
+
+
+```{r points}
+goodmap(
+  data_file,
+  type = "point",
+  custom_colors = "pink",
+  base_radius = 1,
+  radius_factor = 1
+)
+```
+
+`goodmap` can also create animations to illustrate specified geographic dynamics. Users simply set `animate = TRUE` and specify the time variable for the function to draw the map accordingly.
+
+
+```{r ani out.width = '70%', echo = FALSE}
 knitr::include_graphics("province_map_2012.png")
 ```
 
-## Example for Point Type
-
-If the map type is `point`, the dataframe should follow the structure below:
-
-| name                      | year_set | g_lat   | g_lon    | g_pro   | g_city | type |
-|---------------------------|----------|---------|----------|---------|--------|------|
-| 中国共产党历史展览馆      | 2021     | 40.00379| 116.3994 | 北京市  | 北京   | 7    |
-| 中央礼品文物管理中心      | 2021     | 39.89785| 116.4109 | 北京市  | 北京   | 7    |
-| 中国美术馆                | 2021     | 39.92535| 116.4090 | 北京市  | 北京   | 8    |
-| 中国电影博物馆            | 2021     | 39.99636| 116.5206 | 北京市  | 北京   | 8    |
-| 中国邮政邮票博物馆        | 2021     | 39.91081| 116.4311 | 北京市  | 北京   | 8    |
-| 中国钱币博物馆            | 2021     | 39.90215| 116.3949 | 北京市  | 北京   | 8    |
-
-Before loading this function, please set the environment language:
-
-```{r, eval = FALSE}
-Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
-
-#Run the function with the data file:
-
-goodmap(data_file, type = "point", animate = TRUE, animate_var = "year_set", custom_colors = "pink",base_radius = 1, radius_factor = 1)
-```
-
-The function returns the file path of the saved maps GIF. The map is also saved as an HTML file for interactive viewing.
-
-### Figure: Animation for all panel data
 ```{r out.width = '70%', echo = FALSE}
 knitr::include_graphics("preview_point.gif")
 ```
@@ -256,6 +206,36 @@ Except for the primary palette (named as `main`), users are given four alternati
 - `full`: A palette including all the colors gb_cols can call.
 
 I would actually like to open this function to my users for adding your favorite palette, as long as you give them a special name and a list of colors.
+
+
+# Psychological scale scoring: `traits`
+
+`traits` is used for calculating personality traits based on psychological surveys.
+The current version can calculate the TOSCA-3SC scores and Grit-O score.
+The TOSCA-3SC (Test of Self-Conscious Affect—Short Version) is created by @Tangney1990 for measuring self-conscious emotions, particularly *shame* and *guilt* []. 
+Participants are presented with hypothetical scenarios, and their responses are analyzed to assess the intensity of shame or guilt reactions. 
+The Grit-O scale is created by @DuckworthEtAl2007 to measure *grit*, which refers to an individual's perseverance and passion for long-term goals.
+
+Users need to fit the survey data with specific column names as illustrated below: 
+
+- TOSCA-3SC: `Q3|R3` ~ `Q13|R4`
+- Grit-O: `Q14|1` ~ `Q25|1`
+
+```{r traits}
+column_names <- c("Q3|R3", "Q3|R4", "Q4|R3", "Q4|R4", "Q5|R5", "Q5|R6", "Q6|R3", "Q6|R4", "Q7|R3", 
+"Q7|R4", "Q8|R5", "Q8|R6", "Q9|R5", "Q9|R6", "Q10|R5", "Q10|R6", "Q11|R5", "Q11|R6", "Q12|R3", 
+"Q12|R4", "Q13|R3", "Q13|R4", "Q14|1", "Q15|1", "Q16|1", "Q17|1", "Q18|1", "Q19|1", "Q20|1", 
+"Q21|1", "Q22|1", "Q23|1", "Q24|1", "Q25|1")
+
+toy_data <- data.frame(matrix(sample(1:5, 10 * length(column_names), replace = TRUE), 
+ncol = length(column_names)))
+
+names(toy_data) <- column_names
+
+traits(toy_data)
+```
+
+
 
 # Affiliation
 
