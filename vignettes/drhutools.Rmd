@@ -9,7 +9,7 @@ output: rmarkdown::html_vignette
 bibliography: s_drhutools.bib
 
 vignette: >
-  %\VignetteIndexEntry{Use of goodmap}
+  %\VignetteIndexEntry{`drhutools`: Toolbox for Political Science Academic Life}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
   # fig.dim = c(2.2, 2.5)
 )
 
-if(!require(dir2json)) remotes::install_github("stla/dir2json")
+if (!require(dir2json)) remotes::install_github("stla/dir2json")
 
 library(ggplot2)
 library(dir2json)
@@ -32,7 +32,6 @@ library(drhutools)
 theme_set(theme_minimal())
 set.seed(313)
 ```
-
 
 # Efficient file organization: `folderSystem`
 
@@ -50,7 +49,7 @@ library(drhutools)
 wd_original <- getwd()
 
 # Create a temporary directory
-temp_dir <- tempfile() 
+temp_dir <- tempfile()
 dir.create(temp_dir)
 setwd(temp_dir)
 
@@ -64,7 +63,7 @@ folderSystem()
 
 ```{r folderSystem_tree, echo=FALSE}
 # Show the dendrogram of the folder structure using dir2tree
-dir2tree(temp_dir) |> 
+dir2tree(temp_dir) |>
   cat()
 ```
 
@@ -133,10 +132,8 @@ toy_map <- data.frame(
 )
 
 toy_map2010 <- toy_map[toy_map$year_set == 2010, ]
-
-
 goodmap(
-  toy_map,
+  toy_map2010,
   type = "polygon",
   level = "province"
 )
@@ -144,37 +141,65 @@ goodmap(
 
 Note: If users encounter errors or unreadable output, adjusting the encoding may help.
 
-If `type = "point"`, the latitudes and longitudes are required as following
+If `type = "point"`, the data frame should follow the exemplary structure below:
 
-| name                 |   g_lat |   g_lon |
-|----------------------|---------|---------|
-| 中国共产党历史展览馆 | 40.0038 | 116.399 |
-| 中央礼品文物管理中心 | 39.8978 | 116.411 |
-| 中国美术馆           | 39.9254 | 116.409 |
-| 中国电影博物馆       | 39.9964 | 116.521 |
-| 中国邮政邮票博物馆   | 39.9108 | 116.431 |
-| 中国钱币博物馆       | 39.9021 | 116.395 |
+| name                                        | year_set | g_lat      | g_lon       | g_pro          | g_city     | type |
+|---------------------------------------------|----------|------------|-------------|----------------|------------|------|
+| 航天科技空间技术研究院展示中心              | 2021     | 39.947298  | 116.322434  | 北京市         | 北京市     | 8    |
+| 长辛店二七纪念馆                            | 2021     | 39.830932  | 116.20602   | 北京市         | 北京市     | 4    |
+| 天津觉悟社纪念馆                            | 2021     | 39.159621  | 117.196032  | 天津市         | 天津市     | 4    |
+| 五台白求恩纪念馆（白求恩模范病室旧址）      | 2021     | 38.745234  | 113.58242   | 山西省         | 忻州市     | 4    |
+| 中国中铁装备集团郑州盾构总装车间            | 2021     | 34.705527  | 113.755818  | 河南省         | 郑州市     | 8    |
+| 昆仑关抗日战役纪念地                        | 2021     | 23.090849  | 108.685362  | 广西壮族自治区 | 南宁市     | 6    |
+| 海南解放公园                                | 2021     | 20.008295  | 109.715334  | 海南省         | 临高县     | 6    |
+| 南充市阆中红军烈士纪念园                    | 2017     | 31.564526  | 105.974878  | 四川省         | 南充市     | 5    |
+| 厂窖惨案遇难同胞纪念馆                      | 2017     | 29.153561  | 112.248827  | 湖南省         | 益阳市     | 2    |
+| 雅安市红军长征翻越夹金山纪念馆              | 2017     | 30.368317  | 102.811716  | 四川省         | 雅安市     | 4    |
+| 中华苏维埃人民共和国川滇黔省革命委员会旧址  | 2017     | 27.302689  | 105.28199   | 贵州省         | 毕节市     | 4    |
+| 抚顺雷锋纪念馆                              | 1997     | 41.850161  | 123.801936  | 辽宁省         | 抚顺市     | 9    |
+| 杨靖宇烈士陵园                              | 1997     | 41.7295    | 125.962291  | 吉林省         | 通化市     | 5    |
+| 瑷珲历史陈列馆                              | 1997     | 49.977569  | 127.493741  | 黑龙江省       | 黑河市     | 8    |
+| 中国共产党第一次全国代表大会会址纪念馆      | 1997     | 31.220653  | 121.47536   | 上海市         | 上海市     | 4    |
+| 河姆渡遗址博物馆                            | 1997     | 29.962122  | 121.349437  | 浙江省         | 宁波市     | 1    |
+| 陶行知纪念馆                                | 1997     | 29.865772  | 118.436866  | 安徽省         | 黄山市     | 3    |
 
+`goodmap` can also create animations to illustrate specified geographic dynamics. Users simply set `animate = TRUE` and specify the time variable for the function to draw the map accordingly.
 
 ```{r points}
+toy_map <- data.frame(
+  name = c("航天科技空间技术研究院展示中心", "长辛店二七纪念馆", "天津觉悟社纪念馆", 
+           "五台白求恩纪念馆（白求恩模范病室旧址）", "中国中铁装备集团郑州盾构总装车间", 
+           "昆仑关抗日战役纪念地", "海南解放公园", "南充市阆中红军烈士纪念园", 
+           "厂窖惨案遇难同胞纪念馆", "雅安市红军长征翻越夹金山纪念馆", 
+           "中华苏维埃人民共和国川滇黔省革命委员会旧址", "抚顺雷锋纪念馆", 
+           "杨靖宇烈士陵园", "瑷珲历史陈列馆", "中国共产党第一次全国代表大会会址纪念馆", 
+           "河姆渡遗址博物馆", "陶行知纪念馆"),
+  year_set = c(2021, 2021, 2021, 2021, 2021, 2021, 2021, 2017, 2017, 2017, 2017, 
+               1997, 1997, 1997, 1997, 1997, 1997),
+  g_lat = c(39.947298, 39.830932, 39.159621, 38.745234, 34.705527, 23.090849, 
+            20.008295, 31.564526, 29.153561, 30.368317, 27.302689, 41.850161, 
+            41.7295, 49.977569, 31.220653, 29.962122, 29.865772),
+  g_lon = c(116.322434, 116.20602, 117.196032, 113.58242, 113.755818, 108.685362, 
+            109.715334, 105.974878, 112.248827, 102.811716, 105.28199, 123.801936, 
+            125.962291, 127.493741, 121.47536, 121.349437, 118.436866),
+  g_pro = c("北京市", "北京市", "天津市", "山西省", "河南省", "广西壮族自治区", 
+            "海南省", "四川省", "湖南省", "四川省", "贵州省", "辽宁省", 
+            "吉林省", "黑龙江省", "上海市", "浙江省", "安徽省"),
+  g_city = c("北京市", "北京市", "天津市", "忻州市", "郑州市", "南宁市", "临高县", 
+             "南充市", "益阳市", "雅安市", "毕节市", "抚顺市", "通化市", 
+             "黑河市", "上海市", "宁波市", "黄山市"),
+  type = c(8, 4, 4, 4, 8, 6, 6, 5, 2, 4, 4, 9, 5, 8, 4, 1, 3)
+)
 goodmap(
-  data_file,
+  toy_map,
   type = "point",
+  animate = TRUE, 
+  animate_var = "year_set",
   custom_colors = "pink",
   base_radius = 1,
   radius_factor = 1
 )
-```
-
-`goodmap` can also create animations to illustrate specified geographic dynamics. Users simply set `animate = TRUE` and specify the time variable for the function to draw the map accordingly.
-
-
-```{r ani out.width = '70%', echo = FALSE}
-knitr::include_graphics("province_map_2012.png")
-```
-
-```{r out.width = '70%', echo = FALSE}
-knitr::include_graphics("preview_point.gif")
+knitr::include_graphics("animated_map.gif")
 ```
 
 # Color blind friendly palette
@@ -189,11 +214,11 @@ All the above visualizing elements are drawn with this palette.
 An extra example with codes are shown below to illustrate how users can use it.
 
 ```{r gb}
-ggplot(mtcars, aes(wt, mpg, color = cyl)) + 
+ggplot(mtcars, aes(wt, mpg, color = cyl)) +
   geom_point() +
   scale_color_gb(discrete = FALSE)
 
-ggplot(mpg, aes(y = class, fill = drv)) + 
+ggplot(mpg, aes(y = class, fill = drv)) +
   geom_bar() +
   scale_fill_gb()
 ```
@@ -222,13 +247,16 @@ Users need to fit the survey data with specific column names as illustrated belo
 - Grit-O: `Q14|1` ~ `Q25|1`
 
 ```{r traits}
-column_names <- c("Q3|R3", "Q3|R4", "Q4|R3", "Q4|R4", "Q5|R5", "Q5|R6", "Q6|R3", "Q6|R4", "Q7|R3", 
-"Q7|R4", "Q8|R5", "Q8|R6", "Q9|R5", "Q9|R6", "Q10|R5", "Q10|R6", "Q11|R5", "Q11|R6", "Q12|R3", 
-"Q12|R4", "Q13|R3", "Q13|R4", "Q14|1", "Q15|1", "Q16|1", "Q17|1", "Q18|1", "Q19|1", "Q20|1", 
-"Q21|1", "Q22|1", "Q23|1", "Q24|1", "Q25|1")
+column_names <- c(
+  "Q3|R3", "Q3|R4", "Q4|R3", "Q4|R4", "Q5|R5", "Q5|R6", "Q6|R3", "Q6|R4", "Q7|R3",
+  "Q7|R4", "Q8|R5", "Q8|R6", "Q9|R5", "Q9|R6", "Q10|R5", "Q10|R6", "Q11|R5", "Q11|R6", "Q12|R3",
+  "Q12|R4", "Q13|R3", "Q13|R4", "Q14|1", "Q15|1", "Q16|1", "Q17|1", "Q18|1", "Q19|1", "Q20|1",
+  "Q21|1", "Q22|1", "Q23|1", "Q24|1", "Q25|1"
+)
 
-toy_data <- data.frame(matrix(sample(1:5, 10 * length(column_names), replace = TRUE), 
-ncol = length(column_names)))
+toy_data <- data.frame(matrix(sample(1:5, 10 * length(column_names), replace = TRUE),
+  ncol = length(column_names)
+))
 
 names(toy_data) <- column_names
 
