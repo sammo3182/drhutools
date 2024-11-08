@@ -142,6 +142,7 @@ Note: If users encounter errors or unreadable output, adjusting the encoding may
 
 If `type = "point"`, the data frame should follow the exemplary structure below:
 
+<<<<<<< HEAD
 | name                                        | animate_set | g_lat      | g_lon       | g_pro          | g_city     | value_set |
 |---------------------------------------------|-------------|------------|-------------|----------------|------------|-----------|
 | 航天科技空间技术研究院展示中心              | 2021        | 39.947298  | 116.322434  | 北京市         | 北京市     | 8         |
@@ -174,12 +175,18 @@ toy_map <- data.frame(
            "杨靖宇烈士陵园", "瑷珲历史陈列馆", "中国共产党第一次全国代表大会会址纪念馆", 
            "河姆渡遗址博物馆", "陶行知纪念馆"),
   animate_set = c(2021, 2021, 2021, 2021, 2021, 2021, 2021, 2017, 2017, 2017, 2017, 
+=======
+```{r points}
+toy_map <- data.frame(
+  year_set = c(2021, 2021, 2021, 2021, 2021, 2021, 2021, 2017, 2017, 2017, 2017, 
+>>>>>>> 67e59691928f57f779649a8bd610af5808334dc1
                1997, 1997, 1997, 1997, 1997, 1997),
   g_lat = c(39.947298, 39.830932, 39.159621, 38.745234, 34.705527, 23.090849, 
             20.008295, 31.564526, 29.153561, 30.368317, 27.302689, 41.850161, 
             41.7295, 49.977569, 31.220653, 29.962122, 29.865772),
   g_lon = c(116.322434, 116.20602, 117.196032, 113.58242, 113.755818, 108.685362, 
             109.715334, 105.974878, 112.248827, 102.811716, 105.28199, 123.801936, 
+<<<<<<< HEAD
             125.962291, 127.493741, 121.47536, 121.349437, 118.436866),
   g_pro = c("北京市", "北京市", "天津市", "山西省", "河南省", "广西壮族自治区", 
             "海南省", "四川省", "湖南省", "四川省", "贵州省", "辽宁省", 
@@ -188,7 +195,16 @@ toy_map <- data.frame(
              "南充市", "益阳市", "雅安市", "毕节市", "抚顺市", "通化市", 
              "黑河市", "上海市", "宁波市", "黄山市"),
   value_set = c(8, 4, 4, 4, 8, 6, 6, 5, 2, 4, 4, 9, 5, 8, 4, 1, 3)
+=======
+            125.962291, 127.493741, 121.47536, 121.349437, 118.436866)
+>>>>>>> 67e59691928f57f779649a8bd610af5808334dc1
 )
+```
+
+
+`goodmap` can also create animations to illustrate specified geographic dynamics. Users simply set `animate = TRUE` and specify the time variable for the function to draw the map accordingly.
+
+```{r}
 goodmap(
   toy_map,
   type = "point",
@@ -198,8 +214,11 @@ goodmap(
   base_radius = 1,
   radius_factor = 1
 )
+
 knitr::include_graphics("animated_map.gif")
 ```
+
+
 
 # Color blind friendly palette
 
