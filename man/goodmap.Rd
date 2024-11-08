@@ -2,19 +2,18 @@
 % Please edit documentation in R/goodmap.R
 \name{goodmap}
 \alias{goodmap}
-\title{The \code{goodmap} function is designed to create interactive PNG Map or GIF Map
-The \code{goodmap} function creates interactive map animations from a provided data file.
+\title{The \code{goodmap} function is designed to create interactive PNG Map or GIF Map from a provided data file.
 It supports two types of maps: \code{point} and \code{polygon}.
 The function can visualize data by either plotting points based on geographical coordinates
-or highlighting regions based on their administrative boundaries (province or city level).
-Additionally, the function can generate animated that showcase changes over time.}
+or highlighting regions polygon based on their administrative boundaries (province or city level).
+Additionally, the function can generate animated that showcase the change of data.}
 \usage{
 goodmap(
   data_file,
   type = "point",
   level = NULL,
   animate = FALSE,
-  animate_var = "year_set",
+  animate_var = NULL,
   map_center = c(35.8617, 104.1954),
   zoom_level = 4,
   custom_colors = NULL,
@@ -27,27 +26,28 @@ goodmap(
 }
 \arguments{
 \item{data_file}{Dataframe.
-When generate point map, \code{data_file} should include required columns such
-as \code{g_lat} and \code{g_lon}.
-When generate polygon map, \code{data_file} should include required columns such
-as \code{prov} or \code{city}.
+When generate point map, \code{data_file} should include required columns such as \code{g_lat} and \code{g_lon}.
+When generate polygon map, \code{data_file} should include required columns such as \code{prov} or \code{city}.
 The \code{prov} columns must be complete names, such as “内蒙古自治区” instead of “内蒙古”.
 If there is only incomplete names or geocodes in your data_file, we recommend you to use function \code{regioncode}
 as a one-step solution to these conversion from incomplete names.
 Ensure the file is formatted correctly with appropriate column headers.}
 
-\item{type}{A string specifying the type of map to generate. Options are \code{point}for point
-maps using \code{g_lat} and \code{g_lon},
+\item{type}{A string specifying the type of map to generate. Options are \code{point}for point maps using \code{g_lat} and \code{g_lon},
 or \code{polygon} for maps with administrative boundaries.}
 
 \item{level}{A string specifying the level of administrative boundaries for polygon maps.
 Acceptable values are \code{province} or \code{city}. This parameter is required if \code{type} is \code{polygon}.}
 
 \item{animate}{A logical value indicating whether to generate an animation from the maps. The default is FALSE.
-If animate is FALSE, the map for the latest year will be generated as a PNG file.
-If animate is TRUE, an animation will be generated from all panel data.}
+If animate is FALSE, the whole data will be generated as a PNG file.
+If animate is TRUE, an animation will be generated from all panel data, the animate_var must be assigned.}
 
-\item{animate_var}{A string specifying the variable to animate over. The default is \code{year_set}.}
+\item{animate_var}{A string specifying the variable to animate over.
+The default is \code{NULL}, the whole data will be generated as a PNG file.
+If an animation is needed, \code{data_file} should include required the \code{animate_set} column.
+\code{animate_set} includes a series of unique values that represents year or month, or other categorical variable.
+The frame number of the animation depends on the \code{animate_set}.}
 
 \item{map_center}{A numeric vector of length 2 specifying the latitude and longitude
 for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which
@@ -61,7 +61,7 @@ which uses the predefined color palette.}
 \item{base_radius}{A numeric value specifying the base radius for point markers on point maps. Default is 1.}
 
 \item{radius_factor}{A numeric value specifying the multiplier for adjusting the radius of
-point markers based on the type. Default is 1.}
+point markers based on the \code{value_set}. Default is 1.}
 
 \item{legend_opacity}{A numeric value specifying the opacity of the legend. Default is 0.7.}
 
@@ -74,10 +74,9 @@ Image in the viewer.
 }
 \description{
 If the map type is \code{point}, the color and size of the points will be determined by the
-\code{type} column in the data file.
+\code{value_set} column in the data file, which means the different value of each point.
 If the map type is \code{polygon}, the color of the polygons will be determined by the average
-value of the \code{variable} column
-for each city or province in the data file.
+value of the \code{variable} column for each city or province in the data file.
 }
 \examples{
 data_file <- data.frame(
@@ -88,7 +87,7 @@ data_file <- data.frame(
            "中华苏维埃人民共和国川滇黔省革命委员会旧址", "抚顺雷锋纪念馆", 
            "杨靖宇烈士陵园", "瑷珲历史陈列馆", "中国共产党第一次全国代表大会会址纪念馆", 
            "河姆渡遗址博物馆", "陶行知纪念馆"),
-  year_set = c(2021, 2021, 2021, 2021, 2021, 2021, 2021, 2017, 2017, 2017, 2017, 
+  animate_set = c(2021, 2021, 2021, 2021, 2021, 2021, 2021, 2017, 2017, 2017, 2017, 
                1997, 1997, 1997, 1997, 1997, 1997),
   g_lat = c(39.947298, 39.830932, 39.159621, 38.745234, 34.705527, 23.090849, 
             20.008295, 31.564526, 29.153561, 30.368317, 27.302689, 41.850161, 
@@ -102,7 +101,7 @@ data_file <- data.frame(
   g_city = c("北京市", "北京市", "天津市", "忻州市", "郑州市", "南宁市", "临高县", 
              "南充市", "益阳市", "雅安市", "毕节市", "抚顺市", "通化市", 
              "黑河市", "上海市", "宁波市", "黄山市"),
-  type = c(8, 4, 4, 4, 8, 6, 6, 5, 2, 4, 4, 9, 5, 8, 4, 1, 3)
+  value_set = c(8, 4, 4, 4, 8, 6, 6, 5, 2, 4, 4, 9, 5, 8, 4, 1, 3)
 )
 
 Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
@@ -110,9 +109,8 @@ goodmap(
   data_file = data_file,
   type = "point",
   animate = TRUE,
-  animate_var = "year_set",
+  animate_var = "animate_set",
   custom_colors = "pink",
   base_radius = 1, radius_factor = 1
 )
-unlink("*.gif")
 }
