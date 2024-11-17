@@ -131,7 +131,7 @@ goodmap <- function(data_file,
   } else {
     stop("Unknown map type, please select either 'point' or 'polygon'.")
   }
-
+  
   generate_map <- function(input_var_value = NULL, all_data = FALSE) {
     if (animate == FALSE || all_data) {
       filtered_data <- data_file
