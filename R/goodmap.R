@@ -54,7 +54,6 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "varia
 #' @import purrr
 #' @import gganimate
 #' @import sf
-#' @import rlang
 #' @import animation
 #' @import png
 #'

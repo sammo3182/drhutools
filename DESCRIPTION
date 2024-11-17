@@ -25,7 +25,6 @@ Imports:
     magick,
     mapview,
     webshot,
-    rlang,
     animation,
     png,
     grDevices
