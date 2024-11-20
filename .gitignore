@@ -1,13 +1,6 @@
-<<<<<<< HEAD
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-=======
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 docs
->>>>>>> cfd1182a54ae48b0e09487de0f1037d8b86da5e3
 inst/doc

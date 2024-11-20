@@ -1,7 +1,7 @@
 ---
 title: "`drhutools`: Toolbox for Political Science Academic Life"
 author: 
-  - HU Yue, Tsinghua University
+  - HU Yue
   - DENG Wen
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -22,10 +22,7 @@ knitr::opts_chunk$set(
   # fig.dim = c(2.2, 2.5)
 )
 
-if (!require(dir2json)) remotes::install_github("stla/dir2json")
-
 library(ggplot2)
-library(dir2json)
 library(drhutools)
 
 # Functions preload
@@ -38,39 +35,65 @@ set.seed(313)
 An efficient folder system can produce an organized environment for research and a smooth flow to pick up what you left from another moment. 
 `folderSystem` provides a consistent folder categorization for a research project, especially, of empirical studies in social science. 
 
+```{r folderTree-set, include=FALSE}
+# if (!require(dir2json)) remotes::install_github("stla/dir2json")
+# library(dir2json)
+#
+# # Producing folder try in chunk `folderTree-output`
+# wd_original <- getwd()
+# 
+# # Create a temporary directory
+# temp_dir <- tempfile()
+# dir.create(temp_dir)
+# setwd(temp_dir)
+# 
+# folderSystem()
+# 
+# # Show the dendrogram of the folder structure using dir2tree
+# dir2tree(temp_dir) |>
+#   cat()
+# 
+# setwd(wd_original)
+```
+
+```{r folderSystem, eval=FALSE}
+library(drhutools)
+
+folderSystem()
+```
+
 Once the function is called, it will create the folders shown as following in the working directory. 
 In each folder, there is a short document indicating what it is suggested to be used.
 Users are free to remove this illustration document after locating the real files in.
 If the folders with the same name already exist in the directory, it would not be recreated or overwritten.
 
-```{r foldersystem_setup, include=FALSE}
-library(drhutools)
-
-wd_original <- getwd()
-
-# Create a temporary directory
-temp_dir <- tempfile()
-dir.create(temp_dir)
-setwd(temp_dir)
-
-folderSystem()
+```txt
+## +- paper
+## |  |
+## |  +- submission
+## |  |  |
+## |  |  `- files for submission here; delete this file after locating the real files here.txt
+## |  |
+## |  `- images
+## |     |
+## |     `- non-code-generated images here; delete this file after locating the real files.txt
+## |
+## +- output
+## |  |
+## |  `- image, results, and other output files here; delete this file after locating the real files here.txt
+## |
+## +- document
+## |  |
+## |  `- documents and materials here; delete this file after locating the real files.txt
+## |
+## +- data
+## |  |
+## |  `- all data file here.csv
+## |
+## `- codes
+##    |
+##    `- put codes here; delete this file after locating the real files.txt
 ```
-
-```{r folderSystem, eval=FALSE}
-folderSystem()
-```
-
-
-```{r folderSystem_tree, echo=FALSE}
-# Show the dendrogram of the folder structure using dir2tree
-dir2tree(temp_dir) |>
-  cat()
-```
-
-```{r folderSystem_resetwd, include=FALSE}
-setwd(wd_original)
-```
-
 
 # Experimental result visulaization: `cdplot`
 
@@ -100,77 +123,6 @@ data("PlantGrowth")
 plot_plant <- cdplot(PlantGrowth, ks_test = TRUE)
 plot_plant
 ```
-
-# Standard Map of China: `goodmap`
-
-Drawing maps is more than often painful for Chinese scholars. 
-The `goodmap` function is designed to draw national maps based on a template released by [Amap.com](https://ditu.amap.com/?amapexchange=%2F).
-We were inspired by Dawei Lang's ([Lchiffon](https://github.com/Lchiffon)) excellent package [`leafletCN`](https://github.com/Lchiffon/leafletCN) and optimize `leafletCN::geojsonMap` to concentrate on drawing national maps. 
-Moreover, we adopted [Yang Cao](https://caoyang.tech/)'s geodata [updated](https://github.com/Lchiffon/leafletCN/issues/12) in 2020 when drawing the map. 
-
-The current version of `goodmap` enables users to draw points or fill polygons based on full names of prefectures or provinces, as illustrated in the following example.
-For data does not have full city or provincial names, users can consider use tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) to convert the data to the required format.
-If `type = "polygon"`, the data frame should follow the exemplary structure below:
-
-| id | city       | pro               | animate_set | variable   |
-|----|--------------------------------|-------------|------------|
-| 1  | 乌鲁木齐  | 新疆维吾尔自治区   | 2011        | 0.2861395  |
-| 2  | 拉萨      | 西藏自治区         | 2011        | 0.3881083  |
-| 3  | 呼和浩特  | 内蒙古自治区       | 2011        | 0.9466682  |
-| 4  | 西宁      | 青海省             | 2012        | 0.8360043  |
-| 5  | 成都      | 四川省             | 2012        | 0.4622928  |
-| 6  | 哈尔滨    | 黑龙江省           | 2012        | 0.1387102  |
-
-
-```{r polygon}
-toy_map <- data.frame(
-  id = c(1, 2, 3, 4, 5, 6),
-  city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
-  prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
-  animate_set = c(2010, 2010, 2010, 2011, 2011, 2011),
-  variable = c(0.2861395, 0.3881083, 0.9466682, 0.8360043, 0.4622928, 0.1387102)
-)
-
-goodmap(
-  toy_map,
-  type = "polygon",
-  level = "province"
-)
-```
-
-Note: If users encounter errors or unreadable output, adjusting the encoding may help.
-
-If `type = "point"`, the data frame should follow the exemplary structure below:
-
-```{r points}
-toy_map <- data.frame(
-  year_set = c(2021, 2021, 2021, 2021, 2021, 2021, 2021, 2017, 2017, 2017, 2017, 1997, 1997, 1997, 1997, 1997, 1997),
-  g_lat = c(39.947298, 39.830932, 39.159621, 38.745234, 34.705527, 23.090849, 
-            20.008295, 31.564526, 29.153561, 30.368317, 27.302689, 41.850161, 
-            41.7295, 49.977569, 31.220653, 29.962122, 29.865772),
-  g_lon = c(116.322434, 116.20602, 117.196032, 113.58242, 113.755818, 108.685362, 
-            109.715334, 105.974878, 112.248827, 102.811716, 105.28199, 123.801936, 125.962291, 127.493741, 121.47536, 121.349437, 118.436866)
-)
-```
-
-
-`goodmap` can also create animations to illustrate specified geographic dynamics. Users simply set `animate = TRUE` and specify the time variable for the function to draw the map accordingly.
-
-```{r}
-goodmap(
-  toy_map,
-  type = "point",
-  animate = TRUE,
-  animate_var = "animate_set",
-  custom_colors = "pink",
-  base_radius = 1,
-  radius_factor = 1
-)
-
-knitr::include_graphics("animated_map.gif")
-```
-
-
 
 # Color blind friendly palette
 
@@ -202,6 +154,142 @@ Except for the primary palette (named as `main`), users are given four alternati
 
 I would actually like to open this function to my users for adding your favorite palette, as long as you give them a special name and a list of colors.
 
+# Standard Map of China: `goodmap`
+
+Drawing maps is more than often painful for Chinese scholars. 
+The `goodmap` function is designed to draw national maps based on a template released by [Amap.com](https://ditu.amap.com/?amapexchange=%2F).
+We were inspired by Dawei Lang's ([Lchiffon](https://github.com/Lchiffon)) excellent package [`leafletCN`](https://github.com/Lchiffon/leafletCN) and optimize `leafletCN::geojsonMap` to concentrate on drawing national maps. 
+Moreover, we adopted [Yang Cao](https://caoyang.tech/)'s geodata [updated](https://github.com/Lchiffon/leafletCN/issues/12) in 2020 when drawing the map. 
+
+## Static Map
+
+The current version of `goodmap` enables users to draw points or fill polygons based on full names of prefectures or provinces, as illustrated in the following example.
+For data does not have full city or provincial names, users can consider use tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) to convert the data to the required format.
+If `type = "polygon"`, the data frame should follow the exemplary structure (`toy_poly`) below:
+
+```{r polygon-input}
+toy_poly <- data.frame(
+  id = c(1, 2, 3, 4, 5, 6),
+  city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
+  prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
+  animate_set = c(2010, 2010, 2010, 2011, 2011, 2011),
+  variable = c(
+    0.2861395,
+    0.3881083,
+    0.9466682,
+    0.8360043,
+    0.4622928,
+    0.1387102
+  )
+)
+```
+
+With the well-organized data, users can easily draw a national map of China at either provincial or prefectural levels:^[If users encounter errors or unreadable output, adjusting the encoding may help.]
+
+
+```{r polygon-output}
+goodmap(
+  toy_poly,
+  type = "polygon",
+  level = "province"
+)
+```
+
+Apart from polygonous maps, `goodmap` can also draw points on a national map.
+To do so, users need to set `type = "point"`.
+And the data frame should follow the exemplary structure below:
+
+```{r point-input}
+toy_point <- data.frame(
+  g_lat = c(
+    39.947298,
+    39.830932,
+    39.159621,
+    38.745234,
+    34.705527,
+    23.090849,
+    20.008295,
+    31.564526,
+    29.153561,
+    30.368317,
+    27.302689,
+    41.850161,
+    41.7295,
+    49.977569,
+    31.220653,
+    29.962122,
+    29.865772
+  ),
+  g_lon = c(
+    116.322434,
+    116.20602,
+    117.196032,
+    113.58242,
+    113.755818,
+    108.685362,
+    109.715334,
+    105.974878,
+    112.248827,
+    102.811716,
+    105.28199,
+    123.801936,
+    125.962291,
+    127.493741,
+    121.47536,
+    121.349437,
+    118.436866
+  ),
+  value_set = c(8, 4, 4, 4, 8, 6, 6, 5, 2, 4, 4, 9, 5, 8, 4, 1, 3)
+)
+```
+
+In this data structure, users can use `g_lat` and `g_lon` to set up the latitudes and longitudes of the points and vary the column `value_set` to set the size of the points. 
+```{r point-output}
+goodmap(
+  toy_point,
+  type = "point"
+)
+```
+
+## Animated map
+
+`goodmap` can also create animations to illustrate specified geographic dynamics. 
+Users simply set `animate = TRUE` and specify the time variable for the function to draw the map accordingly.
+Here is an example:
+
+```{r points-animate, eval=FALSE}
+toy_point$year <- c(
+    2021,
+    2021,
+    2021,
+    2021,
+    2021,
+    2021,
+    2021,
+    2017,
+    2017,
+    2017,
+    2017,
+    1997,
+    1997,
+    1997,
+    1997,
+    1997,
+    1997
+  )
+
+goodmap(
+  toy_point,
+  type = "point",
+  animate = TRUE,
+  animate_var = "year"
+)
+```
+
+![](https://drhuyue.site:10002/sammo3182/figure/animated_map.gif){fig-align="center"}
+
+In the current version, the animated plot will be stored in a temporary file.
+If users are satisfied with the output, they need to save it into wherever they want before rerun the function again.
 
 # Psychological scale scoring: `traits`
 

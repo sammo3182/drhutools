@@ -58,40 +58,28 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "varia
 #' @import png
 #'
 #' @examples
-#' data_file <- data.frame(
-#'   name = c("航天科技空间技术研究院展示中心", "长辛店二七纪念馆", "天津觉悟社纪念馆", 
-#'            "五台白求恩纪念馆（白求恩模范病室旧址）", "中国中铁装备集团郑州盾构总装车间", 
-#'            "昆仑关抗日战役纪念地", "海南解放公园", "南充市阆中红军烈士纪念园", 
-#'            "厂窖惨案遇难同胞纪念馆", "雅安市红军长征翻越夹金山纪念馆", 
-#'            "中华苏维埃人民共和国川滇黔省革命委员会旧址", "抚顺雷锋纪念馆", 
-#'            "杨靖宇烈士陵园", "瑷珲历史陈列馆", "中国共产党第一次全国代表大会会址纪念馆", 
-#'            "河姆渡遗址博物馆", "陶行知纪念馆"),
-#'   animate_set = c(2021, 2021, 2021, 2021, 2021, 2021, 2021, 2017, 2017, 2017, 2017, 
-#'                1997, 1997, 1997, 1997, 1997, 1997),
-#'   g_lat = c(39.947298, 39.830932, 39.159621, 38.745234, 34.705527, 23.090849, 
-#'             20.008295, 31.564526, 29.153561, 30.368317, 27.302689, 41.850161, 
-#'             41.7295, 49.977569, 31.220653, 29.962122, 29.865772),
-#'   g_lon = c(116.322434, 116.20602, 117.196032, 113.58242, 113.755818, 108.685362, 
-#'             109.715334, 105.974878, 112.248827, 102.811716, 105.28199, 123.801936, 
-#'             125.962291, 127.493741, 121.47536, 121.349437, 118.436866),
-#'   g_pro = c("北京市", "北京市", "天津市", "山西省", "河南省", "广西壮族自治区", 
-#'             "海南省", "四川省", "湖南省", "四川省", "贵州省", "辽宁省", 
-#'             "吉林省", "黑龙江省", "上海市", "浙江省", "安徽省"),
-#'   g_city = c("北京市", "北京市", "天津市", "忻州市", "郑州市", "南宁市", "临高县", 
-#'              "南充市", "益阳市", "雅安市", "毕节市", "抚顺市", "通化市", 
-#'              "黑河市", "上海市", "宁波市", "黄山市"),
-#'   value_set = c(8, 4, 4, 4, 8, 6, 6, 5, 2, 4, 4, 9, 5, 8, 4, 1, 3)
+#' 
+#' toy_poly <- data.frame(
+#'   id = c(1, 2, 3, 4, 5, 6),
+#'   city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
+#'   prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", #' "黑龙江省"),
+#'   animate_set = c(2010, 2010, 2010, 2011, 2011, 2011),
+#'   variable = c(
+#'     0.2861395,
+#'     0.3881083,
+#'     0.9466682,
+#'     0.8360043,
+#'     0.4622928,
+#'     0.1387102
+#'   )
 #' )
 #' 
-#' Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 #' goodmap(
-#'   data_file = data_file,
-#'   type = "point",
-#'   animate = TRUE,
-#'   animate_var = "animate_set",
-#'   custom_colors = "pink",
-#'   base_radius = 1, radius_factor = 1
+#'   toy_poly,
+#'   type = "polygon",
+#'   level = "province"
 #' )
+#' 
 #' @export
 
 goodmap <- function(data_file,
@@ -208,7 +196,7 @@ goodmap <- function(data_file,
           if (!is.null(custom_colors)) {
             value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_prov_var$value)))
           } else {
-            value_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(plot_prov_var$value)))
+            value_colors <- gb_pal(palette = "main")(length(unique(plot_prov_var$value)))
           }
           domain <- unique(plot_prov_var$value)
           value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
@@ -303,6 +291,11 @@ goodmap <- function(data_file,
     }
     
     temp_gif_path <- file.path(tempdir(), "animated_map.gif")
+    
+    if (file.exists(temp_gif_path)) {
+      file.remove(temp_gif_path)
+    }
+    
     saveGIF(
       {
         for (img in images) {
@@ -314,9 +307,7 @@ goodmap <- function(data_file,
       interval = 1
     )
     
-    if (file.exists(temp_gif_path)) {
-      file.remove(temp_gif_path)
-    }
+    
     
   } else {
     map_file <- generate_map(all_data = TRUE)
