@@ -1,4 +1,4 @@
-utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "variable", "value_var", "value_set"))
+utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value_var", "value_set"))
 
 #' The `goodmap` function is designed to create interactive PNG Map or GIF Map from a provided data file.
 #' It supports two types of maps: `point` and `polygon`.
@@ -9,7 +9,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "varia
 #' If the map type is `point`, the color and size of the points will be determined by the
 #' `value_set` column in the data file, which means the different value of each point.
 #' If the map type is `polygon`, the color of the polygons will be determined by the average
-#' value of the `variable` column for each city or province in the data file.
+#' value of the `value_set` column for each city or province in the data file.
 #'
 #' @param data_file Dataframe.
 #'                  When generate point map, `data_file` should include required columns such as `g_lat` and `g_lon`.
@@ -33,13 +33,14 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "varia
 #' @param map_center A numeric vector of length 2 specifying the latitude and longitude
 #'                   for the center of the map view. Default is `c(35.8617, 104.1954)`, which
 #'                   is approximately the center of China.
-#' @param zoom_level A numeric value specifying the zoom level for the map. Default is 4.
+#' @param zoom_level A numeric value specifying the zoom level for the map. Default is 3.
+#' @param color_type If the data is discrete, such as types or categories, choose `factor`. 
+#'                   If the data is continuous, such as temperature or pressure, choose `numeric`. Default is numeric.
 #' @param custom_colors A vector of colors for customizing the color gradient. Default is `NULL`,
 #'                      which uses the predefined color palette.
-#' @param base_radius A numeric value specifying the base radius for point markers on point maps. Default is 1.
-#' @param radius_factor A numeric value specifying the multiplier for adjusting the radius of
-#'                      point markers based on the `value_set`. Default is 1.
+#' @param point_radius A numeric value specifying the radius for point markers on point maps. Default is 5.
 #' @param legend_opacity A numeric value specifying the opacity of the legend. Default is 0.7.
+#' @param legend_name The name of the legend. Default is `Value`.
 #' @param width A numeric value specifying the width of the map images. Default is 800.
 #' @param height A numeric value specifying the height of the map images. Default is 900.
 #'
@@ -62,9 +63,9 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "varia
 #' toy_poly <- data.frame(
 #'   id = c(1, 2, 3, 4, 5, 6),
 #'   city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
-#'   prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", #' "黑龙江省"),
+#'   prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
 #'   animate_set = c(2010, 2010, 2010, 2011, 2011, 2011),
-#'   variable = c(
+#'   value_set = c(
 #'     0.2861395,
 #'     0.3881083,
 #'     0.9466682,
@@ -89,10 +90,11 @@ goodmap <- function(data_file,
                     animate_var = NULL,
                     map_center = c(35.8617, 104.1954),
                     zoom_level = 4,
+                    color_type = "numeric",
                     custom_colors = NULL,
-                    base_radius = 1,
-                    radius_factor = 1,
+                    point_radius = 5,
                     legend_opacity = 0.7,
+                    legend_name = NULL,
                     width = 800,
                     height = 900) {
   temp_saveDir <- file.path(getwd(), "temp_maps")
@@ -130,17 +132,25 @@ goodmap <- function(data_file,
     if (type == "point") {
       plot_point <- filtered_data |>
         select(g_lat, g_lon, value_set) |>
-        mutate(radius = base_radius + (as.numeric(value_set) * radius_factor))
+        mutate(radius = point_radius)
       
-      if (!is.null(custom_colors)) {
-        type_colors <- colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
-      } else {
-        type_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(data_file$value_set)))
-      }
-      
-      domain <- unique(data_file$value_set)
+      if (color_type == "factor") {
+        if (!is.null(custom_colors)) {
+          type_colors <- colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
+        } else {
+          type_colors <- colorRampPalette(c("black", "gold"))(length(unique(data_file$value_set)))
+          type_colors <- colorFactor(palette = type_colors, domain = unique(data_file$value_set))
+        }
+        } else {
+          if (!is.null(custom_colors)) {
+          type_colors <- colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
+          } else {
+            type_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(data_file$value_set)))
+          }
+            type_colors <- colorNumeric(palette = type_colors, domain = unique(data_file$value_set))
+        }
+
       color_mapping <- type_colors
-      type_colors <- colorFactor(palette = color_mapping, domain = domain)
       
       name_prefix <- "point_map"
       if (animate) {
@@ -150,7 +160,7 @@ goodmap <- function(data_file,
       }
       image_file <- file.path(temp_saveDir, name_file)
       
-      grDevices::png(image_file, width = width, height = height, res = 300)
+      grDevices::png(image_file, width = width, height = height, res = 600)
       
       map <- leaflet(plot_point) |>
         amap() |>
@@ -172,7 +182,17 @@ goodmap <- function(data_file,
           "bottomright",
           pal = type_colors,
           values = ~value_set,
-          title = if (is.null(animate_var)) "Value" else paste("Value", input_var_value),
+          title = if (!is.null(legend_name)) {
+            if (!is.null(animate_var)) {
+              paste(legend_name, input_var_value)
+            } else {
+              legend_name
+            }
+          } else if (!is.null(animate_var)) {
+            paste("Value", input_var_value)
+          } else {
+            "Value"
+          },
           opacity = legend_opacity
         )
       
@@ -182,9 +202,9 @@ goodmap <- function(data_file,
       suppressWarnings({
         if (level == "province") {
           plot_prov <- filtered_data |>
-            select(prov, variable) |>
+            select(prov, value_set) |>
             group_by(prov) |>
-            summarise(value_var = mean(variable, na.rm = TRUE)) |>
+            summarise(value_var = mean(value_set, na.rm = TRUE)) |>
             ungroup() |>
             right_join(data.frame(name = regionNames("china")), by = c("prov" = "name")) |>
             filter(!is.na(value_var))
@@ -193,14 +213,23 @@ goodmap <- function(data_file,
             rename(value = value_var) |>
             as.data.frame()
           
-          if (!is.null(custom_colors)) {
-            value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_prov_var$value)))
+          if (color_type == "factor") {
+            if (!is.null(custom_colors)) {
+              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_prov_var$value)))
+            } else {
+              value_colors <- colorRampPalette(c("black", "gold"))(length(unique(plot_prov_var$value)))
+            }
+            value_color_mapping <- colorFactor(palette = value_colors, domain = unique(plot_prov_var$value))
+            color_method <- "factor"
           } else {
-            value_colors <- gb_pal(palette = "main")(length(unique(plot_prov_var$value)))
+            if (!is.null(custom_colors)) {
+              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_prov_var$value)))
+            } else {
+              value_colors <- gb_pal(palette = "main")(length(unique(plot_prov_var$value)))
+            }
+            value_color_mapping <- colorNumeric(palette = value_colors, domain = unique(plot_prov_var$value))
+            color_method <- "numeric"
           }
-          domain <- unique(plot_prov_var$value)
-          value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
-          
           
           name_prefix <- "province_map"
           if (animate) {
@@ -210,22 +239,32 @@ goodmap <- function(data_file,
           }
           image_file <- file.path(temp_saveDir, name_file)
           
-          grDevices::png(image_file, width = width, height = height, res = 300)
+          grDevices::png(image_file, width = width, height = height, res = 600)
           
           map <- geojsonMap(plot_prov_var,
                             mapName = "china",
                             palette = value_colors,
-                            colorMethod = "numeric",
-                            legendTitle = if (is.null(animate_var)) "Value" else paste("Value", input_var_value),
+                            colorMethod = color_method,
+                            legendTitle = if (!is.null(legend_name)) {
+                              if (!is.null(animate_var)) {
+                                paste(legend_name, input_var_value)
+                              } else {
+                                legend_name
+                              }
+                            } else if (!is.null(animate_var)) {
+                              paste("Value", input_var_value)
+                            } else {
+                              "Value"
+                            },
                             na.color = "transparent"
           )
           print(map)
           grDevices::dev.off()
         } else if (level == "city") {
           plot_city <- filtered_data |>
-            select(city, variable) |>
+            select(city, value_set) |>
             group_by(city) |>
-            summarise(value_var = mean(variable, na.rm = TRUE)) |>
+            summarise(value_var = mean(value_set, na.rm = TRUE)) |>
             ungroup() |>
             right_join(data.frame(name = regionNames("city")), by = c("city" = "name")) |>
             filter(!is.na(value_var))
@@ -233,21 +272,44 @@ goodmap <- function(data_file,
           plot_city_var <- select(plot_city, city, value_var) |>
             rename(value = value_var) |>
             as.data.frame()
-          if (!is.null(custom_colors)) {
-            value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
+          
+          if (color_type == "factor") {
+            if (!is.null(custom_colors)) {
+              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
+            } else {
+              value_colors <- colorRampPalette(c("black", "gold"))(length(unique(plot_city_var$value)))
+            }
+            value_color_mapping <- colorFactor(palette = value_colors, domain = unique(plot_city_var$value))
+            color_method <- "factor"
           } else {
-            value_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(plot_city_var$value)))
+            if (!is.null(custom_colors)) {
+              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
+            } else {
+              value_colors <- gb_pal(palette = "main")(length(unique(plot_city_var$value)))
+            }
+            value_color_mapping <- colorNumeric(palette = value_colors, domain = unique(plot_city_var$value))
+            color_method <- "numeric"
           }
           
-          domain <- unique(plot_city_var$value)
-          value_color_mapping <- colorFactor(palette = value_colors, domain = domain)
           map <- geojsonMap(plot_city_var,
                             mapName = "city",
                             palette = value_colors,
-                            colorMethod = "numeric",
-                            legendTitle = if (is.null(animate_var)) "Value" else paste("Value", input_var_value),
+                            colorMethod = color_method,
+                            legendTitle = if (!is.null(legend_name)) {
+                              if (!is.null(animate_var)) {
+                                paste(legend_name, input_var_value)
+                              } else {
+                                legend_name
+                              }
+                            } else if (!is.null(animate_var)) {
+                              paste("Value", input_var_value)
+                            } else {
+                              "Value"
+                            },
                             na.color = "transparent"
           )
+          print(map)
+          grDevices::dev.off()
         }
       })
     }
@@ -269,7 +331,7 @@ goodmap <- function(data_file,
       file = file.path(temp_saveDir, name_file),
       vwidth = width,
       vheight = height,
-      res = 300
+      res = 600
     )
     return(file.path(temp_saveDir, name_file))
   }
@@ -306,8 +368,6 @@ goodmap <- function(data_file,
       movie.name = temp_gif_path,
       interval = 1
     )
-    
-    
     
   } else {
     map_file <- generate_map(all_data = TRUE)

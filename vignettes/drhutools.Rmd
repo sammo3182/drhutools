@@ -173,7 +173,7 @@ toy_poly <- data.frame(
   city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
   prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
   animate_set = c(2010, 2010, 2010, 2011, 2011, 2011),
-  variable = c(
+  value_set = c(
     0.2861395,
     0.3881083,
     0.9466682,
@@ -243,11 +243,17 @@ toy_point <- data.frame(
 )
 ```
 
-In this data structure, users can use `g_lat` and `g_lon` to set up the latitudes and longitudes of the points and vary the column `value_set` to set the size of the points. 
+In this data structure, users can use `g_lat` and `g_lon` to set up the latitudes and longitudes of the points and vary the column.
+The toy_point$value_set is discrete variables, so the color_type choose `factor`.
+Users can name the `legend_name` as they wish.
+
 ```{r point-output}
 goodmap(
   toy_point,
-  type = "point"
+  type = "point",
+  color_type = "factor",
+  point_radius = 7,
+  legend_name = "Number",
 )
 ```
 
@@ -281,6 +287,7 @@ toy_point$year <- c(
 goodmap(
   toy_point,
   type = "point",
+  color_type = "factor",
   animate = TRUE,
   animate_var = "year"
 )
