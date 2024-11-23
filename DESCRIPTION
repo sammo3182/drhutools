@@ -2,9 +2,15 @@ Package: drhutools
 Type: Package
 Title: Toolbox for Writing Academic Paper and Organizing Research Project in Political Science and Other Social Science disciplines
 Version: 1.0.0
-Authors@R: person("Yue", "Hu", role = c("aut", "cre"), email = "yuehu@tsinghua.edu.cn")
+Authors@R: 
+  c(
+  person("Yue", "Hu", role = c("aut", "cre"), email = "yuehu@tsinghua.edu.cn"),
+  person("Wen", "Deng", role = c("ctb"), email = "dengwenjoy@outlook.com")
+  )
 Maintainer: Yue Hu <yuehu@tsinghua.edu.cn>
-Description: A toolbox for conducting empirical research in political science and other social science disciplines.
+Description: A toolbox for conducting empirical research in political science and other social science disciplines. The current version can create folder system for academic project in political science, calculate psychological trait scores, visualize experimental and spatial data, and set up color-blind palette, functions used in academic research of political psychology or political science in general.
+URL: https://www.drhuyue.site/software/drhutools/
+BugReports: https://github.com/sammo3182/drhutools/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends:
@@ -31,13 +37,8 @@ Imports:
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-URL: https://github.com/sammo3182/drhutools
-BugReports: https://github.com/sammo3182/drhutools/issues
 Suggests: 
     knitr,
-    dir2json,
     remotes,
-    rmarkdown,
-    testthat (>= 3.0.0)
+    rmarkdown
 VignetteBuilder: knitr
-Config/testthat/edition: 3

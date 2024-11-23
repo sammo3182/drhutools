@@ -45,9 +45,6 @@ install.packages("drhutools")
 remotes::install_github("yuedeng/drhutools")
 ```
 
-
-
-
 # Efficient File Organization with `folderSystem`
 
 A well-organized folder system enhances research efficiency and ensures continuity, allowing you to easily resume work at any stage of the project. 
@@ -355,6 +352,7 @@ traits(toy_data)
 
 This example generates random data for the required columns and calculates the scores for TOSCA-3SC and Grit-O. 
 Adjust your dataset to match the column structure and format for accurate scoring.
+
 # Affiliation
 
 Yue Hu
