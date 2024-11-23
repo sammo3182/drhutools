@@ -30,10 +30,28 @@ theme_set(theme_minimal())
 set.seed(313)
 ```
 
-# Efficient file organization: `folderSystem`
+The `drhutools` package is designed to support political science research and academic tasks by providing a set of practical tools. 
+The functions are developed to streamline routine data analysis and visualization while accommodating domain-specific requirements.
 
-An efficient folder system can produce an organized environment for research and a smooth flow to pick up what you left from another moment. 
-`folderSystem` provides a consistent folder categorization for a research project, especially, of empirical studies in social science. 
+# Installation
+
+You can install the stable version of `drhutools` from CRAN or the developed version from GitHub using the following commands:
+
+```{r install-drhutools, eval=FALSE}
+# Install the stable version
+install.packages("drhutools")
+
+# Install drhutools from GitHub
+remotes::install_github("yuedeng/drhutools")
+```
+
+
+
+
+# Efficient File Organization with `folderSystem`
+
+A well-organized folder system enhances research efficiency and ensures continuity, allowing you to easily resume work at any stage of the project. 
+The `folderSystem` function establishes a standardized folder structure tailored for research projects, particularly those involving empirical studies in social science.
 
 ```{r folderTree-set, include=FALSE}
 # if (!require(dir2json)) remotes::install_github("stla/dir2json")
@@ -62,10 +80,9 @@ library(drhutools)
 folderSystem()
 ```
 
-Once the function is called, it will create the folders shown as following in the working directory. 
-In each folder, there is a short document indicating what it is suggested to be used.
-Users are free to remove this illustration document after locating the real files in.
-If the folders with the same name already exist in the directory, it would not be recreated or overwritten.
+When the function is executed, it creates the following folder structure in the working directory. 
+Each folder includes a brief guide explaining its recommended usage. Users may delete these instructional files once they have organized their actual project files. 
+If folders with the same names already exist in the directory, the function will not recreate or overwrite them, ensuring no accidental loss of existing data.
 
 ```txt
 ## +- paper
@@ -95,27 +112,20 @@ If the folders with the same name already exist in the directory, it would not b
 ##    `- put codes here; delete this file after locating the real files.txt
 ```
 
-# Experimental result visulaization: `cdplot`
+# Visualizing Experimental Results with `cdplot`
 
-`cdplot` provides a function to compare the empirical cumulative distribution functions (ECDF) between the treatment and control groups in an experiment or quasi-experiment.
-Comparing with conventional bar plots or difference-in-mean statistics, ECDF offers a fuller, non-parametric picture of the difference between treatment and control groups. 
+`cdplot` enables the comparison of empirical cumulative distribution functions (ECDFs) between treatment and control groups in experiments or quasi-experiments. 
+Unlike conventional bar plots or difference-in-mean statistics, ECDFs provide a comprehensive, non-parametric view of differences between the treatment and control groups, capturing the entire distribution of outcomes.
 
-The function will produce a `ggplot` object showing the entire distribution between the experimental groups.
-The plot will show the ECDF of both the control and treatment groups.
-It also identify with points and dash lines the value at which the treatment group is different from the control the most.
-For multi-group experiment, the function will produce multiple plots for the comparison between the control group and each treatment.
+The function generates a `ggplot` object that displays:
 
-Users should put experimental data into a "long" format storing the outcome in the first column and assignment in the second column.
-The assign groups should be stored as levels of a factor.
-The first category will be regarded as the control group.
+1. The ECDFs of the control and treatment groups.
+2. Points and dashed lines highlighting the value at which the treatment group differs most from the control group.
+3. For multi-group experiments, separate plots comparing the control group to each treatment group.
 
-
-Users can alter the argument in `point_size`, `point_color`, and `link_color` to customize the size of points and lines in the plot.
-The function also provide the Kolmogorov-Smirnov test result between the control and treatment groups.
-Users can set `ks_test` to `TRUE` to appear the result at the bottom-right corner of the plot.
-
-The following example illustrates the results of an  experiment to compare yields (as measured by dried weight of plants) obtained under a control and two different treatment conditions, a dataset from @Dobson1983 and freely access by `datasets::PlantGrowh`.
-
+Before using `cdplot`, the users should organize the experimental data in a "long" format, where the first column contains the outcome variable.
+The second column contains the group assignment, stored as a factor with levels.
+The first level is treated as the control group.
 
 ```{r cdplot}
 data("PlantGrowth")
@@ -124,16 +134,20 @@ plot_plant <- cdplot(PlantGrowth, ks_test = TRUE)
 plot_plant
 ```
 
-# Color blind friendly palette
+Users can customize the appearance of the plot by adjusting:
+- `point_size` to control the size of the points.
+- `point_color` to define the color of the points.
+- `link_color` to set the color of the dashed lines.
 
-Everyone has their favorite colors. 
-This package provides a palette that I personally like and use all the time. 
-The primary colors are gold (#FFCD00) and black (#000000).
-So the palette is named as `_gb`. 
+Additionally, the function can perform and display the results of a Kolmogorov-Smirnov (K-S) test to compare the distributions. Set the `ks_test` argument to `TRUE` to show the test result in the bottom-right corner of the plot.
 
-Users can use the palette as any other palettes when visualizing with `ggplot2`.
-All the above visualizing elements are drawn with this palette. 
-An extra example with codes are shown below to illustrate how users can use it.
+
+
+# Color-Blind Friendly Palette
+
+While everyone has their preferred colors, this package includes a palette that I personally use and recommend. The primary colors are gold (`#FFCD00`) and black (`#000000`), which inspired the name `_gb`.
+
+This palette integrates seamlessly with `ggplot2` visualizations, allowing users to apply it as they would any other palette. The visualizations shown above were created using this palette. Below is an additional example demonstrating how to use it in practice:
 
 ```{r gb}
 ggplot(mtcars, aes(wt, mpg, color = cyl)) +
@@ -145,27 +159,31 @@ ggplot(mpg, aes(y = class, fill = drv)) +
   scale_fill_gb()
 ```
 
-Except for the primary palette (named as `main`), users are given four alternatives with more color options, as following.
+In addition to the primary palette (`main`), the package offers four alternatives to suit various visualization needs:
 
-- `tricol`: Gold, black, and dark grey to create a gradual effect.
-- `digitMixed`: Five-pack colors specified for digital publications.
-- `printMixed`: Five-pack colors specified for printed publications.
-- `full`: A palette including all the colors gb_cols can call.
+- `tricol`: A gradient effect using gold, black, and dark grey.
+- `digitMixed`: A set of five colors optimized for digital publications.
+- `printMixed`: A set of five colors optimized for printed materials.
+- `full`: A comprehensive palette containing all colors available through `gb_cols`.
 
-I would actually like to open this function to my users for adding your favorite palette, as long as you give them a special name and a list of colors.
+I also invite users to contribute their favorite palettes. You can customize and add your own palette by assigning it a unique name and providing a list of colors.
+
 
 # Standard Map of China: `goodmap`
 
-Drawing maps is more than often painful for Chinese scholars. 
-The `goodmap` function is designed to draw national maps based on a template released by [Amap.com](https://ditu.amap.com/?amapexchange=%2F).
-We were inspired by Dawei Lang's ([Lchiffon](https://github.com/Lchiffon)) excellent package [`leafletCN`](https://github.com/Lchiffon/leafletCN) and optimize `leafletCN::geojsonMap` to concentrate on drawing national maps. 
-Moreover, we adopted [Yang Cao](https://caoyang.tech/)'s geodata [updated](https://github.com/Lchiffon/leafletCN/issues/12) in 2020 when drawing the map. 
+Drawing maps can often be a challenge for Chinese scholars. 
+The `goodmap` function simplifies this process by creating national maps based on a template provided by [Amap.com](https://ditu.amap.com/?amapexchange=%2F). 
+This function is inspired by Dawei Lang's excellent package [`leafletCN`](https://github.com/Lchiffon/leafletCN) and optimizes `leafletCN::geojsonMap` to focus specifically on national maps. It also incorporates geodata updated in 2020 by [Yang Cao](https://caoyang.tech/) ([details here](https://github.com/Lchiffon/leafletCN/issues/12)).
 
-## Static Map
+## Static Maps
 
-The current version of `goodmap` enables users to draw points or fill polygons based on full names of prefectures or provinces, as illustrated in the following example.
-For data does not have full city or provincial names, users can consider use tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) to convert the data to the required format.
-If `type = "polygon"`, the data frame should follow the exemplary structure (`toy_poly`) below:
+The current version of `goodmap` allows users to draw points or fill polygons based on the full names of prefectures or provinces. 
+Here is an example workflow for generating such maps.
+
+### Preparing Data for Polygon Maps
+
+To draw a polygon map, the dataset should be formatted with full city or provincial names. If your data lacks this format, tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) can help convert the data. 
+The data structure should resemble the example below (`toy_poly`):
 
 ```{r polygon-input}
 toy_poly <- data.frame(
@@ -184,8 +202,7 @@ toy_poly <- data.frame(
 )
 ```
 
-With the well-organized data, users can easily draw a national map of China at either provincial or prefectural levels:^[If users encounter errors or unreadable output, adjusting the encoding may help.]
-
+With properly structured data, users can easily generate a national map of China at the provincial or prefectural level:^[If errors occur or the output is unreadable, adjusting the encoding may resolve the issue.]
 
 ```{r polygon-output}
 goodmap(
@@ -195,9 +212,10 @@ goodmap(
 )
 ```
 
-Apart from polygonous maps, `goodmap` can also draw points on a national map.
-To do so, users need to set `type = "point"`.
-And the data frame should follow the exemplary structure below:
+### Preparing Data for Point Maps
+
+To create a map with points, set `type = "point"`. 
+The data should follow this structure:
 
 ```{r point-input}
 toy_point <- data.frame(
@@ -243,9 +261,8 @@ toy_point <- data.frame(
 )
 ```
 
-In this data structure, users can use `g_lat` and `g_lon` to set up the latitudes and longitudes of the points and vary the column.
-The toy_point$value_set is discrete variables, so the color_type choose `factor`.
-Users can name the `legend_name` as they wish.
+The `g_lat` and `g_lon` columns define the latitude and longitude of the points, while the `value_set` column contains the variable to be displayed. 
+If `value_set` contains discrete variables, set `color_type = "factor"`. The legend can be named using the `legend_name` argument.
 
 ```{r point-output}
 goodmap(
@@ -257,10 +274,10 @@ goodmap(
 )
 ```
 
-## Animated map
+## Animated Maps
 
-`goodmap` can also create animations to illustrate specified geographic dynamics. 
-Users simply set `animate = TRUE` and specify the time variable for the function to draw the map accordingly.
+`goodmap` can also create animations to illustrate geographic dynamics over time. 
+To do this, set `animate = TRUE` and specify the time variable. 
 Here is an example:
 
 ```{r points-animate, eval=FALSE}
@@ -295,21 +312,29 @@ goodmap(
 
 ![](https://drhuyue.site:10002/sammo3182/figure/animated_map.gif){fig-align="center"}
 
-In the current version, the animated plot will be stored in a temporary file.
-If users are satisfied with the output, they need to save it into wherever they want before rerun the function again.
+Currently, animated plots are stored in a temporary file.
+If satisfied with the result, users should save the animation to a desired location before rerunning the function.
 
-# Psychological scale scoring: `traits`
 
-`traits` is used for calculating personality traits based on psychological surveys.
-The current version can calculate the TOSCA-3SC scores and Grit-O score.
-The TOSCA-3SC (Test of Self-Conscious Affect—Short Version) is created by @Tangney1990 for measuring self-conscious emotions, particularly *shame* and *guilt* []. 
-Participants are presented with hypothetical scenarios, and their responses are analyzed to assess the intensity of shame or guilt reactions. 
-The Grit-O scale is created by @DuckworthEtAl2007 to measure *grit*, which refers to an individual's perseverance and passion for long-term goals.
 
-Users need to fit the survey data with specific column names as illustrated below: 
+# Psychological Scale Scoring: `traits`
 
-- TOSCA-3SC: `Q3|R3` ~ `Q13|R4`
-- Grit-O: `Q14|1` ~ `Q25|1`
+The `traits` function calculates personality trait scores based on psychological survey responses. 
+The current version supports scoring for two widely used scales:
+
+- **TOSCA-3SC**: The Test of Self-Conscious Affect—Short Version, developed by @Tangney1990, measures self-conscious emotions, particularly *shame* and *guilt*. Participants respond to hypothetical scenarios, and their answers are analyzed to determine the intensity of their shame or guilt reactions.
+- **Grit-O**: The Grit Scale, created by @DuckworthEtAl2007, evaluates *grit*—defined as perseverance and passion for long-term goals.
+
+### Data Requirements
+
+To use `traits`, the survey data must include specific column names corresponding to the questions in each scale:
+
+- **TOSCA-3SC**: Columns `Q3|R3` through `Q13|R4`.
+- **Grit-O**: Columns `Q14|1` through `Q25|1`.
+
+### Example
+
+The following example demonstrates how to prepare and analyze a dataset using `traits`:
 
 ```{r traits}
 column_names <- c(
@@ -328,8 +353,8 @@ names(toy_data) <- column_names
 traits(toy_data)
 ```
 
-
-
+This example generates random data for the required columns and calculates the scores for TOSCA-3SC and Grit-O. 
+Adjust your dataset to match the column structure and format for accurate scoring.
 # Affiliation
 
 Yue Hu
