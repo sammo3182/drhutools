@@ -83,6 +83,7 @@ value of the \code{value_set} column for each city or province in the data file.
 }
 \examples{
 
+\donttest{
 toy_poly <- data.frame(
   id = c(1, 2, 3, 4, 5, 6),
   city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
@@ -103,5 +104,6 @@ goodmap(
   type = "polygon",
   level = "province"
 )
+}
 
 }

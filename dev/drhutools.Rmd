@@ -180,23 +180,34 @@ Here is an example workflow for generating such maps.
 ### Preparing Data for Polygon Maps
 
 To draw a polygon map, the dataset should be formatted with full city or provincial names. If your data lacks this format, tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) can help convert the data. 
-The data structure should resemble the example below (`toy_poly`):^[CRAN check seems not allow Chinese characters in the vignette since it intends to compile a pdf version. To pass the CRAN check, I had to insert a screenshot as following rather than the real toy data. For users who want to try the toy data, you can find the codes to create it in the example of `goodmap`.]
+The data structure should resemble the example below (`toy_poly`):
 
-![](toy_poly.png){fig-align="center"}
+```{r polygon-input}
+toy_poly <- data.frame(
+  id = c(1, 2, 3, 4, 5, 6),
+  city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
+  prov = c("新疆维吾尔自治区", "西藏自治区", "内蒙古自治区", "青海省", "四川省", "黑龙江省"),
+  animate_set = c(2010, 2010, 2010, 2011, 2011, 2011),
+  value_set = c(
+    0.2861395,
+    0.3881083,
+    0.9466682,
+    0.8360043,
+    0.4622928,
+    0.1387102
+  )
+)
+```
 
 With properly structured data, users can easily generate a national map of China at the provincial or prefectural level:^[If errors occur or the output is unreadable, adjusting the encoding may resolve the issue.]
 
-```{r polygon-output, eval=FALSE}
+```{r polygon-output}
 goodmap(
   toy_poly,
   type = "polygon",
   level = "province"
 )
-
-ggsave("goodmap_polygon.png")
 ```
-
-![](goodemap_poly.png){fig-align="center"}
 
 ### Preparing Data for Point Maps
 

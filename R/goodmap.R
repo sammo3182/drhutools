@@ -60,6 +60,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #'
 #' @examples
 #' 
+#' \donttest{
 #' toy_poly <- data.frame(
 #'   id = c(1, 2, 3, 4, 5, 6),
 #'   city = c("乌鲁木齐", "拉萨", "呼和浩特", "西宁", "成都", "哈尔滨"),
@@ -80,6 +81,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #'   type = "polygon",
 #'   level = "province"
 #' )
+#' }
 #' 
 #' @export
 

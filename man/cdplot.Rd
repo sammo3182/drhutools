@@ -2,7 +2,7 @@
 % Please edit documentation in R/cdplot.R
 \name{cdplot}
 \alias{cdplot}
-\title{Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) between the treatment and control groups in an experiment or quasi-experiment}
+\title{Visualizing the experimental outcome with cumulative distribution functions.}
 \arguments{
 \item{data}{A data.frame including two columns, one recording the outcome and the other recording the assignment. The assignment column must be named as \code{group}.}
 
@@ -18,7 +18,7 @@
 A list of \code{ggplot2} objects comparing the ECDFs between the control and treatment groups and identifying at most three largest differences.
 }
 \description{
-Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) between the treatment and control groups in an experiment or quasi-experiment
+Packed \code{ggplot2} function to compare the empirical cumulative distribution functions (ECDF) between the treatment and control groups in an experiment or quasi-experiment.
 }
 \examples{
 
