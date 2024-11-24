@@ -1,3 +1,8 @@
+# drhutools 1.0.0
+
+- Add new function `goodmap`
+- CRAN submission
+
 # drhutools 0.1.2
 
 - `folderSystem` create the folder system automatically at the project's root directory.
