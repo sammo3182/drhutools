@@ -186,17 +186,14 @@ The data structure should resemble the example below (`toy_poly`):^[CRAN check s
 
 With properly structured data, users can easily generate a national map of China at the provincial or prefectural level:^[If errors occur or the output is unreadable, adjusting the encoding may resolve the issue.]
 
-```{r polygon-output, eval=FALSE}
+```{r polygon-output}
 goodmap(
   toy_poly,
   type = "polygon",
   level = "province"
 )
-
-ggsave("goodmap_polygon.png")
 ```
 
-![](goodemap_poly.png){fig-align="center"}
 
 ### Preparing Data for Point Maps
 

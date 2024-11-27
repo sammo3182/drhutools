@@ -3,14 +3,14 @@
 \docType{data}
 \name{leafletcn.map.names}
 \alias{leafletcn.map.names}
-\title{A data file of words and frequency from tm package}
+\title{Leaflet Map Names Dataset}
 \format{
-A data set cities and file names
+A data frame with city names and file names.
 }
 \usage{
 leafletcn.map.names
 }
 \description{
-A data file of words and frequency from tm package
+A internal dataset providing city names and corresponding file names for mapping with Leaflet.
 }
 \keyword{datasets}
