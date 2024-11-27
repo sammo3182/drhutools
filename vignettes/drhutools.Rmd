@@ -179,14 +179,14 @@ Here is an example workflow for generating such maps.
 
 ### Preparing Data for Polygon Maps
 
-To draw a polygon map, the dataset should be formatted with full city or provincial names. If your data lacks this format, tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/index.html) can help convert the data. 
+To draw a polygon map, the dataset should be formatted with full city or provincial names. If your data lacks this format, tools such as [`regioncodes`](https://cran.r-project.org/web/packages/regioncode/) can help convert the data. 
 The data structure should resemble the example below (`toy_poly`):^[CRAN check seems not allow Chinese characters in the vignette since it intends to compile a pdf version. To pass the CRAN check, I had to insert a screenshot as following rather than the real toy data. For users who want to try the toy data, you can find the codes to create it in the example of `goodmap`.]
 
 ![](toy_poly.png){fig-align="center"}
 
 With properly structured data, users can easily generate a national map of China at the provincial or prefectural level:^[If errors occur or the output is unreadable, adjusting the encoding may resolve the issue.]
 
-```{r polygon-output}
+```{r polygon-output, eval=FALSE}
 goodmap(
   toy_poly,
   type = "polygon",
@@ -194,6 +194,7 @@ goodmap(
 )
 ```
 
+![](goodemap_poly.png){fig-align="center"}
 
 ### Preparing Data for Point Maps
 
@@ -247,7 +248,7 @@ toy_point <- data.frame(
 The `g_lat` and `g_lon` columns define the latitude and longitude of the points, while the `value_set` column contains the variable to be displayed. 
 If `value_set` contains discrete variables, set `color_type = "factor"`. The legend can be named using the `legend_name` argument.
 
-```{r point-output}
+```{r point-output, eval=FALSE}
 goodmap(
   toy_point,
   type = "point",
@@ -256,6 +257,8 @@ goodmap(
   legend_name = "Number",
 )
 ```
+
+![](goodmap_point.png){fig-align="center"}
 
 ## Animated Maps
 

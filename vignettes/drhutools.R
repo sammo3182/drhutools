@@ -60,12 +60,12 @@ ggplot(mpg, aes(y = class, fill = drv)) +
   geom_bar() +
   scale_fill_gb()
 
-## ----polygon-output-----------------------------------------------------------
-goodmap(
-  toy_poly,
-  type = "polygon",
-  level = "province"
-)
+## ----polygon-output, eval=FALSE-----------------------------------------------
+# goodmap(
+#   toy_poly,
+#   type = "polygon",
+#   level = "province"
+# )
 
 ## ----point-input--------------------------------------------------------------
 toy_point <- data.frame(
@@ -110,14 +110,14 @@ toy_point <- data.frame(
   value_set = c(8, 4, 4, 4, 8, 6, 6, 5, 2, 4, 4, 9, 5, 8, 4, 1, 3)
 )
 
-## ----point-output-------------------------------------------------------------
-goodmap(
-  toy_point,
-  type = "point",
-  color_type = "factor",
-  point_radius = 7,
-  legend_name = "Number",
-)
+## ----point-output, eval=FALSE-------------------------------------------------
+# goodmap(
+#   toy_point,
+#   type = "point",
+#   color_type = "factor",
+#   point_radius = 7,
+#   legend_name = "Number",
+# )
 
 ## ----points-animate, eval=FALSE-----------------------------------------------
 # toy_point$year <- c(

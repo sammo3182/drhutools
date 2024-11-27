@@ -14,7 +14,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #' @param data_file Dataframe.
 #'                  When generate point map, `data_file` should include required columns such as `g_lat` and `g_lon`.
 #'                  When generate polygon map, `data_file` should include required columns such as `prov` or `city`.
-#'                  The `prov` columns must be complete names, such as “内蒙古自治区” instead of “内蒙古”.
+#'                  The `prov` columns must be complete, official names rather than any shortened form or abbreviation.
 #'                  If there is only incomplete names or geocodes in your data_file, we recommend you to use function `regioncode`
 #'                  as a one-step solution to these conversion from incomplete names.
 #'                  Ensure the file is formatted correctly with appropriate column headers.
@@ -60,7 +60,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #'
 #' @examples
 #' 
-#' \donttest{
+#' \dontrun{
 #' goodmap(
 #'   toy_poly,
 #'   type = "polygon",

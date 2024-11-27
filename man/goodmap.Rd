@@ -29,7 +29,7 @@ goodmap(
 \item{data_file}{Dataframe.
 When generate point map, \code{data_file} should include required columns such as \code{g_lat} and \code{g_lon}.
 When generate polygon map, \code{data_file} should include required columns such as \code{prov} or \code{city}.
-The \code{prov} columns must be complete names, such as “内蒙古自治区” instead of “内蒙古”.
+The \code{prov} columns must be complete, official names rather than any shortened form or abbreviation.
 If there is only incomplete names or geocodes in your data_file, we recommend you to use function \code{regioncode}
 as a one-step solution to these conversion from incomplete names.
 Ensure the file is formatted correctly with appropriate column headers.}
@@ -83,7 +83,7 @@ value of the \code{value_set} column for each city or province in the data file.
 }
 \examples{
 
-\donttest{
+\dontrun{
 goodmap(
   toy_poly,
   type = "polygon",
