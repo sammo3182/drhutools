@@ -1,5 +1,5 @@
 ---
-title: "`drhutools`: Toolbox for Political Science Academic Life"
+title: "`drhutools`: Political Science Academic Research Gears"
 author: 
   - HU Yue
   - DENG Wen
@@ -9,7 +9,7 @@ output: rmarkdown::html_vignette
 bibliography: s_drhutools.bib
 
 vignette: >
-  %\VignetteIndexEntry{`drhutools`: Toolbox for Political Science Academic Life}
+  %\VignetteIndexEntry{`drhutools`: Political Science Academic Research Gears}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

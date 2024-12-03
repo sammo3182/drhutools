@@ -17,6 +17,9 @@ A geographic data frame with 6 rows and 5 variables:
 \usage{
 toy_poly
 }
+\value{
+A data.frame object
+}
 \description{
 A sample dataset designed to illustrate the functionality of the \code{goodmap} function.
 }

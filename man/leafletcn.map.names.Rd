@@ -10,6 +10,9 @@ A data frame with city names and file names.
 \usage{
 leafletcn.map.names
 }
+\value{
+A data.frame object
+}
 \description{
 A internal dataset providing city names and corresponding file names for mapping with Leaflet.
 }

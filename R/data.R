@@ -12,6 +12,7 @@
 #'   \item{animate_set}{A numeric vector used to group data for animated plotting.}
 #'   \item{value_set}{Values used to fill each polygon in the map.}
 #' }
+#' @return A data.frame object
 "toy_poly"
 
 #' Leaflet Map Names Dataset
@@ -21,4 +22,5 @@
 #' @docType data
 #' @name leafletcn.map.names
 #' @format A data frame with city names and file names.
+#' @return A data.frame object
 "leafletcn.map.names"

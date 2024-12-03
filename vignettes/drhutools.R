@@ -14,16 +14,16 @@ theme_set(theme_minimal())
 set.seed(313)
 
 ## ----install-drhutools, eval=FALSE--------------------------------------------
-#  # Install the stable version
-#  install.packages("drhutools")
-#  
-#  # Install drhutools from GitHub
-#  remotes::install_github("yuedeng/drhutools")
+# # Install the stable version
+# install.packages("drhutools")
+# 
+# # Install drhutools from GitHub
+# remotes::install_github("yuedeng/drhutools")
 
 ## ----folderSystem, eval=FALSE-------------------------------------------------
-#  library(drhutools)
-#  
-#  folderSystem()
+# library(drhutools)
+# 
+# folderSystem()
 
 ## ----cdplot-------------------------------------------------------------------
 data("PlantGrowth")
@@ -41,11 +41,11 @@ ggplot(mpg, aes(y = class, fill = drv)) +
   scale_fill_gb()
 
 ## ----polygon-output, eval=FALSE-----------------------------------------------
-#  goodmap(
-#    toy_poly,
-#    type = "polygon",
-#    level = "province"
-#  )
+# goodmap(
+#   toy_poly,
+#   type = "polygon",
+#   level = "province"
+# )
 
 ## ----point-input--------------------------------------------------------------
 toy_point <- data.frame(
@@ -91,42 +91,42 @@ toy_point <- data.frame(
 )
 
 ## ----point-output, eval=FALSE-------------------------------------------------
-#  goodmap(
-#    toy_point,
-#    type = "point",
-#    color_type = "factor",
-#    point_radius = 7,
-#    legend_name = "Number",
-#  )
+# goodmap(
+#   toy_point,
+#   type = "point",
+#   color_type = "factor",
+#   point_radius = 7,
+#   legend_name = "Number",
+# )
 
 ## ----points-animate, eval=FALSE-----------------------------------------------
-#  toy_point$year <- c(
-#      2021,
-#      2021,
-#      2021,
-#      2021,
-#      2021,
-#      2021,
-#      2021,
-#      2017,
-#      2017,
-#      2017,
-#      2017,
-#      1997,
-#      1997,
-#      1997,
-#      1997,
-#      1997,
-#      1997
-#    )
-#  
-#  goodmap(
-#    toy_point,
-#    type = "point",
-#    color_type = "factor",
-#    animate = TRUE,
-#    animate_var = "year"
-#  )
+# toy_point$year <- c(
+#     2021,
+#     2021,
+#     2021,
+#     2021,
+#     2021,
+#     2021,
+#     2021,
+#     2017,
+#     2017,
+#     2017,
+#     2017,
+#     1997,
+#     1997,
+#     1997,
+#     1997,
+#     1997,
+#     1997
+#   )
+# 
+# goodmap(
+#   toy_point,
+#   type = "point",
+#   color_type = "factor",
+#   animate = TRUE,
+#   animate_var = "year"
+# )
 
 ## ----traits-------------------------------------------------------------------
 column_names <- c(
