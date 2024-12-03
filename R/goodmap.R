@@ -86,10 +86,7 @@ goodmap <- function(data_file,
                     height = 900) {
   temp_saveDir <- file.path(tempdir(), "temp_maps")
   dir.create(temp_saveDir, showWarnings = FALSE)
-  
-  # if (!webshot::is_phantomjs_installed()) {
-  #   webshot::install_phantomjs()
-  # }
+
   
   if (type == "point") {
     if (!all(c("g_lat", "g_lon") %in% colnames(data_file))) {
