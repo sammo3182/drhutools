@@ -50,27 +50,6 @@ remotes::install_github("yuedeng/drhutools")
 A well-organized folder system enhances research efficiency and ensures continuity, allowing you to easily resume work at any stage of the project. 
 The `folderSystem` function establishes a standardized folder structure tailored for research projects, particularly those involving empirical studies in social science.
 
-```{r folderTree-set, include=FALSE}
-# if (!require(dir2json)) remotes::install_github("stla/dir2json")
-# library(dir2json)
-#
-# # Producing folder try in chunk `folderTree-output`
-# wd_original <- getwd()
-# 
-# # Create a temporary directory
-# temp_dir <- tempfile()
-# dir.create(temp_dir)
-# setwd(temp_dir)
-# 
-# folderSystem()
-# 
-# # Show the dendrogram of the folder structure using dir2tree
-# dir2tree(temp_dir) |>
-#   cat()
-# 
-# setwd(wd_original)
-```
-
 ```{r folderSystem, eval=FALSE}
 library(drhutools)
 

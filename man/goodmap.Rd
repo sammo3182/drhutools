@@ -83,7 +83,7 @@ value of the \code{value_set} column for each city or province in the data file.
 }
 \examples{
 
-\dontrun{
+\donttest{
 goodmap(
   toy_poly,
   type = "polygon",

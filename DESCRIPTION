@@ -1,6 +1,6 @@
 Package: drhutools
 Type: Package
-Title: Toolbox for Writing Academic Paper and Organizing Research Project in Political Science and Other Social Science Disciplines
+Title: Toolbox for Academic Research in Political Science
 Version: 1.0.0
 Authors@R: 
   c(
@@ -8,7 +8,7 @@ Authors@R:
   person("Wen", "Deng", role = c("ctb"), email = "dengwenjoy@outlook.com")
   )
 Maintainer: Yue Hu <yuehu@tsinghua.edu.cn>
-Description: A toolbox for conducting empirical research in political science and other social science disciplines. The current version can create folder system for academic project in political science, calculate psychological trait scores, visualize experimental and spatial data, and set up color-blind palette, functions used in academic research of political psychology or political science in general.
+Description: Using these tools to simplify the research process of political science and other social sciences. The current version can create folder system for academic project in political science, calculate psychological trait scores, visualize experimental and spatial data, and set up color-blind palette, functions used in academic research of political psychology or political science in general.
 URL: https://www.drhuyue.site/software/drhutools/
 BugReports: https://github.com/sammo3182/drhutools/issues
 License: MIT + file LICENSE

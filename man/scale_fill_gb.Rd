@@ -22,6 +22,9 @@ scale_fill_gb(palette = "main", discrete = TRUE, reverse = FALSE, ...)
 
 \item{...}{Additional arguments passed to \code{discrete_scale()} or \code{scale_color_gradientn()}, used respectively when discrete is TRUE or FALSE}
 }
+\value{
+No return value, called for modifying the appearance of the plot.
+}
 \description{
 Color scale constructors for gold & black colors
 }

@@ -10,6 +10,14 @@
 
 A toolbox for writing an academic paper with rmarkdown. The tools includes data analyses, visualization, and documenting.
 
+Before install:
+
+```
+if (!webshot::is_phantomjs_installed()) {
+  webshot::install_phantomjs()
+}
+```
+
 To install:
 
 * the latest developing version: `remotes::install_github("sammo3182/drhutools")`.

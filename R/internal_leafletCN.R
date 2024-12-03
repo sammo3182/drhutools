@@ -341,11 +341,24 @@ read.geoShape <- function(txt) {
 
 regionNames <- function(mapName = NULL) {
   # city = 'china'
+  # if (is.null(mapName)) {
+  #   print(leafletcn.map.names$name)
+  #   cat("\nThese are valid mapName~\n")
+  #   return("NULL")
+  # }
+  # Revise for CRAN
+  
   if (is.null(mapName)) {
-    print(leafletcn.map.names$name)
-    cat("\nThese are valid mapName~\n")
-    return("NULL")
+    # Generate the object with the map names
+    map_names_message <- paste(leafletcn.map.names$name, collapse = "\n")
+    
+    # Print the message using message() for better control
+    message("These are valid mapName:\n", map_names_message)
+    
+    # Return NULL explicitly instead of a string
+    return(NULL)
   }
+  
 
   ## read from local files
   countries <- readGeoLocal(mapName)

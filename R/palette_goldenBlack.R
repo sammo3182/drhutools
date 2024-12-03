@@ -111,6 +111,7 @@ gb_palettes <- list(
 #' @param reverse A logic vector indicating whether the palette should be reversed.
 #' @param ... Additional arguments passed to \code{discrete_scale()} or \code{scale_color_gradientn()}, used respectively when discrete is TRUE or FALSE
 #'
+#' @return No return value, called for modifying the appearance of the plot.
 #' @export
 
 scale_color_gb <-
@@ -141,6 +142,8 @@ scale_color_gb <-
 #' @param discrete A logic vector indicating whether color aesthetic is discrete or not; the default is "main".
 #' @param reverse A logic vector indicating whether the palette should be reversed.
 #' @param ... Additional arguments passed to \code{discrete_scale()} or \code{scale_color_gradientn()}, used respectively when discrete is TRUE or FALSE
+#'
+#' @return No return value, called for modifying the appearance of the plot.
 #'
 #' @export
 
