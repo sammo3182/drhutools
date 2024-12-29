@@ -33,6 +33,12 @@
 #' @export
 
 traits <- function(survey) {
+  # Check if input is "average"
+  if (is.character(survey) && survey == "average") {
+    return(paste0("Reference: Average shame score is [30.8, 34.7], guilt score is [45.2, 46.8] for Japanese college students; Grit-S is [3.5, 3.7] for pharmacy students in the U.S."))
+  }
+
+  
   # Calculate score_shame using columns that match ".*R(3|5)"
   score_shame <- survey[, grep(".*R(3|5)", names(survey))] |>
     rowSums(na.rm = TRUE)
@@ -42,11 +48,18 @@ traits <- function(survey) {
     rowSums(na.rm = TRUE)
 
   # Calculate score_grit using columns that end with ".1"
-  score_grit <- survey[, grep(".*\\|1$", names(survey))] |>
+  score_grit12 <- survey[, grep(".*1$", names(survey))] |>
+    rowMeans(na.rm = TRUE)
+
+  score_grit8 <- survey[, grep("^Q(15|17|18|19|20|21|22|25)", names(survey))] |>
     rowMeans(na.rm = TRUE)
 
   # Create a data frame with the results
-  df_result <- data.frame(score_shame = score_shame, score_guilt = score_guilt, score_grit = score_grit)
+  df_result <- data.frame(name = survey$Q2, 
+  score_shame = score_shame, 
+  score_guilt = score_guilt, 
+  score_gritO = score_grit12,
+  score_gritS = score_grit8)
 
   return(df_result)
 }
