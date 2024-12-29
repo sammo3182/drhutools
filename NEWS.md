@@ -1,3 +1,8 @@
+# drhutools 1.0.1
+
+- Add reference information in `traits`
+- Add more information in the output of `traits`
+
 # drhutools 1.0.0
 
 - Add new function `goodmap`
