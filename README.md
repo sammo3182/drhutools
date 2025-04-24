@@ -1,5 +1,4 @@
-<img src="https://user-images.githubusercontent.com/58319029/114663100-59769e80-9d2c-11eb-912b-64303aad256d.png" align="right" alt="" width="120" />
-
+<a href="https://cran.r-project.org/web/packages/interplot/index.html" target="_blank" rel="noopener"><img src="http://www.r-pkg.org/badges/version/interplot" alt="CRAN version"></a> <img src="http://cranlogs.r-pkg.org/badges/grand-total/interplot" alt=""><img src="http://cranlogs.r-pkg.org/badges/interplot?color=orange" alt=""></p>
 <!-- badges: start -->
 
 [![CRAN version](http://www.r-pkg.org/badges/version/drhutools)](https://cran.r-project.org/package=drhutools) ![](http://cranlogs.r-pkg.org/badges/grand-total/drhutools)
