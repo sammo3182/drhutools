@@ -1,5 +1,6 @@
 # drhutools 1.0.1
 
+- Fixed the issue caused by `mapview`
 - Add reference information in `traits`
 - Add more information in the output of `traits`
 

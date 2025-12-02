@@ -5,8 +5,8 @@ Version: 1.0.1
 Authors@R: 
   c(
   person("Yue", "Hu", role = c("aut", "cre"), email = "yuehu@tsinghua.edu.cn"),
-  person("Wen", "Deng", role = c("ctb"), email = "dengwenjoy@outlook.com"),
-  person("Qian", "Qiu", role = c("ctb"), email = "mathildaqiu@tsinghua.edu.cn")
+  person("Qian", "Qiu", role = c("ctb"), email = "mathildaqiu@tsinghua.edu.cn"),
+  person("Wen", "Deng", role = c("ctb"), email = "dengwenjoy@outlook.com")
   )
 Maintainer: Yue Hu <yuehu@tsinghua.edu.cn>
 Description: Using these tools to simplify the research process of political science and other social sciences. The current version can create folder system for academic project in political science, calculate psychological trait scores, visualize experimental and spatial data, and set up color-blind palette, functions used in academic research of political psychology or political science in general.
