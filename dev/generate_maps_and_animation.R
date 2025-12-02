@@ -27,7 +27,6 @@
 #' @import plyr
 #' @import pacman
 #' @import webshot
-#' @import mapview
 #' @import magick
 #' 
 #' @return The function saves the generated map images and animated GIF to the specified output directory.

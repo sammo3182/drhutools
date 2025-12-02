@@ -37,29 +37,33 @@ traits <- function(survey) {
   if (is.character(survey) && survey == "average") {
     return(paste0("Reference: Average shame score is [30.8, 34.7], guilt score is [45.2, 46.8] for Japanese college students; Grit-S is [3.5, 3.7] for pharmacy students in the U.S."))
   }
-
+  
   
   # Calculate score_shame using columns that match ".*R(3|5)"
-  score_shame <- survey[, grep(".*R(3|5)", names(survey))] |>
+  # 使用 drop=FALSE 防止选中单列时变成向量导致 rowSums 报错
+  score_shame <- survey[, grep(".*R(3|5)", names(survey)), drop = FALSE] |>
     rowSums(na.rm = TRUE)
-
+  
   # Calculate score_guilt using columns that match ".*R(4|6)"
-  score_guilt <- survey[, grep(".*R(4|6)", names(survey))] |>
+  score_guilt <- survey[, grep(".*R(4|6)", names(survey)), drop = FALSE] |>
     rowSums(na.rm = TRUE)
-
+  
   # Calculate score_grit using columns that end with ".1"
-  score_grit12 <- survey[, grep(".*1$", names(survey))] |>
+  # 注意：你的列名是 "Q14|1"，grep ".*1$" 是能匹配上的
+  score_grit12 <- survey[, grep(".*1$", names(survey)), drop = FALSE] |>
     rowMeans(na.rm = TRUE)
-
-  score_grit8 <- survey[, grep("^Q(15|17|18|19|20|21|22|25)", names(survey))] |>
+  
+  score_grit8 <- survey[, grep("^Q(15|17|18|19|20|21|22|25)", names(survey)), drop = FALSE] |>
     rowMeans(na.rm = TRUE)
-
+  
   # Create a data frame with the results
-  df_result <- data.frame(name = survey$Q2, 
-  score_shame = score_shame, 
-  score_guilt = score_guilt, 
-  score_gritO = score_grit12,
-  score_gritS = score_grit8)
-
+  # 【修复核心】：删除了 name = survey$Q2，因为输入数据不一定包含 Q2 列
+  df_result <- data.frame(
+    score_shame = score_shame, 
+    score_guilt = score_guilt, 
+    score_gritO = score_grit12,
+    score_gritS = score_grit8
+  )
+  
   return(df_result)
 }

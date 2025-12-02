@@ -51,7 +51,6 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #' @import webshot
 #' @import leaflet
 #' @import htmlwidgets
-#' @import mapview
 #' @import purrr
 #' @import gganimate
 #' @import sf
@@ -60,11 +59,11 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #'
 #' @examples
 #' 
-#' \donttest{
+#' \dontrun{
 #' goodmap(
-#'   toy_poly,
-#'   type = "polygon",
-#'   level = "province"
+#'    toy_poly,
+#'    type = "polygon",
+#'    level = "province"
 #' )
 #' }
 #' 
@@ -84,9 +83,11 @@ goodmap <- function(data_file,
                     legend_name = NULL,
                     width = 800,
                     height = 900) {
+  
   temp_saveDir <- file.path(tempdir(), "temp_maps")
-  dir.create(temp_saveDir, showWarnings = FALSE)
-
+  if (!dir.exists(temp_saveDir)) {
+    dir.create(temp_saveDir, showWarnings = FALSE)
+  }
   
   if (type == "point") {
     if (!all(c("g_lat", "g_lon") %in% colnames(data_file))) {
@@ -110,214 +111,138 @@ goodmap <- function(data_file,
       filtered_data <- data_file
     } else {
       filtered_data <- data_file |>
-        filter(!!sym(animate_var) == input_var_value)
+        dplyr::filter(!!sym(animate_var) == input_var_value)
     }
     
+    map <- NULL
+    
+
     if (type == "point") {
       plot_point <- filtered_data |>
-        select(g_lat, g_lon, value_set) |>
-        mutate(radius = point_radius)
+        dplyr::select(g_lat, g_lon, value_set) |>
+        dplyr::mutate(radius = point_radius)
       
+      # 定义颜色
       if (color_type == "factor") {
         if (!is.null(custom_colors)) {
-          type_colors <- colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
+          pal_colors <- grDevices::colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
         } else {
-          type_colors <- colorRampPalette(c("black", "gold"))(length(unique(data_file$value_set)))
-          type_colors <- colorFactor(palette = type_colors, domain = unique(data_file$value_set))
+          pal_colors <- grDevices::colorRampPalette(c("black", "gold"))(length(unique(data_file$value_set)))
         }
-        } else {
-          if (!is.null(custom_colors)) {
-          type_colors <- colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
-          } else {
-            type_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(data_file$value_set)))
-          }
-            type_colors <- colorNumeric(palette = type_colors, domain = unique(data_file$value_set))
-        }
-
-      color_mapping <- type_colors
-      
-      name_prefix <- "point_map"
-      if (animate) {
-        name_file <- paste0(name_prefix, "_", input_var_value, ".png")
+        type_colors <- leaflet::colorFactor(palette = pal_colors, domain = unique(data_file$value_set))
       } else {
-        name_file <- paste0(name_prefix, ".png")
+        if (!is.null(custom_colors)) {
+          pal_colors <- grDevices::colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
+        } else {
+          if (exists("gb_pal")) {
+            pal_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(data_file$value_set)))
+          } else {
+            pal_colors <- grDevices::topo.colors(length(unique(data_file$value_set)))
+          }
+        }
+        type_colors <- leaflet::colorNumeric(palette = pal_colors, domain = unique(data_file$value_set))
       }
-      image_file <- file.path(temp_saveDir, name_file)
       
-      grDevices::png(image_file, width = width, height = height, res = 600)
-      
-      map <- leaflet(plot_point) |>
-        amap() |>
-        setView(
-          lng = map_center[2],
-          lat = map_center[1],
-          zoom = zoom_level
-        ) |>
-        addCircleMarkers(
-          lng = ~g_lon,
-          lat = ~g_lat,
-          color = ~ type_colors(value_set),
-          fillOpacity = 1,
-          stroke = FALSE,
-          popup = ~ paste("Value"),
+      map <- leaflet::leaflet(plot_point) |>
+        leaflet::addTiles() |>
+        leaflet::setView(lng = map_center[2], lat = map_center[1], zoom = zoom_level) |>
+        leaflet::addCircleMarkers(
+          lng = ~g_lon, lat = ~g_lat,
+          color = ~type_colors(value_set),
+          fillOpacity = 1, stroke = FALSE,
+          popup = ~paste("Value:", value_set),
           radius = ~radius
         ) |>
-        addLegend(
-          "bottomright",
-          pal = type_colors,
-          values = ~value_set,
-          title = if (!is.null(legend_name)) {
-            if (!is.null(animate_var)) {
-              paste(legend_name, input_var_value)
-            } else {
-              legend_name
-            }
-          } else if (!is.null(animate_var)) {
-            paste("Value", input_var_value)
-          } else {
-            "Value"
-          },
+        leaflet::addLegend(
+          "bottomright", pal = type_colors, values = ~value_set,
+          title = if (!is.null(legend_name)) legend_name else "Value",
           opacity = legend_opacity
         )
       
-      print(map)
-      grDevices::dev.off()
+
     } else if (type == "polygon") {
-      suppressWarnings({
-        if (level == "province") {
-          plot_prov <- filtered_data |>
-            select(prov, value_set) |>
-            group_by(prov) |>
-            summarise(value_var = mean(value_set, na.rm = TRUE)) |>
-            ungroup() |>
-            right_join(data.frame(name = regionNames("china")), by = c("prov" = "name")) |>
-            filter(!is.na(value_var))
-          
-          plot_prov_var <- select(plot_prov, prov, value_var) |>
-            rename(value = value_var) |>
-            as.data.frame()
-          
-          if (color_type == "factor") {
-            if (!is.null(custom_colors)) {
-              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_prov_var$value)))
-            } else {
-              value_colors <- colorRampPalette(c("black", "gold"))(length(unique(plot_prov_var$value)))
-            }
-            value_color_mapping <- colorFactor(palette = value_colors, domain = unique(plot_prov_var$value))
-            color_method <- "factor"
+      
+      # 通用颜色生成器
+      get_pal_fun <- function(vals) {
+        n_colors <- length(unique(vals))
+        if (n_colors < 2) n_colors <- 2 
+        
+        if (color_type == "factor") {
+          if (!is.null(custom_colors)) {
+            cols <- grDevices::colorRampPalette(c("black", custom_colors))(n_colors)
           } else {
-            if (!is.null(custom_colors)) {
-              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_prov_var$value)))
-            } else {
-              value_colors <- gb_pal(palette = "main")(length(unique(plot_prov_var$value)))
-            }
-            value_color_mapping <- colorNumeric(palette = value_colors, domain = unique(plot_prov_var$value))
-            color_method <- "numeric"
+            cols <- grDevices::colorRampPalette(c("black", "gold"))(n_colors)
           }
-          
-          name_prefix <- "province_map"
-          if (animate) {
-            name_file <- paste0(name_prefix, "_", input_var_value, ".png")
+          return(leaflet::colorFactor(palette = cols, domain = vals))
+        } else {
+          if (!is.null(custom_colors)) {
+            cols <- grDevices::colorRampPalette(c("black", custom_colors))(n_colors)
           } else {
-            name_file <- paste0(name_prefix, ".png")
-          }
-          image_file <- file.path(temp_saveDir, name_file)
-          
-          grDevices::png(image_file, width = width, height = height, res = 600)
-          
-          map <- geojsonMap(plot_prov_var,
-                            mapName = "china",
-                            palette = value_colors,
-                            colorMethod = color_method,
-                            legendTitle = if (!is.null(legend_name)) {
-                              if (!is.null(animate_var)) {
-                                paste(legend_name, input_var_value)
-                              } else {
-                                legend_name
-                              }
-                            } else if (!is.null(animate_var)) {
-                              paste("Value", input_var_value)
-                            } else {
-                              "Value"
-                            },
-                            na.color = "transparent"
-          )
-          print(map)
-          grDevices::dev.off()
-        } else if (level == "city") {
-          plot_city <- filtered_data |>
-            select(city, value_set) |>
-            group_by(city) |>
-            summarise(value_var = mean(value_set, na.rm = TRUE)) |>
-            ungroup() |>
-            right_join(data.frame(name = regionNames("city")), by = c("city" = "name")) |>
-            filter(!is.na(value_var))
-          
-          plot_city_var <- select(plot_city, city, value_var) |>
-            rename(value = value_var) |>
-            as.data.frame()
-          
-          if (color_type == "factor") {
-            if (!is.null(custom_colors)) {
-              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
+            if (exists("gb_pal")) {
+              cols <- gb_pal(palette = "main")(n_colors)
             } else {
-              value_colors <- colorRampPalette(c("black", "gold"))(length(unique(plot_city_var$value)))
+              cols <- grDevices::topo.colors(n_colors)
             }
-            value_color_mapping <- colorFactor(palette = value_colors, domain = unique(plot_city_var$value))
-            color_method <- "factor"
-          } else {
-            if (!is.null(custom_colors)) {
-              value_colors <- colorRampPalette(c("black", custom_colors))(length(unique(plot_city_var$value)))
-            } else {
-              value_colors <- gb_pal(palette = "main")(length(unique(plot_city_var$value)))
-            }
-            value_color_mapping <- colorNumeric(palette = value_colors, domain = unique(plot_city_var$value))
-            color_method <- "numeric"
           }
-          
-          map <- geojsonMap(plot_city_var,
-                            mapName = "city",
-                            palette = value_colors,
-                            colorMethod = color_method,
-                            legendTitle = if (!is.null(legend_name)) {
-                              if (!is.null(animate_var)) {
-                                paste(legend_name, input_var_value)
-                              } else {
-                                legend_name
-                              }
-                            } else if (!is.null(animate_var)) {
-                              paste("Value", input_var_value)
-                            } else {
-                              "Value"
-                            },
-                            na.color = "transparent"
-          )
-          print(map)
-          grDevices::dev.off()
+          return(leaflet::colorNumeric(palette = cols, domain = vals))
         }
-      })
+      }
+      
+      if (level == "province") {
+        plot_prov <- filtered_data |>
+          dplyr::group_by(prov) |>
+          dplyr::summarise(value = mean(value_set, na.rm = TRUE)) |>
+          dplyr::ungroup()
+        
+        map_data <- dplyr::left_join(china_prov_sf, plot_prov, by = c("name" = "prov"))
+        pal_fun <- get_pal_fun(map_data$value)
+        
+        map <- leaflet::leaflet(data = map_data) |>
+          leaflet::addTiles() |>
+          leaflet::addPolygons(
+            fillColor = ~pal_fun(value), weight = 1, opacity = 1, color = "white",
+            dashArray = "3", fillOpacity = 0.7,
+            highlightOptions = leaflet::highlightOptions(weight = 3, color = "#666", fillOpacity = 0.7, bringToFront = TRUE),
+            label = ~paste0(name, ": ", value),
+            popup = ~paste0("<strong>", name, "</strong><br>Value: ", value)
+          ) |>
+          leaflet::addLegend(pal = pal_fun, values = ~value, opacity = 0.7, title = if (!is.null(legend_name)) legend_name else "Value", position = "bottomright")
+        
+      } else if (level == "city") {
+        plot_city <- filtered_data |>
+          dplyr::select(city, value_set) |>
+          dplyr::group_by(city) |>
+          dplyr::summarise(value = mean(value_set, na.rm = TRUE)) |>
+          dplyr::ungroup()
+        
+        map_data <- dplyr::left_join(china_city_sf, plot_city, by = c("name" = "city"))
+        pal_fun <- get_pal_fun(map_data$value)
+        
+        map <- leaflet::leaflet(data = map_data) |>
+          leaflet::addTiles() |>
+          leaflet::addPolygons(
+            fillColor = ~pal_fun(value), weight = 1, opacity = 1, color = "white",
+            dashArray = "3", fillOpacity = 0.7,
+            highlightOptions = leaflet::highlightOptions(weight = 3, color = "#666", fillOpacity = 0.7, bringToFront = TRUE),
+            label = ~paste0(name, ": ", value),
+            popup = ~paste0("<strong>", name, "</strong><br>Value: ", value)
+          ) |>
+          leaflet::addLegend(pal = pal_fun, values = ~value, opacity = 0.7, title = if (!is.null(legend_name)) legend_name else "Value", position = "bottomright")
+      }
     }
     
-    name_prefix <- switch(type,
-                          "point" = "point_map",
-                          "polygon" = ifelse(level == "province", "province_map", "city_map"),
-                          "map"
-    )
-    
-    if (animate) {
-      name_file <- paste0(name_prefix, "_", input_var_value, ".png")
-    } else {
-      name_file <- paste0(name_prefix, ".png")
-    }
+    name_prefix <- switch(type, "point" = "point_map", "polygon" = ifelse(level == "province", "province_map", "city_map"), "map")
+    name_file <- if (animate) paste0(name_prefix, "_", input_var_value, ".png") else paste0(name_prefix, ".png")
     image_file <- file.path(temp_saveDir, name_file)
-    mapshot(
-      map,
-      file = file.path(temp_saveDir, name_file),
-      vwidth = width,
-      vheight = height,
-      res = 600
-    )
-    return(file.path(temp_saveDir, name_file))
+    
+    save_leaflet_png(map = map, file = image_file, width = width, height = height)
+    
+    # 只有非动画模式才在 View 窗口显示
+    if (!animate) {
+      print(map)
+    }
+    
+    return(image_file)
   }
   
   if (animate) {
@@ -327,38 +252,37 @@ goodmap <- function(data_file,
     unique_vars <- unique(data_file[[animate_var]])
     
     images <- list()
-    
-    
     for (input_var_value in unique_vars) {
       map_file <- generate_map(input_var_value)
-      
       img <- png::readPNG(map_file)
       images[[length(images) + 1]] <- img
     }
     
     temp_gif_path <- file.path(tempdir(), "animated_map.gif")
+    if (file.exists(temp_gif_path)) file.remove(temp_gif_path)
     
-    if (file.exists(temp_gif_path)) {
-      file.remove(temp_gif_path)
-    }
-    
-    saveGIF(
-      {
-        for (img in images) {
-          grid::grid.newpage()
-          grid::grid.raster(img)
-        }
-      },
-      movie.name = temp_gif_path,
-      interval = 1
-    )
-    
+    animation::saveGIF({
+      for (img in images) {
+        grid::grid.newpage()
+        grid::grid.raster(img)
+      }
+    }, movie.name = temp_gif_path, interval = 1)
   } else {
-    map_file <- generate_map(all_data = TRUE)
-    img <- png::readPNG(map_file)
-    grid::grid.raster(img)
+    generate_map(all_data = TRUE)
   }
+  
   if (dir.exists("temp_maps")) {
     unlink("temp_maps", recursive = TRUE)
   }
+}
+
+#' Internal function to save leaflet map
+#' @noRd
+save_leaflet_png <- function(map, file, width, height) {
+  tmp_html <- tempfile(fileext = ".html")
+  htmlwidgets::saveWidget(map, tmp_html, selfcontained = FALSE)
+  if (requireNamespace("webshot", quietly = TRUE)) {
+    webshot::webshot(tmp_html, file = file, vwidth = width, vheight = height, cliprect = "viewport")
+  }
+  unlink(tmp_html)
 }
