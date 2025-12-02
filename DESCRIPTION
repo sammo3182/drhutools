@@ -1,7 +1,7 @@
 Package: drhutools
 Type: Package
 Title: Political Science Academic Research Gears
-Version: 1.0.1
+Version: 1.0.9999
 Authors@R: 
   c(
   person("Yue", "Hu", role = c("aut", "cre"), email = "yuehu@tsinghua.edu.cn"),
