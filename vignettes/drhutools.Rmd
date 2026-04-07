@@ -322,9 +322,84 @@ traits(toy_data)
 This example generates random data for the required columns and calculates the scores for TOSCA-3SC and Grit-O. 
 Adjust your dataset to match the column structure and format for accurate scoring.
 
+# Guarding Against False Positives in QCA
+
+Qualitative Comparative Analysis (QCA) evaluates multiple configurations simultaneously, which raises a multiple-testing problem: the more configurations examined in a truth table, the greater the chance that at least one appears significant purely by chance.
+The functions below, originally from Bear Braumoeller's `QCAfalsePositive` package, address this by providing adjusted tests for three QCA variants: crisp-set (csQCA), multi-value (mvQCA), and fuzzy-set (fsQCA).
+
+## Binomial Tests for csQCA and mvQCA
+
+For csQCA, `csQCAbinTest` calculates the probability that each supporting configuration arose by chance, given how often the outcome occurs in the sample.
+It then adjusts those p-values to account for all configurations in the truth table.
+
+The key arguments are:
+
+- `freq.y`: the proportion of cases where the outcome equals 1.
+- `configs`: a named list mapping each configuration to its number of supporting cases.
+- `total.configs`: the total number of rows in the truth table (including those not in `configs`).
+
+```{r csQCA-test}
+test_cs <- csQCAbinTest(
+  freq.y      = 0.7,
+  configs     = list(aB = 5, bCD = 3, Ce = 2),
+  total.configs = 20
+)
+summary(test_cs)
+```
+
+The summary reports, for each configuration, the raw binomial p-value (`p-raw`) and the Holm-adjusted p-value (`p-adj`) that corrects for the full set of truth table rows.
+A small adjusted p-value indicates the result is unlikely to be a false positive.
+
+`mvQCAbinTest` follows the same logic for multi-value QCA and accepts identical arguments.
+
+## Permutation Test for fsQCA
+
+Fuzzy-set QCA requires a different approach because membership scores are continuous rather than binary.
+`fsQCApermTest` builds a null distribution by repeatedly shuffling the outcome variable and recomputing consistency and counterexample counts for each configuration.
+The observed values are then compared against this distribution, with p-values adjusted for the total number of configurations tested.
+
+The `social.revolutions` dataset (Ragin 2000) provides a classic illustration.
+It contains fuzzy-set membership scores for state breakdown, popular insurrection, and social revolution across 20 hypothetical cases:
+
+```{r fsQCA-data}
+head(social.revolutions)
+```
+
+We test four configurations formed by all combinations of `breakdown` (B) and `pop.ins` (I) and their complements:
+
+```{r fsQCA-test, cache=TRUE}
+intersect  <- pmin(social.revolutions$breakdown, social.revolutions$pop.ins)
+intersect2 <- pmin(social.revolutions$breakdown, 1 - social.revolutions$pop.ins)
+intersect3 <- pmin(1 - social.revolutions$breakdown, social.revolutions$pop.ins)
+intersect4 <- pmin(1 - social.revolutions$breakdown, 1 - social.revolutions$pop.ins)
+
+# num.iter is reduced here for illustration; use the default 10,000 in practice
+test_fs <- fsQCApermTest(
+  y             = social.revolutions$soc.rev,
+  configs       = list(BI = intersect, Bi = intersect2,
+                       bI = intersect3, bi = intersect4),
+  total.configs = 4,
+  num.iter      = 500
+)
+summary(test_fs)
+```
+
+The summary presents two panels.
+The **Counterexamples** panel shows, for each configuration, how many cases contradict it and whether that count is low enough to be implausible under the null distribution.
+The **Consistency** panel shows observed consistency scores and whether they exceed what would be expected by chance.
+Both panels display raw and Holm-adjusted p-values.
+
+Calling `plot()` on the result overlays the observed value (black dot) on the null distribution, with the critical region (adjusted for multiple inference) shaded in dark blue:
+
+```{r fsQCA-plot, fig.width=7, fig.height=7, fig.cap="Permutation distributions for four fsQCA configurations. Dark blue marks the critical region after multiple-testing adjustment; the black dot is the observed value."}
+plot(test_fs)
+```
+
+Any configuration whose observed value falls well within the light-blue region—far from the critical dark-blue region—warrants scrutiny as a potential false positive that survives only because many configurations were evaluated simultaneously.
+
 # Affiliation
 
-Yue Hu
+HU Yue
 
 Department of Political Science,
 
@@ -336,7 +411,17 @@ Website: <https://www.drhuyue.site>
 
 <br>
 
-Wen Deng
+QIU Qian
+
+Department of Political Science,
+
+Tsinghua University, 
+
+Email: <mathildaqiu@tsinghua.edu.cn>
+
+<br>
+
+DENG Wen
 
 College of Public Administration,
 

@@ -14,7 +14,7 @@
 <meta name="author" content="QIU Qian" />
 <meta name="author" content="DENG Wen" />
 
-<meta name="date" content="2025-12-02" />
+<meta name="date" content="2026-04-07" />
 
 <title>drhutools: Political Science Academic Research Gears</title>
 
@@ -369,7 +369,7 @@ Academic Research Gears</h1>
 <h4 class="author">HU Yue</h4>
 <h4 class="author">QIU Qian</h4>
 <h4 class="author">DENG Wen</h4>
-<h4 class="date">2025-12-02</h4>
+<h4 class="date">2026-04-07</h4>
 
 
 
@@ -697,6 +697,137 @@ dataset using <code>traits</code>:</p>
 <p>This example generates random data for the required columns and
 calculates the scores for TOSCA-3SC and Grit-O. Adjust your dataset to
 match the column structure and format for accurate scoring.</p>
+</div>
+</div>
+<div id="guarding-against-false-positives-in-qca" class="section level1">
+<h1>Guarding Against False Positives in QCA</h1>
+<p>Qualitative Comparative Analysis (QCA) evaluates multiple
+configurations simultaneously, which raises a multiple-testing problem:
+the more configurations examined in a truth table, the greater the
+chance that at least one appears significant purely by chance. The
+functions below, originally from Bear Braumoeller’s
+<code>QCAfalsePositive</code> package, address this by providing
+adjusted tests for three QCA variants: crisp-set (csQCA), multi-value
+(mvQCA), and fuzzy-set (fsQCA).</p>
+<div id="binomial-tests-for-csqca-and-mvqca" class="section level2">
+<h2>Binomial Tests for csQCA and mvQCA</h2>
+<p>For csQCA, <code>csQCAbinTest</code> calculates the probability that
+each supporting configuration arose by chance, given how often the
+outcome occurs in the sample. It then adjusts those p-values to account
+for all configurations in the truth table.</p>
+<p>The key arguments are:</p>
+<ul>
+<li><code>freq.y</code>: the proportion of cases where the outcome
+equals 1.</li>
+<li><code>configs</code>: a named list mapping each configuration to its
+number of supporting cases.</li>
+<li><code>total.configs</code>: the total number of rows in the truth
+table (including those not in <code>configs</code>).</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>test_cs <span class="ot">&lt;-</span> <span class="fu">csQCAbinTest</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="at">freq.y      =</span> <span class="fl">0.7</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">configs     =</span> <span class="fu">list</span>(<span class="at">aB =</span> <span class="dv">5</span>, <span class="at">bCD =</span> <span class="dv">3</span>, <span class="at">Ce =</span> <span class="dv">2</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="at">total.configs =</span> <span class="dv">20</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="fu">summary</span>(test_cs)</span></code></pre></div>
+<pre><code>## Call:
+## csQCAbinTest(freq.y = 0.7, configs = list(aB = 5, bCD = 3, Ce = 2), 
+##     total.configs = 20)
+## 
+## Counterexamples
+##     Number of cases   p-raw  p-adj  
+## aB                5 0.00243 0.0486 *
+## bCD               3 0.02700 0.5130  
+## Ce                2 0.09000 1.0000  
+## Total number of configurations: 20 
+## p-value adjustment method: holm</code></pre>
+<p>The summary reports, for each configuration, the raw binomial p-value
+(<code>p-raw</code>) and the Holm-adjusted p-value (<code>p-adj</code>)
+that corrects for the full set of truth table rows. A small adjusted
+p-value indicates the result is unlikely to be a false positive.</p>
+<p><code>mvQCAbinTest</code> follows the same logic for multi-value QCA
+and accepts identical arguments.</p>
+</div>
+<div id="permutation-test-for-fsqca" class="section level2">
+<h2>Permutation Test for fsQCA</h2>
+<p>Fuzzy-set QCA requires a different approach because membership scores
+are continuous rather than binary. <code>fsQCApermTest</code> builds a
+null distribution by repeatedly shuffling the outcome variable and
+recomputing consistency and counterexample counts for each
+configuration. The observed values are then compared against this
+distribution, with p-values adjusted for the total number of
+configurations tested.</p>
+<p>The <code>social.revolutions</code> dataset (Ragin 2000) provides a
+classic illustration. It contains fuzzy-set membership scores for state
+breakdown, popular insurrection, and social revolution across 20
+hypothetical cases:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">head</span>(social.revolutions)</span></code></pre></div>
+<pre><code>##   soc.rev breakdown pop.ins
+## 1    0.10      0.41    0.83
+## 2    0.34      0.69    0.42
+## 3    0.13      0.72    0.71
+## 4    0.10      0.78    0.34
+## 5    0.04      0.15    0.47
+## 6    0.11      0.36    0.15</code></pre>
+<p>We test four configurations formed by all combinations of
+<code>breakdown</code> (B) and <code>pop.ins</code> (I) and their
+complements:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>intersect  <span class="ot">&lt;-</span> <span class="fu">pmin</span>(social.revolutions<span class="sc">$</span>breakdown, social.revolutions<span class="sc">$</span>pop.ins)</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>intersect2 <span class="ot">&lt;-</span> <span class="fu">pmin</span>(social.revolutions<span class="sc">$</span>breakdown, <span class="dv">1</span> <span class="sc">-</span> social.revolutions<span class="sc">$</span>pop.ins)</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>intersect3 <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="dv">1</span> <span class="sc">-</span> social.revolutions<span class="sc">$</span>breakdown, social.revolutions<span class="sc">$</span>pop.ins)</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>intersect4 <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="dv">1</span> <span class="sc">-</span> social.revolutions<span class="sc">$</span>breakdown, <span class="dv">1</span> <span class="sc">-</span> social.revolutions<span class="sc">$</span>pop.ins)</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co"># num.iter is reduced here for illustration; use the default 10,000 in practice</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>test_fs <span class="ot">&lt;-</span> <span class="fu">fsQCApermTest</span>(</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>  <span class="at">y             =</span> social.revolutions<span class="sc">$</span>soc.rev,</span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>  <span class="at">configs       =</span> <span class="fu">list</span>(<span class="at">BI =</span> intersect, <span class="at">Bi =</span> intersect2,</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>                       <span class="at">bI =</span> intersect3, <span class="at">bi =</span> intersect4),</span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>  <span class="at">total.configs =</span> <span class="dv">4</span>,</span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>  <span class="at">num.iter      =</span> <span class="dv">500</span></span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>)</span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a><span class="fu">summary</span>(test_fs)</span></code></pre></div>
+<pre><code>## Call:
+## fsQCApermTest(y = social.revolutions$soc.rev, configs = list(BI = intersect, 
+##     Bi = intersect2, bI = intersect3, bi = intersect4), total.configs = 4, 
+##     num.iter = 500)
+## 
+## Counterexamples
+##    Observed Upper Bound Lower c.i.  p-adj se(p-adj)
+## BI    0.000      11.000      4.000  0.000    0.0000
+## Bi    8.000      14.000      8.000  0.210    0.0911
+## bI    9.000      12.000      6.000  0.926    0.0585
+## bi    7.000      12.000      5.000  0.884    0.0716
+## 
+## Consistency
+##    Observed Lower Bound Upper c.i.   p-adj se(p-adj)
+## BI  1.00000     0.64133    0.86533 0.00000         0
+## Bi  0.52933     0.48400    0.69467 1.00000         0
+## bI  0.67336     0.56934    0.82664 1.00000         0
+## bi  0.61029     0.56801    0.82904 1.00000         0
+## 
+## Total number of configurations: 4 
+## Number of permutations: 500 
+## p-value adjustment method: holm</code></pre>
+<p>The summary presents two panels. The <strong>Counterexamples</strong>
+panel shows, for each configuration, how many cases contradict it and
+whether that count is low enough to be implausible under the null
+distribution. The <strong>Consistency</strong> panel shows observed
+consistency scores and whether they exceed what would be expected by
+chance. Both panels display raw and Holm-adjusted p-values.</p>
+<p>Calling <code>plot()</code> on the result overlays the observed value
+(black dot) on the null distribution, with the critical region (adjusted
+for multiple inference) shaded in dark blue:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">plot</span>(test_fs)</span></code></pre></div>
+<div class="float">
+<img role="img" aria-label="Permutation distributions for four fsQCA configurations. Dark blue marks the critical region after multiple-testing adjustment; the black dot is the observed value." src="data:image/png;base64,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" alt="Permutation distributions for four fsQCA configurations. Dark blue marks the critical region after multiple-testing adjustment; the black dot is the observed value." />
+<div class="figcaption">Permutation distributions for four fsQCA
+configurations. Dark blue marks the critical region after
+multiple-testing adjustment; the black dot is the observed value.</div>
+</div>
+<p>Any configuration whose observed value falls well within the
+light-blue region—far from the critical dark-blue region—warrants
+scrutiny as a potential false positive that survives only because many
+configurations were evaluated simultaneously.</p>
 </div>
 </div>
 <div id="affiliation" class="section level1">

@@ -1,0 +1,16 @@
+Package: QCAfalsePositive
+Title: Tests for Type I Error in Qualitative Comparative Analysis (QCA)
+Version: 1.1.1
+Author: Bear Braumoeller <braumoeller.1@osu.edu>
+Maintainer: Bear Braumoeller <braumoeller.1@osu.edu>
+Description: Implements tests for Type I error in Qualitative Comparative Analysis (QCA) that take into account the multiple hypothesis tests inherent in the procedure. Tests can be carried out on three variants of QCA: crisp-set QCA (csQCA), multi-value QCA (mvQCA) and fuzzy-set QCA (fsQCA). For fsQCA, the fsQCApermTest() command implements a permutation test that provides 95% confidence intervals for the number of counterexamples and degree of consistency, respectively. The distributions of permuted values can be plotted against the observed values. For csQCA and mvQCA, simple binomial tests are implemented in csQCAbinTest() and mvQCAbinTest(), respectively.
+Depends: R (>= 3.2.0)
+License: GPL-3
+LazyData: true
+Note: For details and derivation, see Braumoeller, Bear F. "Guarding
+        Against False Positives in Qualitative Comparative Analysis."
+        Forthcoming, Political Analysis.
+NeedsCompilation: no
+Packaged: 2015-05-19 00:32:36 UTC; bfbraum
+Repository: CRAN
+Date/Publication: 2015-05-19 06:07:40

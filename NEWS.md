@@ -1,3 +1,14 @@
+# drhutools 1.1.0
+
+- Absorbed functions from Bear Braumoeller's archived CRAN package `QCAfalsePositive` for continued accessibility:
+  - `csQCAbinTest`: binomial test for Type I error in crisp-set QCA
+  - `mvQCAbinTest`: binomial test for Type I error in multi-value QCA
+  - `fsQCApermTest`: permutation test for Type I error in fuzzy-set QCA
+  - `p.threshold.adjust`: adjusted p-value threshold utility used by `fsQCApermTest`
+  - `plot.fsQCApt`, `summary.csQCAbt`, `summary.fsQCApt`, `summary.mvQCAbt`: S3 methods for printing and plotting QCA test results
+- Added two datasets: `Arab.Spring` and `social.revolutions`
+- Relicensed from MIT to GPL (>= 3) to comply with the source package license
+
 # drhutools 1.0.1
 
 - Fixed the issue caused by `mapview`

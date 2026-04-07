@@ -1,5 +1,7 @@
 # Check List for A New Release
 
+devtools::check(vignettes = FALSE)
+
 ## Vignette building
 
 devtools::install(build_vignettes = TRUE)
@@ -28,9 +30,9 @@ library(here)
 
 ls_html <-
   list.files(here("inst/tutorials"),
-             pattern = "*.html$",
-             recursive = TRUE,
-             full.names = TRUE)
+            pattern = "*.html$",
+            recursive = TRUE,
+            full.names = TRUE)
 
 file.remove(ls_html)
 
