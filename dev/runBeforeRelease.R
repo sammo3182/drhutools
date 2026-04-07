@@ -38,7 +38,7 @@ file.remove(ls_html)
 
 ## Release
 
-devtools::release()
+usethis::use_release_issue()
 
 ## Change the version number in `DESCRIPTION` back to the dev version (i.e., "9999")
 
