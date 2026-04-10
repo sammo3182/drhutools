@@ -38,4 +38,34 @@ folderSystem <- function() {
       file.create(path)
     }
   })
+
+  # Create default .gitignore in project root if not present
+  gitignore_path <- ".gitignore"
+  if (!file.exists(gitignore_path)) {
+    gitignore_content <- c(
+      "# R artifacts",
+      ".Rhistory",
+      ".RData",
+      ".Ruserdata",
+      ".Rproj.user/",
+      "*.Rproj",
+      "",
+      "# Data files",
+      "data/",
+      "",
+      "# Output",
+      "output/",
+      "",
+      "# OS files",
+      ".DS_Store",
+      "Thumbs.db",
+      "",
+      "# Quarto / RMarkdown caches",
+      "*_cache/",
+      "*_files/",
+      "*.html",
+      "!paper/submission/*.html"
+    )
+    writeLines(gitignore_content, gitignore_path)
+  }
 }

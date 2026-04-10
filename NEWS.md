@@ -1,4 +1,8 @@
-# drhutools 1.1.0
+# 1.1.1
+
+- Added a default `.gitignore` file into `folderSystem`
+
+# 1.1.0
 
 - Absorbed functions from Bear Braumoeller's archived CRAN package `QCAfalsePositive` for continued accessibility:
   - `csQCAbinTest`: binomial test for Type I error in crisp-set QCA
@@ -9,22 +13,22 @@
 - Added two datasets: `Arab.Spring` and `social.revolutions`
 - Relicensed from MIT to GPL (>= 3) to comply with the source package license
 
-# drhutools 1.0.1
+# 1.0.1
 
 - Fixed the issue caused by `mapview`
 - Add reference information in `traits`
 - Add more information in the output of `traits`
 
-# drhutools 1.0.0
+# 1.0.0
 
 - Add new function `goodmap`
 - CRAN submission
 
-# drhutools 0.1.2
+# 0.1.2
 
 - `folderSystem` create the folder system automatically at the project's root directory.
 
-# drhutools 0.1.1
+# 0.1.1
 
 - Removed the useless functions:
   - `textWrapper` has been superseded by `ggfittext` functions.
@@ -35,6 +39,6 @@
 - Clean the document
 
 
-# drhutools 0.1.0
+# 0.1.0
 
 The initial release of the package.
