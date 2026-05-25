@@ -1,6 +1,7 @@
 # 1.1.1
 
 - Added a default `.gitignore` file into `folderSystem`
+- `folderSystem` now copies the bundled manuscript templates (Quarto/Typst paper template, main/appendix bibliographies, OSCOLA citation style, and the citation-prefix Lua filter) into `paper/`, with an `overwrite` argument to control replacing existing files
 
 # 1.1.0
 

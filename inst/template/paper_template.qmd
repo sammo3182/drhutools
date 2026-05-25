@@ -1,0 +1,156 @@
+---
+format:
+  typst:
+    number-sections: true
+    papersize: a4
+    keep-typ: true
+    margin:
+      x: 1in
+      y: 1in
+    include-in-header:
+      text: |
+        #import "@preview/alexandria:0.2.2": *
+        #show: alexandria(prefix: "main:", read: path => read(path))
+        #show: alexandria(prefix: "appendix:", read: path => read(path))
+        #let ref-style = "oscola.csl"  // citation/reference style for both bibliographies
+        #set text(font: ("Libertinus Serif", "Songti SC", "SimSun"))
+crossref:
+  sec-prefix: OSM      # appendix sections referenced as "OSM A", "OSM B", ...
+  sec-labels: alpha A  # A, B, C, ...
+
+fontsize: 12pt
+indent: true
+linestretch: 1.5       # 1.5 ≈ double spacing in Typst
+colorlinks: true
+link-citations: true
+
+# --- Dual bibliography (Alexandria) ---------------------------------------
+# Two separate reference lists (main text + appendix) are produced by the
+# Alexandria Typst package. cite-prefix.lua tags every citation key with
+# "main:" / "appendix:" by which .bib it lives in; keys present in BOTH bibs
+# are routed by location (before/after the appendix heading whose id is
+# `alexandria-appendix-id`). The #bibliographyx() calls sit next to each
+# "References" heading below. Do NOT add a `bibliography:` key here — that
+# would make Quarto emit its own conflicting #bibliography().
+alexandria-main-bib: "references_main.bib"
+alexandria-appendix-bib: "references_app.bib"
+alexandria-appendix-id: "online-supplementary-materials"
+validate-yaml: false
+filters:
+  - cite-prefix.lua
+
+title: "PAPER TITLE HERE"
+author:
+  - name: First Author
+    affiliation: Your Institution
+  - name: Second Author
+    affiliation: Your Institution
+abstract: |
+  Replace with the abstract. One sentence per line keeps diffs clean.
+
+  **Keywords:** keyword one; keyword two; keyword three
+
+execute:
+  echo: false
+  message: false
+  warning: false
+  dpi: 300
+editor_options:
+  chunk_output_type: console
+editor:
+  markdown:
+    wrap: 84
+
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+if (!require(pacman)) install.packages("pacman")
+library(pacman)
+
+p_load(
+  here,
+  tidyverse,
+  ggplot2
+  # add packages as needed
+)
+
+set.seed(313)
+# showtext::showtext_auto()  # uncomment if rendering CJK plots
+```
+
+# Introduction
+
+Write the body here. Cite main-text sources normally, e.g. [@SomeKey2020];
+the filter routes the citation to the main reference list automatically.
+
+Cross-reference the appendix like @sec-app1 (renders as "OSM A").
+
+# Section
+
+More body text.
+
+<!-- ========================================================================
+     MAIN-TEXT REFERENCES
+     ===================================================================== -->
+
+{{< pagebreak >}}
+
+# References {.unnumbered}
+
+```{=typst}
+#bibliographyx("references_main.bib", prefix: "main:", title: none, style: ref-style)
+```
+
+<!-- ========================================================================
+     ONLINE SUPPLEMENTARY MATERIALS (APPENDIX)
+     The heading id MUST equal `alexandria-appendix-id` above. Quarto derives
+     the id from the title; "Online Supplementary Materials" ->
+     "online-supplementary-materials". Citations *after* this heading go to
+     the appendix bibliography.
+     ===================================================================== -->
+
+{{< pagebreak >}}
+
+```{=typst}
+// Switch to A-style page numbers on the fresh appendix page BEFORE the heading
+// renders. If #set page runs after the heading, Typst forces a second page break
+// and leaves the heading alone on an otherwise empty page.
+#set page(numbering: (n, ..) => [A#n])
+#counter(page).update(1)
+```
+
+# Online Supplementary Materials {.unnumbered}
+
+```{=typst}
+// Appendix numbering: sections A, B, …; figures/tables A.1, A.2, …
+#set heading(numbering: "A.1")
+#counter(heading).update(0)
+#counter(figure.where(kind: "quarto-float-fig")).update(0)
+#counter(figure.where(kind: "quarto-float-tbl")).update(0)
+#show figure.where(kind: "quarto-float-fig"): set figure(numbering: n => "A." + str(n))
+#show figure.where(kind: "quarto-float-tbl"): set figure(numbering: n => "A." + str(n))
+```
+
+# First Appendix Section {#sec-app1}
+
+Appendix body. Figures/tables here number as A.1, A.2, …; this section is
+"OSM A". Citations here (e.g. [@AppendixOnlyKey2021]) go to the appendix list.
+
+# Second Appendix Section {#sec-app2}
+
+More appendix content ("OSM B").
+
+<!-- ========================================================================
+     APPENDIX REFERENCES
+     ===================================================================== -->
+
+{{< pagebreak >}}
+
+# References {.unnumbered}
+
+```{=typst}
+#bibliographyx("references_app.bib", prefix: "appendix:", title: none, style: ref-style)
+```

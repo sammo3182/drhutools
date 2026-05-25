@@ -4,14 +4,19 @@
 \alias{folderSystem}
 \title{Folder hierarchy creator for academic research}
 \usage{
-folderSystem()
+folderSystem(overwrite = FALSE)
+}
+\arguments{
+\item{overwrite}{Logical. Should existing template files in \verb{paper/} be overwritten? Defaults to \code{FALSE}, leaving any files the user has already edited untouched.}
 }
 \value{
-Local folders under the project's working directory.
+Invisibly returns \code{NULL}. Called for its side effect of creating local folders, placeholder files, a default \code{.gitignore}, and the manuscript templates under the project's working directory.
 }
 \description{
 Folder hierarchy creator for academic research
 }
 \details{
 The function constructs a standardized folder hierarchy encompassing \verb{codes/}, \verb{data/}, \verb{output/}, \verb{paper/}, and \verb{document/}. These directories are designated for storing programming scripts, data sets, processed outputs, manuscript drafts (including related images and submission documents), and assorted materials, respectively. This organization facilitates easy retrieval of project components, ensuring that members of Dr. Hu's Amazing Team can efficiently navigate and manage shared resources. This structure is advocated for collaborative projects to maintain uniformity across team operations.
+
+In addition, the manuscript-writing templates bundled with the package (a Quarto/Typst paper template, its main and appendix bibliographies, the OSCOLA citation style, and the citation-prefix Lua filter) are copied into the \verb{paper/} folder so a new project starts ready to write.
 }
