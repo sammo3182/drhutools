@@ -9,13 +9,13 @@
 #' @return A data frame with trait scores for each observations
 #'
 #' @references
-#' Duckworth, Angela L., Christopher Peterson, Michael D. Matthews, and Dennis R. Kelly. 2007. 
-#' “Grit: Perseverance and Passion for Long-Term Goals.” Journal of Personality and Social Psychology 
-#' 92(6): 1087–1101. doi:10.1037/0022-3514.92.6.1087.
+#' Duckworth, Angela L., Christopher Peterson, Michael D. Matthews, and Dennis R. Kelly. 2007.
+#' "Grit: Perseverance and Passion for Long-Term Goals." Journal of Personality and Social Psychology
+#' 92(6): 1087-1101. doi:10.1037/0022-3514.92.6.1087.
 #'
-#' Tangney, June P. 1990. “Assessing Individual Differences in Proneness to Shame and Guilt: Development 
-#' of the Self-Conscious Affect and Attribution Inventory.” Journal of Personality and Social Psychology 
-#' 59(1): 102–11. doi:10.1037/0022-3514.59.1.102.
+#' Tangney, June P. 1990. "Assessing Individual Differences in Proneness to Shame and Guilt: Development
+#' of the Self-Conscious Affect and Attribution Inventory." Journal of Personality and Social Psychology
+#' 59(1): 102-11. doi:10.1037/0022-3514.59.1.102.
 #'
 #' @examples
 #' column_names <- c("Q3|R3", "Q3|R4", "Q4|R3", "Q4|R4", "Q5|R5", "Q5|R6", "Q6|R3", "Q6|R4", "Q7|R3", 
@@ -40,7 +40,7 @@ traits <- function(survey) {
   
   
   # Calculate score_shame using columns that match ".*R(3|5)"
-  # 使用 drop=FALSE 防止选中单列时变成向量导致 rowSums 报错
+  # drop = FALSE keeps a single selected column as a data frame so rowSums works
   score_shame <- survey[, grep(".*R(3|5)", names(survey)), drop = FALSE] |>
     rowSums(na.rm = TRUE)
   
@@ -49,7 +49,7 @@ traits <- function(survey) {
     rowSums(na.rm = TRUE)
   
   # Calculate score_grit using columns that end with ".1"
-  # 注意：你的列名是 "Q14|1"，grep ".*1$" 是能匹配上的
+  # note: column names such as "Q14|1" are matched by grep ".*1$"
   score_grit12 <- survey[, grep(".*1$", names(survey)), drop = FALSE] |>
     rowMeans(na.rm = TRUE)
   
@@ -57,7 +57,7 @@ traits <- function(survey) {
     rowMeans(na.rm = TRUE)
   
   # Create a data frame with the results
-  # 【修复核心】：删除了 name = survey$Q2，因为输入数据不一定包含 Q2 列
+  # key fix: dropped name = survey$Q2 because the input may not contain a Q2 column
   df_result <- data.frame(
     score_shame = score_shame, 
     score_guilt = score_guilt, 

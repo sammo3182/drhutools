@@ -1,15 +1,6 @@
-<<<<<<< HEAD
-pandoc: 2.11.4
-pkgdown: 1.6.1.9000
-pkgdown_sha: 1c28ef9d9476e35974e1933de76a9aaa24d4cd27
-articles: {}
-last_built: 2021-02-16T09:06Z
-
-=======
-pandoc: 2.11.4
-pkgdown: 1.6.1
+pandoc: 3.8.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
-articles: {}
-last_built: 2021-04-14T06:21Z
-
->>>>>>> cfd1182a54ae48b0e09487de0f1037d8b86da5e3
+articles:
+  drhutools: drhutools.html
+last_built: 2026-06-04T08:26Z

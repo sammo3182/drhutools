@@ -34,10 +34,10 @@ traits(toy_data)
 }
 \references{
 Duckworth, Angela L., Christopher Peterson, Michael D. Matthews, and Dennis R. Kelly. 2007.
-“Grit: Perseverance and Passion for Long-Term Goals.” Journal of Personality and Social Psychology
-92(6): 1087–1101. doi:10.1037/0022-3514.92.6.1087.
+"Grit: Perseverance and Passion for Long-Term Goals." Journal of Personality and Social Psychology
+92(6): 1087-1101. doi:10.1037/0022-3514.92.6.1087.
 
-Tangney, June P. 1990. “Assessing Individual Differences in Proneness to Shame and Guilt: Development
-of the Self-Conscious Affect and Attribution Inventory.” Journal of Personality and Social Psychology
-59(1): 102–11. doi:10.1037/0022-3514.59.1.102.
+Tangney, June P. 1990. "Assessing Individual Differences in Proneness to Shame and Guilt: Development
+of the Self-Conscious Affect and Attribution Inventory." Journal of Personality and Social Psychology
+59(1): 102-11. doi:10.1037/0022-3514.59.1.102.
 }

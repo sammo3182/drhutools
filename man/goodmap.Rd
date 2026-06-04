@@ -16,6 +16,8 @@ goodmap(
   animate_var = NULL,
   map_center = c(35.8617, 104.1954),
   zoom_level = 4,
+  tile_source = "amap",
+  coord = "WGS-84",
   color_type = "numeric",
   custom_colors = NULL,
   point_radius = 5,
@@ -55,6 +57,20 @@ for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which
 is approximately the center of China.}
 
 \item{zoom_level}{A numeric value specifying the zoom level for the map. Default is 3.}
+
+\item{tile_source}{A string specifying the basemap tile provider. Options are \code{amap}
+for the Gaode/Amap Chinese basemap (default), or \code{osm}
+for OpenStreetMap. Amap offers fuller Chinese labelling and coverage;
+note its tiles use the GCJ-02 coordinate system (see \code{coord}).
+Baidu is not supported because its BD-09 projection is incompatible
+with the standard leaflet tile grid.}
+
+\item{coord}{A string giving the coordinate system of the \strong{point} input data
+(\code{g_lat}/\code{g_lon}). Options are \code{WGS-84} (default, GPS/international
+geocoders), \code{GCJ-02} (Amap/Gaode/Tencent geocoders), or \code{BD-09} (Baidu
+geocoder). Points are reprojected to match \code{tile_source} so markers align
+with the basemap. This argument is ignored for polygon maps, whose
+boundaries are bundled in GCJ-02 and align with the Amap basemap.}
 
 \item{color_type}{If the data is discrete, such as types or categories, choose \code{factor}.
 If the data is continuous, such as temperature or pressure, choose \code{numeric}. Default is numeric.}

@@ -1,5 +1,11 @@
+# drhutools 1.1.2
+
 # 1.1.1
 
+- `goodmap` now correctly draws on the Amap (AutoNavi) Chinese basemap by default instead of OpenStreetMap:
+  - New `tile_source` argument (`"amap"` default, or `"osm"`) selects the basemap provider.
+  - New `coord` argument (`"WGS-84"` default, `"GCJ-02"`, or `"BD-09"`) declares the coordinate system of point input; points are reprojected to match the basemap so markers align with the tiles.
+  - Added an internal closed-form WGS-84 / GCJ-02 / BD-09 coordinate converter (no new dependency).
 - Added a default `.gitignore` file into `folderSystem`
 - `folderSystem` now copies the bundled manuscript templates (Quarto/Typst paper template, main/appendix bibliographies, OSCOLA citation style, and the citation-prefix Lua filter) into `paper/`, with an `overwrite` argument to control replacing existing files
 
@@ -38,7 +44,6 @@
 - `ksplot` is superseded by the `cdplot` function
 - Added the `folderSystem` function
 - Clean the document
-
 
 # 0.1.0
 

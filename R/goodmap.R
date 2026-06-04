@@ -34,7 +34,19 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #'                   for the center of the map view. Default is `c(35.8617, 104.1954)`, which
 #'                   is approximately the center of China.
 #' @param zoom_level A numeric value specifying the zoom level for the map. Default is 3.
-#' @param color_type If the data is discrete, such as types or categories, choose `factor`. 
+#' @param tile_source A string specifying the basemap tile provider. Options are `amap`
+#'                    for the Gaode/Amap Chinese basemap (default), or `osm`
+#'                    for OpenStreetMap. Amap offers fuller Chinese labelling and coverage;
+#'                    note its tiles use the GCJ-02 coordinate system (see `coord`).
+#'                    Baidu is not supported because its BD-09 projection is incompatible
+#'                    with the standard leaflet tile grid.
+#' @param coord A string giving the coordinate system of the **point** input data
+#'              (`g_lat`/`g_lon`). Options are `WGS-84` (default, GPS/international
+#'              geocoders), `GCJ-02` (Amap/Gaode/Tencent geocoders), or `BD-09` (Baidu
+#'              geocoder). Points are reprojected to match `tile_source` so markers align
+#'              with the basemap. This argument is ignored for polygon maps, whose
+#'              boundaries are bundled in GCJ-02 and align with the Amap basemap.
+#' @param color_type If the data is discrete, such as types or categories, choose `factor`.
 #'                   If the data is continuous, such as temperature or pressure, choose `numeric`. Default is numeric.
 #' @param custom_colors A vector of colors for customizing the color gradient. Default is `NULL`,
 #'                      which uses the predefined color palette.
@@ -76,6 +88,8 @@ goodmap <- function(data_file,
                     animate_var = NULL,
                     map_center = c(35.8617, 104.1954),
                     zoom_level = 4,
+                    tile_source = "amap",
+                    coord = "WGS-84",
                     color_type = "numeric",
                     custom_colors = NULL,
                     point_radius = 5,
@@ -84,6 +98,9 @@ goodmap <- function(data_file,
                     width = 800,
                     height = 900) {
   
+  tile_source <- match.arg(tile_source, c("amap", "osm"))
+  coord <- match.arg(coord, c("WGS-84", "GCJ-02", "BD-09"))
+
   temp_saveDir <- file.path(tempdir(), "temp_maps")
   if (!dir.exists(temp_saveDir)) {
     dir.create(temp_saveDir, showWarnings = FALSE)
@@ -121,8 +138,17 @@ goodmap <- function(data_file,
       plot_point <- filtered_data |>
         dplyr::select(g_lat, g_lon, value_set) |>
         dplyr::mutate(radius = point_radius)
-      
-      # 定义颜色
+
+      # Reproject points to the basemap's system so markers sit on the tiles
+      # (Amap renders GCJ-02, OSM renders WGS-84).
+      target_crs <- if (tile_source == "amap") "GCJ-02" else "WGS-84"
+      if (coord != target_crs) {
+        xy <- convert_coord(plot_point$g_lon, plot_point$g_lat, from = coord, to = target_crs)
+        plot_point$g_lon <- xy$lon
+        plot_point$g_lat <- xy$lat
+      }
+
+      # define colors
       if (color_type == "factor") {
         if (!is.null(custom_colors)) {
           pal_colors <- grDevices::colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
@@ -144,7 +170,7 @@ goodmap <- function(data_file,
       }
       
       map <- leaflet::leaflet(plot_point) |>
-        leaflet::addTiles() |>
+        add_basemap(tile_source) |>
         leaflet::setView(lng = map_center[2], lat = map_center[1], zoom = zoom_level) |>
         leaflet::addCircleMarkers(
           lng = ~g_lon, lat = ~g_lat,
@@ -162,7 +188,7 @@ goodmap <- function(data_file,
 
     } else if (type == "polygon") {
       
-      # 通用颜色生成器
+      # general color-palette generator
       get_pal_fun <- function(vals) {
         n_colors <- length(unique(vals))
         if (n_colors < 2) n_colors <- 2 
@@ -198,7 +224,7 @@ goodmap <- function(data_file,
         pal_fun <- get_pal_fun(map_data$value)
         
         map <- leaflet::leaflet(data = map_data) |>
-          leaflet::addTiles() |>
+          add_basemap(tile_source) |>
           leaflet::addPolygons(
             fillColor = ~pal_fun(value), weight = 1, opacity = 1, color = "white",
             dashArray = "3", fillOpacity = 0.7,
@@ -219,7 +245,7 @@ goodmap <- function(data_file,
         pal_fun <- get_pal_fun(map_data$value)
         
         map <- leaflet::leaflet(data = map_data) |>
-          leaflet::addTiles() |>
+          add_basemap(tile_source) |>
           leaflet::addPolygons(
             fillColor = ~pal_fun(value), weight = 1, opacity = 1, color = "white",
             dashArray = "3", fillOpacity = 0.7,
@@ -237,7 +263,7 @@ goodmap <- function(data_file,
     
     save_leaflet_png(map = map, file = image_file, width = width, height = height)
     
-    # 只有非动画模式才在 View 窗口显示
+    # only display in the Viewer in non-animation mode
     if (!animate) {
       print(map)
     }
@@ -273,6 +299,29 @@ goodmap <- function(data_file,
   
   if (dir.exists("temp_maps")) {
     unlink("temp_maps", recursive = TRUE)
+  }
+}
+
+#' Internal function to add a basemap tile layer
+#'
+#' Adds the Gaode/Amap Chinese basemap or OpenStreetMap to a leaflet map.
+#' Amap serves standard XYZ tiles in Web Mercator (its imagery is GCJ-02 encoded),
+#' so it drops straight into leaflet; the `{s}` subdomains spread tile requests
+#' across Amap's four servers for reliability.
+#' @noRd
+add_basemap <- function(map, tile_source = "amap") {
+  if (tile_source == "amap") {
+    leaflet::addTiles(
+      map,
+      urlTemplate = "https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+      attribution = '&copy; <a href="https://amap.com">Amap / Gaode</a>',
+      options = leaflet::tileOptions(
+        subdomains = c("1", "2", "3", "4"),
+        tileSize = 256, minZoom = 3, maxZoom = 18
+      )
+    )
+  } else {
+    leaflet::addTiles(map)
   }
 }
 

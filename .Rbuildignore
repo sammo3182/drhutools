@@ -25,3 +25,5 @@
 ^temp_maps$
 ^CRAN-SUBMISSION$
 ^vignettes/drhutools_cache$
+^\.Rhistory$
+^tmp.*

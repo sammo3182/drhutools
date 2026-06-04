@@ -16,7 +16,7 @@ BugReports: https://github.com/sammo3182/drhutools/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Depends:
-  R(>= 3.6.0)
+  R (>= 4.1.0)
 Imports:
     dplyr,
     ggplot2,

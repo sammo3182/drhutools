@@ -1,63 +1,63 @@
-# Check List for A New Release
-# Run each section sequentially; individual lines can be sourced as needed.
+# CRAN Release Checklist for drhutools
+# Run top to bottom after a functional update. Each step is independent: run it,
+# confirm a clean result, then move to the next. Reference: https://r-pkgs.org/release.html
 
-## 0. After Any Function or Documentation Changes ----------------------------
-# (Daily use during development)
+## 0. Bump version & metadata -------------------------------------------------
+# Bump by hand, or let usethis bump and seed a matching NEWS.md heading:
+#   usethis::use_version("patch")   # x.y.Z  -> bug fixes
+#   usethis::use_version("minor")   # x.Y.0  -> new feature / new arguments
+# Then make sure these three agree on the same version number:
+#   [ ] DESCRIPTION        Version:
+#   [ ] NEWS.md            top heading + bullet points for this release
+#   [ ] cran-comments.md   one-line summary + the 0/0/0 result
 
-devtools::document()  # Regenerate NAMESPACE and man/ from roxygen2 comments
-devtools::load_all()  # Reload package in session without reinstalling
+## 1. Regenerate documentation ------------------------------------------------
 
-## 1. Vignette Building -------------------------------------------------------
+devtools::document()   # roxygen2 -> man/*.Rd + NAMESPACE   (shortcut: Ctrl+Shift+D)
+devtools::load_all()   # reload in the session to sanity-check the build
 
-devtools::build_vignettes()               # Build and preview vignettes locally
+## 2. Check URLs --------------------------------------------------------------
+# CRAN rejects dead or redirecting URLs. url_check() reports them and can
+# auto-rewrite redirects when you pass the result to urlchecker::url_update().
 
-# For final verification before submission:
-devtools::install(build_vignettes = TRUE)
+urlchecker::url_check()
 
-## 2. Spell Check --------------------------------------------------------------
+## 3. Build & preview vignettes -----------------------------------------------
 
-devtools::spell_check()
+devtools::build_vignettes()
+# Pandoc note: RStudio/Positron set RSTUDIO_PANDOC automatically. If you run this
+# from a bare Rscript and vignette building fails with "Pandoc is required", set:
+#   Sys.setenv(RSTUDIO_PANDOC = "C:/Users/yuehu/AppData/Local/Programs/Quarto/bin/tools")
 
-## 3. Pre-submission Checks ---------------------------------------------------
+## 4. Local CRAN check -- the gate --------------------------------------------
+# cran = TRUE applies CRAN policies; remote = TRUE runs CRAN's incoming-feasibility
+# checks (needs internet); manual = TRUE builds the PDF manual (needs LaTeX via
+# tinytex::install_tinytex()). Drop manual = TRUE if you have no LaTeX toolchain.
+# Target result: 0 errors | 0 warnings | 0 notes.
 
-# Local R CMD check (automatically calls document() internally)
-devtools::check()
+devtools::check(cran = TRUE, remote = TRUE, manual = TRUE)
 
-# Cross-platform check via GitHub Actions (rhub v2)
-# One-time setup — skip if .github/workflows/rhub.yaml already exists:
-#   rhub::rhub_setup()
-# Commit and push all changes to GitHub, then run:
-rhub::rhub_check()
+# Optional cross-platform check via R-hub v2 (runs on GitHub Actions; needs the
+# repo pushed and rhub::rhub_setup() done once). Skip if not wanted:
+# rhub::rhub_check()
 
-## 4. Pre-submission Housekeeping ---------------------------------------------
+## 5. Housekeeping before the tarball -----------------------------------------
+# Remove compiled vignette HTML so it does not bloat the source tarball.
 
-# Remove compiled HTML vignettes to reduce tarball size
-ls_html <- list.files(
-  here::here("vignettes"),
-  pattern    = "\\.html$",
-  recursive  = TRUE,
-  full.names = TRUE
-)
-file.remove(ls_html)
+ls_html <- list.files(here::here("vignettes"), pattern = "\\.html$",
+                      recursive = TRUE, full.names = TRUE)
+if (length(ls_html)) file.remove(ls_html)
 
-# Manual checklist:
-# [ ] Update version number in DESCRIPTION (remove .9999 suffix)
-# [ ] Update NEWS.md
-# [ ] Update cran-comments.md
+## 6. Submit to CRAN ----------------------------------------------------------
+# submit_cran() builds the tarball, uploads it with cran-comments.md through the
+# CRAN web form, then CRAN emails the maintainer address to confirm. Done.
 
-## 5. Submit to CRAN ----------------------------------------------------------
-# release() runs a final series of checks before opening the CRAN web form
+devtools::submit_cran()
 
-devtools::release()
+# Guided alternative that walks the standard release questions before submitting:
+# devtools::release()
 
-# After CRAN acceptance: bump version back to x.y.z.9999 in DESCRIPTION
-# Post the release note when the package appears on CRAN
-
-## 6. Post-release (run once; skip if already configured) --------------------
-
-pkgdown::build_site()
-
-# One-time project setup (already done for this package):
-# usethis::git_vaccinate()
-# usethis::use_github_links()
-# usethis::use_github_action_check_standard()
+## 7. After CRAN acceptance ---------------------------------------------------
+#   [ ] git tag the released commit (e.g. usethis::use_github_release())
+#   [ ] DESCRIPTION  Version: -> x.y.z.9000   (back to a development version)
+#   [ ] pkgdown::build_site()                 # refresh the docs website
