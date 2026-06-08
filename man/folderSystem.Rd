@@ -4,13 +4,27 @@
 \alias{folderSystem}
 \title{Folder hierarchy creator for academic research}
 \usage{
-folderSystem(overwrite = FALSE)
+folderSystem(
+  overwrite = FALSE,
+  language = NULL,
+  format = NULL,
+  bibliography = NULL,
+  csl = NULL
+)
 }
 \arguments{
 \item{overwrite}{Logical. Should existing template files in \verb{paper/} be overwritten? Defaults to \code{FALSE}, leaving any files the user has already edited untouched.}
+
+\item{language}{Character or \code{NULL}. Manuscript language: \code{"english"} or \code{"chinese"}. \code{NULL} (default) prompts interactively.}
+
+\item{format}{Character or \code{NULL}. Output format: \code{"typst"} or \code{"word"}. \code{NULL} (default) prompts interactively.}
+
+\item{bibliography}{Character or \code{NULL}. Bibliography layout: \code{"single"} or \code{"separate"}. \code{NULL} (default) prompts interactively (skipped, and forced to \code{"single"}, when \code{format = "word"}).}
+
+\item{csl}{Character or \code{NULL}. Citation style: \code{"apsa"} or \code{"apa"}. \code{NULL} (default) prompts interactively.}
 }
 \value{
-Invisibly returns \code{NULL}. Called for its side effect of creating local folders, placeholder files, a default \code{.gitignore}, and the manuscript templates under the project's working directory.
+Invisibly returns \code{NULL}. Called for its side effect of creating local folders, placeholder files, a default \code{.gitignore}, and the configured manuscript template under the project's working directory.
 }
 \description{
 Folder hierarchy creator for academic research
@@ -18,5 +32,13 @@ Folder hierarchy creator for academic research
 \details{
 The function constructs a standardized folder hierarchy encompassing \verb{codes/}, \verb{data/}, \verb{output/}, \verb{paper/}, and \verb{document/}. These directories are designated for storing programming scripts, data sets, processed outputs, manuscript drafts (including related images and submission documents), and assorted materials, respectively. This organization facilitates easy retrieval of project components, ensuring that members of Dr. Hu's Amazing Team can efficiently navigate and manage shared resources. This structure is advocated for collaborative projects to maintain uniformity across team operations.
 
-In addition, the manuscript-writing templates bundled with the package (a Quarto/Typst paper template, its main and appendix bibliographies, the OSCOLA citation style, and the citation-prefix Lua filter) are copied into the \verb{paper/} folder so a new project starts ready to write.
+In addition, the function assembles a ready-to-write manuscript template under \verb{paper/} from the choices below. When an argument is left \code{NULL} and the session is interactive, the function asks for the choice; otherwise it falls back to the first option.
+\itemize{
+\item \code{language} --- \code{"english"} writes \code{paper_en.qmd}; \code{"chinese"} writes \code{paper_cn.qmd} (Chinese heading numbering, dual abstract, online appendix; modelled on the bundled \code{organizedParticipation.qmd}).
+\item \code{format} --- \code{"typst"} (PDF via Typst) or \code{"word"} (\code{.docx}).
+\item \code{bibliography} --- \code{"single"} produces one reference list via Quarto's citeproc; \code{"separate"} produces separate main-text and appendix lists via the Alexandria Typst package (Typst only; Word output is forced to \code{"single"}).
+\item \code{csl} --- \code{"apsa"} (American Political Science Association) or \code{"apa"} (APA 7th edition).
+}
+
+Only the support files required by the chosen configuration are copied into \verb{paper/} (the selected \code{.csl}, the matching \code{.bib} file(s), and the relevant Lua filters).
 }

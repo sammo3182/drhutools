@@ -1,0 +1,272 @@
+---
+format:
+  typst:
+    number-sections: true
+    papersize: a4
+    keep-typ: true
+    margin:
+      x: 1in
+      y: 1in
+    include-in-header:
+      text: |
+        #set text(font: ("Libertinus Serif", "SimSun", "Songti SC"))
+        #set par(first-line-indent: (amount: 2em, all: true))
+        #show figure: set block(breakable: true)
+
+        // 中文标题编号用的汉字序列
+        #let cn-nums = ("一","二","三","四","五","六","七","八","九","十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十")
+        // 状态变量：是否进入附录
+        #let in-appendix = state("appendix", false)
+
+        // 一级标题：正文居中，附录左对齐
+        #show heading.where(level: 1): it => {
+          let is-app = in-appendix.at(it.location())
+          let n = counter(heading).at(it.location())
+          let the-content = [
+            #set text(weight: "bold")
+            #if it.numbering != none {
+              if not is-app { cn-nums.at(n.at(0) - 1) + "、" }
+              else { counter(heading).display(it.numbering) + " " }
+            }
+            #it.body
+          ]
+          if is-app {
+            align(left, block(above: 1.5em, below: 0.8em, the-content))
+          } else {
+            align(center, block(above: 1.5em, below: 0.8em, the-content))
+          }
+        }
+
+        // 二级标题：（一）（二）…，左对齐
+        #show heading.where(level: 2): it => {
+          let is-app = in-appendix.at(it.location())
+          let n = counter(heading).at(it.location())
+          let the-content = [
+            #set text(weight: "bold")
+            #if it.numbering != none {
+              if not is-app { "（" + cn-nums.at(n.at(1) - 1) + "）" }
+              else { counter(heading).display(it.numbering) + " " }
+            }
+            #it.body
+          ]
+          align(left, block(above: 1em, below: 0.5em, the-content))
+        }
+
+        // 三级标题：1. 2. 3.，左对齐
+        #show heading.where(level: 3): it => {
+          let is-app = in-appendix.at(it.location())
+          let n = counter(heading).at(it.location())
+          let the-content = [
+            #set text(weight: "bold")
+            #if it.numbering != none {
+              if not is-app { str(n.at(2)) + "." }
+              else { counter(heading).display(it.numbering) + " " }
+            }
+            #it.body
+          ]
+          align(left, block(above: 0.8em, below: 0.3em, the-content))
+        }
+
+        // 四级标题：（1）（2）…，与正文连排
+        #show heading.where(level: 4): it => {
+          let n = counter(heading).at(it.location())
+          strong[（#str(n.at(3))）#it.body]
+          h(0.5em, weak: true)
+        }
+
+        // 交叉引用：只显示编号
+        #show ref: it => {
+          let el = it.element
+          if el != none and el.func() == heading and el.numbering != none {
+            link(el.location(), numbering(el.numbering, ..counter(heading).at(el.location())))
+          } else { it }
+        }
+crossref:
+  fig-prefix: "图"
+  fig-title: "图"
+  tbl-prefix: "表"
+  tbl-title: "表"
+  appendix-title: "附录"
+
+fontsize: 12pt
+linestretch: 1.5
+colorlinks: true
+link-citations: true
+
+# --- 单一参考文献（Quarto 原生 citeproc） ---------------------------------
+# 默认使用一份参考文献：正文与附录共用 references.bib。fix-lang.lua 与
+# localize-cnbib.lua 负责把英文 CSL 输出本地化为中文格式（如 et al. -> 等）。
+bibliography: references.bib
+csl: american-political-science-association.csl
+citeproc: true
+filters:
+  - fix-lang.lua
+  - localize-cnbib.lua
+
+# author:
+#   - 第一作者
+#   - 第二作者
+
+title: "论文标题"
+# subtitle: "（工作论文。未经作者同意，请勿转载、引用。）"
+abstract-title: "摘要"
+abstract: |
+  在此填写中文摘要。每句一行，便于版本比较。
+  摘要应概括研究问题、数据与方法、主要发现及其意义。
+
+  **关键词：** 关键词一；关键词二；关键词三
+
+keywords: [关键词一, 关键词二, 关键词三]
+execute:
+  echo: false
+  message: false
+  warning: false
+  dpi: 300
+editor_options:
+  chunk_output_type: console
+editor:
+  markdown:
+    wrap: 84
+
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+if (!require(pacman)) install.packages("pacman")
+if (!require(drhutools)) remotes::install_github("sammo3182/drhutools")
+library(pacman)
+
+p_load(
+  here, rio,
+  tidyverse, drhutools,
+  tinytable, modelsummary,
+  showtext, knitr
+  # 按需添加其他包
+)
+
+showtext_auto(enable = TRUE)
+set.seed(313)
+
+# dat <- readRDS(here("data", "dat.rds"))
+```
+
+# 引言
+
+在此撰写引言。正文中正常引用文献，例如 [@SomeKey2020]。
+交叉引用图、表与附录小节，例如 @tbl-desc 与 @sec-variables。
+
+# 理论与文献
+
+梳理相关理论与既有研究，提出本文的分析框架。
+
+## 概念界定
+
+界定核心概念。
+
+## 分析框架
+
+阐述分析框架与逻辑。
+
+# 研究假设
+
+> **假设1：** 在此陈述第一个假设。
+
+> **假设2：** 在此陈述第二个假设。
+
+# 数据与方法
+
+说明数据来源、变量测量与估计策略。变量的具体操作化见 @sec-variables，
+问卷题目见 @sec-survey。@tbl-desc 报告主要变量的描述性统计。
+
+```{r}
+#| label: tbl-desc
+#| tbl-cap: "主要变量的描述性统计"
+
+# 示例表格：用你的数据替换下面的内容
+example <- data.frame(
+  变量   = c("变量一", "变量二"),
+  样本量 = c(1000, 1000),
+  均值   = c(0.00, 0.00),
+  标准差 = c(1.00, 1.00)
+)
+
+tt(example) |>
+  style_tt(j = 1, align = "l") |>
+  style_tt(j = 2:4, align = "c")
+```
+
+# 研究发现
+
+报告主要结果。
+
+# 结论与讨论
+
+总结研究发现，讨论理论与现实意义、研究局限与未来方向。
+
+<!-- ========================================================================
+     正文参考文献
+     drhutools 会在你选择「单一」或「主文/附录分离」参考文献时重写下方标记
+     之间的内容。请保留标记注释。
+     ===================================================================== -->
+
+<!-- drhutools:refs-main:start -->
+{{< pagebreak >}}
+
+# 参考文献 {.unnumbered}
+
+::: {#refs}
+:::
+<!-- drhutools:refs-main:end -->
+
+{{< pagebreak >}}
+
+# Paper Title in English {.unnumbered}
+
+```{=typst}
+#align(center)[*Abstract*]
+```
+
+Replace with the English abstract. One sentence per line keeps diffs clean.
+
+**Keywords**: keyword one; keyword two; keyword three
+
+{{< pagebreak >}}
+
+```{=typst}
+// 在附录首页切换为 A 式页码（须在标题渲染前设置）
+#set page(numbering: (n, ..) => [A#n])
+#counter(page).update(1)
+```
+
+# 线上附录 {#online-supplementary-materials .unnumbered}
+
+```{=typst}
+// 进入附录：激活左对齐状态，切换编号方案
+#in-appendix.update(true)
+#set heading(numbering: (..nums) => {
+  let n = nums.pos()
+  if n.len() == 1 { "附录" + numbering("A", n.at(0)) } else { numbering("A.1", ..n) }
+})
+#counter(heading).update(0)
+#counter(figure.where(kind: "quarto-float-fig")).update(0)
+#counter(figure.where(kind: "quarto-float-tbl")).update(0)
+#show figure.where(kind: "quarto-float-fig"): set figure(numbering: n => "A." + str(n))
+#show figure.where(kind: "quarto-float-tbl"): set figure(numbering: n => "A." + str(n))
+```
+
+# 变量操作化说明 {#sec-variables}
+
+逐一说明结果变量、解释变量与控制变量的测量与编码。
+
+# 问卷题目 {#sec-survey}
+
+附上问卷或访谈提纲的核心题目。
+
+<!-- ========================================================================
+     附录参考文献（仅在选择「主文/附录分离」时生成）
+     ===================================================================== -->
+
+<!-- drhutools:refs-appendix:start -->
+<!-- drhutools:refs-appendix:end -->

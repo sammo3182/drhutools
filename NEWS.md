@@ -1,5 +1,13 @@
 # drhutools 1.1.2
 
+- `folderSystem` now assembles a configurable manuscript template instead of copying a single fixed one. New arguments (each prompts interactively when left `NULL`, and falls back to the first option in non-interactive sessions):
+  - `language`: `"english"` writes `paper_en.qmd`; `"chinese"` writes a new `paper_cn.qmd` (Chinese heading numbering, 图/表 cross-references, dual Chinese/English abstract, and an online appendix, modelled on the bundled `organizedParticipation.qmd`).
+  - `format`: `"typst"` (PDF) or `"word"` (`.docx`).
+  - `bibliography`: `"single"` (one reference list via Quarto citeproc) or `"separate"` (separate main-text and appendix lists via the Alexandria Typst package; Typst only, so Word output is forced to `"single"`).
+  - `csl`: `"apsa"` (American Political Science Association) or `"apa"` (APA 7th edition).
+- `folderSystem` now copies only the support files the chosen configuration needs (the selected `.csl`, the matching `.bib` file(s), and the relevant Lua filters) rather than the whole bundled template folder.
+- Added the Chinese single-bibliography localization filters (`fix-lang.lua`, `localize-cnbib.lua`) and a `references.bib` placeholder for the single-bibliography layout; replaced the OSCOLA style with the APSA and APA citation styles.
+
 # 1.1.1
 
 - `goodmap` now correctly draws on the Amap (AutoNavi) Chinese basemap by default instead of OpenStreetMap:

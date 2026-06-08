@@ -1,0 +1,72 @@
+#set text(font: ("Libertinus Serif", "SimSun", "Songti SC"))
+#set par(first-line-indent: (amount: 2em, all: true))
+#show figure: set block(breakable: true)
+
+// 中文标题编号用的汉字序列
+#let cn-nums = ("一","二","三","四","五","六","七","八","九","十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十")
+// 状态变量：是否进入附录
+#let in-appendix = state("appendix", false)
+
+// 一级标题：正文居中，附录左对齐
+#show heading.where(level: 1): it => {
+  let is-app = in-appendix.at(it.location())
+  let n = counter(heading).at(it.location())
+  let the-content = [
+    #set text(weight: "bold")
+    #if it.numbering != none {
+      if not is-app { cn-nums.at(n.at(0) - 1) + "、" }
+      else { counter(heading).display(it.numbering) + " " }
+    }
+    #it.body
+  ]
+  if is-app {
+    align(left, block(above: 1.5em, below: 0.8em, the-content))
+  } else {
+    align(center, block(above: 1.5em, below: 0.8em, the-content))
+  }
+}
+
+// 二级标题：（一）（二）…，左对齐
+#show heading.where(level: 2): it => {
+  let is-app = in-appendix.at(it.location())
+  let n = counter(heading).at(it.location())
+  let the-content = [
+    #set text(weight: "bold")
+    #if it.numbering != none {
+      if not is-app { "（" + cn-nums.at(n.at(1) - 1) + "）" }
+      else { counter(heading).display(it.numbering) + " " }
+    }
+    #it.body
+  ]
+  align(left, block(above: 1em, below: 0.5em, the-content))
+}
+
+// 三级标题：1. 2. 3.，左对齐
+#show heading.where(level: 3): it => {
+  let is-app = in-appendix.at(it.location())
+  let n = counter(heading).at(it.location())
+  let the-content = [
+    #set text(weight: "bold")
+    #if it.numbering != none {
+      if not is-app { str(n.at(2)) + "." }
+      else { counter(heading).display(it.numbering) + " " }
+    }
+    #it.body
+  ]
+  align(left, block(above: 0.8em, below: 0.3em, the-content))
+}
+
+// 四级标题：（1）（2）…，与正文连排
+#show heading.where(level: 4): it => {
+  let n = counter(heading).at(it.location())
+  strong[（#str(n.at(3))）#it.body]
+  h(0.5em, weak: true)
+}
+
+// 交叉引用：只显示编号
+#show ref: it => {
+  let el = it.element
+  if el != none and el.func() == heading and el.numbering != none {
+    link(el.location(), numbering(el.numbering, ..counter(heading).at(el.location())))
+  } else { it }
+}

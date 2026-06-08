@@ -12,7 +12,7 @@ format:
         #import "@preview/alexandria:0.2.2": *
         #show: alexandria(prefix: "main:", read: path => read(path))
         #show: alexandria(prefix: "appendix:", read: path => read(path))
-        #let ref-style = "oscola.csl"  // citation/reference style for both bibliographies
+        #let ref-style = "american-political-science-association.csl"  // citation/reference style for both bibliographies
         #set text(font: ("Libertinus Serif", "Songti SC", "SimSun"))
 crossref:
   sec-prefix: OSM      # appendix sections referenced as "OSM A", "OSM B", ...
@@ -94,8 +94,11 @@ More body text.
 
 <!-- ========================================================================
      MAIN-TEXT REFERENCES
+     drhutools rewrites the block between the markers below when you choose a
+     single vs. separate bibliography. Leave the marker comments in place.
      ===================================================================== -->
 
+<!-- drhutools:refs-main:start -->
 {{< pagebreak >}}
 
 # References {.unnumbered}
@@ -103,6 +106,7 @@ More body text.
 ```{=typst}
 #bibliographyx("references_main.bib", prefix: "main:", title: none, style: ref-style)
 ```
+<!-- drhutools:refs-main:end -->
 
 <!-- ========================================================================
      ONLINE SUPPLEMENTARY MATERIALS (APPENDIX)
@@ -147,6 +151,7 @@ More appendix content ("OSM B").
      APPENDIX REFERENCES
      ===================================================================== -->
 
+<!-- drhutools:refs-appendix:start -->
 {{< pagebreak >}}
 
 # References {.unnumbered}
@@ -154,3 +159,4 @@ More appendix content ("OSM B").
 ```{=typst}
 #bibliographyx("references_app.bib", prefix: "appendix:", title: none, style: ref-style)
 ```
+<!-- drhutools:refs-appendix:end -->

@@ -29,6 +29,7 @@ Imports:
     sp,
     stats,
     methods,
+    utils,
     gganimate,
     magick,
     webshot,
