@@ -1,10 +1,15 @@
 ## Submission summary
 
-This is a feature update (1.1.1). The `goodmap()` function now uses the
-Gaode/Amap (AutoNavi) Chinese basemap by default instead of OpenStreetMap, and
-gains `tile_source` and `coord` arguments together with an internal coordinate
-converter (WGS-84 / GCJ-02 / BD-09). The minimum R version is now declared as
-R (>= 4.1.0) to match the package's use of the native pipe `|>`.
+This is a feature and maintenance update (1.1.2).
+
+* `folderSystem()` now assembles a configurable Quarto manuscript template
+  (language, output format, bibliography layout, and citation style) and copies
+  only the support files the chosen configuration needs.
+* `goodmap()` polygon maps were repaired and simplified, and its point/polygon
+  colour-palette logic was unified.
+* Internal clean-up: deduplicated the QCA false-positive tests, removed unused
+  helper code, and dropped the unused `htmltools`, `gganimate`, and `magick`
+  dependencies.
 
 ## Test environments
 

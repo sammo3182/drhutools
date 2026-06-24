@@ -61,7 +61,7 @@ folderSystem <- function(overwrite = FALSE,
   # Resolve the manuscript-template choices (interactive when NULL) ----------
   language <- .fs_resolve(
     language, c("english", "chinese"),
-    c("English", "Chinese (中文)"),
+    c("English", "Chinese (\u4e2d\u6587)"),
     "Which language is the paper written in?",
     aliases = list(en = "english", eng = "english", cn = "chinese", zh = "chinese", chi = "chinese")
   )
@@ -246,11 +246,11 @@ folderSystem <- function(overwrite = FALSE,
   if (language == "chinese") {
     c(
       "crossref:",
-      '  fig-prefix: "图"',
-      '  fig-title: "图"',
-      '  tbl-prefix: "表"',
-      '  tbl-title: "表"',
-      '  appendix-title: "附录"'
+      '  fig-prefix: "\u56fe"',
+      '  fig-title: "\u56fe"',
+      '  tbl-prefix: "\u8868"',
+      '  tbl-title: "\u8868"',
+      '  appendix-title: "\u9644\u5f55"'
     )
   } else {
     c(
@@ -299,17 +299,17 @@ folderSystem <- function(overwrite = FALSE,
   if (language == "chinese") {
     c(
       "# author:",
-      "#   - 第一作者",
-      "#   - 第二作者",
+      "#   - \u7b2c\u4e00\u4f5c\u8005",
+      "#   - \u7b2c\u4e8c\u4f5c\u8005",
       "",
-      'title: "论文标题"',
-      'abstract-title: "摘要"',
+      'title: "\u8bba\u6587\u6807\u9898"',
+      'abstract-title: "\u6458\u8981"',
       "abstract: |",
-      "  在此填写中文摘要。每句一行，便于版本比较。",
+      "  \u5728\u6b64\u586b\u5199\u4e2d\u6587\u6458\u8981\u3002\u6bcf\u53e5\u4e00\u884c\uff0c\u4fbf\u4e8e\u7248\u672c\u6bd4\u8f83\u3002",
       "",
-      "  **关键词：** 关键词一；关键词二；关键词三",
+      "  **\u5173\u952e\u8bcd\uff1a** \u5173\u952e\u8bcd\u4e00\uff1b\u5173\u952e\u8bcd\u4e8c\uff1b\u5173\u952e\u8bcd\u4e09",
       "",
-      "keywords: [关键词一, 关键词二, 关键词三]"
+      "keywords: [\u5173\u952e\u8bcd\u4e00, \u5173\u952e\u8bcd\u4e8c, \u5173\u952e\u8bcd\u4e09]"
     )
   } else {
     c(
@@ -392,7 +392,7 @@ folderSystem <- function(overwrite = FALSE,
 }
 
 .fs_refs_main <- function(language, format, bibliography) {
-  heading <- if (language == "chinese") "参考文献" else "References"
+  heading <- if (language == "chinese") "\u53c2\u8003\u6587\u732e" else "References"
   if (bibliography == "separate" && format == "typst") {
     c(
       "{{< pagebreak >}}",
@@ -417,7 +417,7 @@ folderSystem <- function(overwrite = FALSE,
 
 .fs_refs_appendix <- function(language, format, bibliography) {
   if (bibliography == "separate" && format == "typst") {
-    heading <- if (language == "chinese") "参考文献" else "References"
+    heading <- if (language == "chinese") "\u53c2\u8003\u6587\u732e" else "References"
     c(
       "{{< pagebreak >}}",
       "",

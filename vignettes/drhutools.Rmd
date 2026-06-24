@@ -42,8 +42,8 @@ You can install the stable version of `drhutools` from CRAN or the developed ver
 # Install the stable version
 install.packages("drhutools")
 
-# Install drhutools from GitHub
-remotes::install_github("yuedeng/drhutools")
+# Install the development version from GitHub
+remotes::install_github("sammo3182/drhutools")
 ```
 
 # Efficient File Organization with `folderSystem`
@@ -367,7 +367,7 @@ head(social.revolutions)
 
 We test four configurations formed by all combinations of `breakdown` (B) and `pop.ins` (I) and their complements:
 
-```{r fsQCA-test, cache=TRUE}
+```{r fsQCA-test}
 intersect  <- pmin(social.revolutions$breakdown, social.revolutions$pop.ins)
 intersect2 <- pmin(social.revolutions$breakdown, 1 - social.revolutions$pop.ins)
 intersect3 <- pmin(1 - social.revolutions$breakdown, social.revolutions$pop.ins)

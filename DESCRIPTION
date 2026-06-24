@@ -1,7 +1,7 @@
 Package: drhutools
 Type: Package
 Title: Political Science Academic Research Gears
-Version: 1.1.9999
+Version: 1.1.2
 Authors@R:
   c(
   person("Yue", "Hu", role = c("aut", "cre"), email = "yuehu@tsinghua.edu.cn"),
@@ -21,7 +21,6 @@ Imports:
     dplyr,
     ggplot2,
     purrr,
-    htmltools,
     sf,
     htmlwidgets,
     jsonlite,
@@ -30,11 +29,10 @@ Imports:
     stats,
     methods,
     utils,
-    gganimate,
-    magick,
     webshot,
     animation,
     png,
+    grid,
     grDevices,
     graphics
 LazyData: true

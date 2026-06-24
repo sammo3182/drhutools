@@ -28,19 +28,5 @@
 
 
 csQCAbinTest <- function(freq.y, configs, total.configs, adj.method="holm"){
-	if(typeof(configs)!="list"){stop("configs must be a list of the form list(name1=number.of.cases1, name2=number.of.cases2, ...)")}
-	if(is.null(names(configs))){stop("configs must be a list of the form list(name1=number.of.cases1, name2=number.of.cases2, ...)")}
-	if(total.configs < length(configs)){stop("Value of total.configs cannot be less than the length of configs.")}
-	if(length(freq.y)>1 | freq.y<0 | freq.y>1){stop("y must be a single value between 0 and 1.")}
-	if(sum(configs > (total.configs - (total.configs*freq.y)))>0){warning("Number of confirming cases not consistent with total number of configurations and frequency of outcome.", call.=FALSE)}
-
-	out.mat <- matrix(, nrow = length(configs), ncol = 3)
-	out.mat[,1] <- as.vector(unlist(configs))
-	out.mat[,2] <- (1-freq.y)^(out.mat[,1])
-	out.mat[,3] <- p.adjust(c(out.mat[,2], rep(1,(total.configs-length(configs)))), method=adj.method)[1:length(configs)]
-	rownames(out.mat) <- names(configs)
-	colnames(out.mat) <- c("Number of cases", "p-raw", "p-adj")
-	return.obj <- list(call = match.call(), total.configurations = total.configs, config.names = names(configs), p.adj.method = adj.method, result = out.mat)
-	class(return.obj) <- "csQCAbt"
-	return.obj
+	.qca_binom_test(freq.y, configs, total.configs, adj.method, match.call(), "csQCAbt")
 }

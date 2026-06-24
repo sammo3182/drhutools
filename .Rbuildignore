@@ -25,5 +25,9 @@
 ^temp_maps$
 ^CRAN-SUBMISSION$
 ^vignettes/drhutools_cache$
+^vignettes/drhutools_files$
+^vignettes/\.quarto$
+^\.quarto$
+^\.luarc\.json$
 ^\.Rhistory$
 ^tmp.*

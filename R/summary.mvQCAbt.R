@@ -20,13 +20,5 @@
 
 
 summary.mvQCAbt <- function(object, ...){
-	cat("Call:\n")
-    print(object$call)
-    cat("\n")
-    cat("Counterexamples\n")
-	printCoefmat(object$result[,1:3], P.values=TRUE, has.Pvalue=TRUE, tst.ind=1, signif.legend=FALSE)
-    cat(paste("Total number of configurations:", object$total.configurations), "\n")
-    cat(paste("p-value adjustment method:", object$p.adj.method))
-    cat("\n")
-    cat("\n")
-	}
+	.summary_qca_bt(object)
+}

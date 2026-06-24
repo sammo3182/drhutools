@@ -1,76 +1,66 @@
-utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value_var", "value_set"))
+utils::globalVariables(c("g_lat", "g_lon", "value_set", "value", "name"))
 
-#' The `goodmap` function is designed to create interactive PNG Map or GIF Map from a provided data file.
-#' It supports two types of maps: `point` and `polygon`.
-#' The function can visualize data by either plotting points based on geographical coordinates
-#' or highlighting regions polygon based on their administrative boundaries (province or city level).
-#' Additionally, the function can generate animated that showcase the change of data.
+#' Draw a standard map of China from a data frame
 #'
-#' If the map type is `point`, the color and size of the points will be determined by the
-#' `value_set` column in the data file, which means the different value of each point.
-#' If the map type is `polygon`, the color of the polygons will be determined by the average
-#' value of the `value_set` column for each city or province in the data file.
+#' `goodmap()` creates an interactive PNG (or animated GIF) map from a data
+#' frame. It supports two map types: `point` and `polygon`. Point maps plot
+#' markers from geographic coordinates; polygon maps shade administrative
+#' regions (province or city level) by the average of a value column. Setting
+#' `animate = TRUE` strings per-frame maps into a GIF.
 #'
-#' @param data_file Dataframe.
-#'                  When generate point map, `data_file` should include required columns such as `g_lat` and `g_lon`.
-#'                  When generate polygon map, `data_file` should include required columns such as `prov` or `city`.
-#'                  The `prov` columns must be complete, official names rather than any shortened form or abbreviation.
-#'                  If there is only incomplete names or geocodes in your data_file, we recommend you to use function `regioncode`
-#'                  as a one-step solution to these conversion from incomplete names.
-#'                  Ensure the file is formatted correctly with appropriate column headers.
-#' @param type A string specifying the type of map to generate. Options are `point`for point maps using `g_lat` and `g_lon`,
-#'             or `polygon` for maps with administrative boundaries.
-#' @param level A string specifying the level of administrative boundaries for polygon maps.
-#'              Acceptable values are `province` or `city`. This parameter is required if `type` is `polygon`.
-#' @param animate A logical value indicating whether to generate an animation from the maps. The default is FALSE.
-#'                If animate is FALSE, the whole data will be generated as a PNG file.
-#'                If animate is TRUE, an animation will be generated from all panel data, the animate_var must be assigned.
-#' @param animate_var A string specifying the variable to animate over. 
-#'                The default is `NULL`, the whole data will be generated as a PNG file.
-#'                If an animation is needed, `data_file` should include required the `animate_set` column.
-#'                `animate_set` includes a series of unique values that represents year or month, or other categorical variable.
-#'                The frame number of the animation depends on the `animate_set`. 
-#' @param map_center A numeric vector of length 2 specifying the latitude and longitude
-#'                   for the center of the map view. Default is `c(35.8617, 104.1954)`, which
-#'                   is approximately the center of China.
-#' @param zoom_level A numeric value specifying the zoom level for the map. Default is 3.
-#' @param tile_source A string specifying the basemap tile provider. Options are `amap`
-#'                    for the Gaode/Amap Chinese basemap (default), or `osm`
-#'                    for OpenStreetMap. Amap offers fuller Chinese labelling and coverage;
-#'                    note its tiles use the GCJ-02 coordinate system (see `coord`).
-#'                    Baidu is not supported because its BD-09 projection is incompatible
-#'                    with the standard leaflet tile grid.
-#' @param coord A string giving the coordinate system of the **point** input data
-#'              (`g_lat`/`g_lon`). Options are `WGS-84` (default, GPS/international
-#'              geocoders), `GCJ-02` (Amap/Gaode/Tencent geocoders), or `BD-09` (Baidu
-#'              geocoder). Points are reprojected to match `tile_source` so markers align
-#'              with the basemap. This argument is ignored for polygon maps, whose
-#'              boundaries are bundled in GCJ-02 and align with the Amap basemap.
-#' @param color_type If the data is discrete, such as types or categories, choose `factor`.
-#'                   If the data is continuous, such as temperature or pressure, choose `numeric`. Default is numeric.
-#' @param custom_colors A vector of colors for customizing the color gradient. Default is `NULL`,
-#'                      which uses the predefined color palette.
-#' @param point_radius A numeric value specifying the radius for point markers on point maps. Default is 5.
-#' @param legend_opacity A numeric value specifying the opacity of the legend. Default is 0.7.
-#' @param legend_name The name of the legend. Default is `Value`.
-#' @param width A numeric value specifying the width of the map images. Default is 800.
-#' @param height A numeric value specifying the height of the map images. Default is 900.
+#' For point maps the marker colour and size follow the `value_set` column. For
+#' polygon maps each region is shaded by the mean of `value_set` for that city
+#' or province.
 #'
-#' @return Image in the viewer.
+#' @param data_file Data frame.
+#'                  For point maps it must include `g_lat` and `g_lon` columns.
+#'                  For polygon maps it must include `prov` (province level) or
+#'                  `city` (city level) columns holding the complete, official
+#'                  names rather than abbreviations. Use a tool such as
+#'                  `regioncode` to expand incomplete names beforehand.
+#' @param type A string, `point` (default) or `polygon`.
+#' @param level A string, `province` or `city`. Required when `type = "polygon"`.
+#' @param animate Logical. Generate an animation across `animate_var`? Defaults
+#'                to `FALSE`, which draws a single PNG from the whole data.
+#' @param animate_var A string naming the column to animate over. One frame is
+#'                drawn per unique value. Required when `animate = TRUE`.
+#' @param map_center A length-2 numeric `c(lat, lon)` for the map centre.
+#'                Default `c(35.8617, 104.1954)`, roughly the centre of China.
+#' @param zoom_level Numeric initial zoom level. Default `4`.
+#' @param tile_source A string, `amap` (Gaode/Amap Chinese basemap, default) or
+#'                `osm` (OpenStreetMap). Amap tiles use the GCJ-02 coordinate
+#'                system (see `coord`). Baidu is unsupported because its BD-09
+#'                projection is incompatible with the standard leaflet tile grid.
+#' @param coord A string giving the coordinate system of the **point** input
+#'                (`g_lat`/`g_lon`): `WGS-84` (default, GPS/international
+#'                geocoders), `GCJ-02` (Amap/Gaode/Tencent), or `BD-09` (Baidu).
+#'                Points are reprojected to match `tile_source`. Ignored for
+#'                polygon maps, whose bundled boundaries are GCJ-02 encoded.
+#' @param color_type `numeric` (default) for continuous values or `factor` for
+#'                discrete categories.
+#' @param custom_colors Optional vector of colours for the gradient. Default
+#'                `NULL` uses the package's gold-black palette.
+#' @param point_radius Numeric marker radius for point maps. Default `5`.
+#' @param legend_opacity Numeric legend opacity. Default `0.7`.
+#' @param legend_name Legend title. Default `Value`.
+#' @param width Numeric image width. Default `800`.
+#' @param height Numeric image height. Default `900`.
+#'
+#' @return The path to the rendered image, invisibly for animations. Called
+#'   mainly for its side effect of displaying the map in the viewer.
 #'
 #' @import dplyr
-#' @import magick
-#' @import webshot
 #' @import leaflet
 #' @import htmlwidgets
-#' @import purrr
-#' @import gganimate
-#' @import sf
+#' @import webshot
 #' @import animation
 #' @import png
+#' @import sf
+#' @importFrom grid grid.newpage grid.raster
+#' @importFrom grDevices colorRampPalette
 #'
 #' @examples
-#' 
+#'
 #' \dontrun{
 #' goodmap(
 #'    toy_poly,
@@ -78,7 +68,7 @@ utils::globalVariables(c("g_lat", "g_lon", "prov", "city", "animate_set", "value
 #'    level = "province"
 #' )
 #' }
-#' 
+#'
 #' @export
 
 goodmap <- function(data_file,
@@ -97,50 +87,66 @@ goodmap <- function(data_file,
                     legend_name = NULL,
                     width = 800,
                     height = 900) {
-  
+  type <- match.arg(type, c("point", "polygon"))
   tile_source <- match.arg(tile_source, c("amap", "osm"))
   coord <- match.arg(coord, c("WGS-84", "GCJ-02", "BD-09"))
 
-  temp_saveDir <- file.path(tempdir(), "temp_maps")
-  if (!dir.exists(temp_saveDir)) {
-    dir.create(temp_saveDir, showWarnings = FALSE)
-  }
-  
+  # Validate inputs up front.
   if (type == "point") {
-    if (!all(c("g_lat", "g_lon") %in% colnames(data_file))) {
-      stop("The data must include 'g_lat' and 'g_lon' columns for latitude and longitude.")
-    }
-  } else if (type == "polygon") {
-    if (is.null(level) || !(level %in% c("province", "city"))) {
-      stop("Polygon maps require 'level' to be either 'province' or 'city'.")
-    }
-    if (level == "province" && !("prov" %in% colnames(data_file))) {
-      stop("The data must include a 'prov' column to specify the province.")
-    } else if (level == "city" && !("city" %in% colnames(data_file))) {
-      stop("The data must include a 'city' column to specify the city.")
+    if (!all(c("g_lat", "g_lon") %in% names(data_file))) {
+      stop("Point maps require 'g_lat' and 'g_lon' columns.")
     }
   } else {
-    stop("Unknown map type, please select either 'point' or 'polygon'.")
-  }
-  
-  generate_map <- function(input_var_value = NULL, all_data = FALSE) {
-    if (animate == FALSE || all_data) {
-      filtered_data <- data_file
-    } else {
-      filtered_data <- data_file |>
-        dplyr::filter(!!sym(animate_var) == input_var_value)
+    level <- match.arg(level, c("province", "city"))
+    key <- if (level == "province") "prov" else "city"
+    if (!key %in% names(data_file)) {
+      stop(sprintf("%s-level polygon maps require a '%s' column.", level, key))
     }
-    
-    map <- NULL
-    
+  }
+  if (animate && !(animate_var %in% names(data_file))) {
+    stop("The 'animate_var' column does not exist in the data: ", animate_var)
+  }
+
+  temp_dir <- file.path(tempdir(), "temp_maps")
+  dir.create(temp_dir, showWarnings = FALSE, recursive = TRUE)
+  legend_title <- if (is.null(legend_name)) "Value" else legend_name
+
+  # One palette builder for both map types; `reverse` keeps the previous
+  # point/polygon defaults (points run gold->black, polygons black->gold).
+  make_pal <- function(vals, reverse = FALSE) {
+    vals <- vals[!is.na(vals)]
+    n <- max(length(unique(vals)), 2L)
+    if (!is.null(custom_colors)) {
+      cols <- colorRampPalette(c("black", custom_colors))(n)
+    } else if (color_type == "factor") {
+      cols <- colorRampPalette(c("black", "gold"))(n)
+    } else {
+      cols <- gb_pal(palette = "main", reverse = reverse)(n)
+    }
+    if (color_type == "factor") {
+      leaflet::colorFactor(cols, domain = vals)
+    } else {
+      leaflet::colorNumeric(cols, domain = vals)
+    }
+  }
+
+  # Polygon boundaries are the same for every frame: fetch them once.
+  boundary_sf <- NULL
+  if (type == "polygon") {
+    boundary_sf <- sf::st_as_sf(readGeoLocal(if (level == "province") "\u4e2d\u56fd" else "city"))
+  }
+
+  generate_map <- function(frame_value = NULL) {
+    filtered <- if (animate && !is.null(frame_value)) {
+      dplyr::filter(data_file, !!dplyr::sym(animate_var) == frame_value)
+    } else {
+      data_file
+    }
 
     if (type == "point") {
-      plot_point <- filtered_data |>
-        dplyr::select(g_lat, g_lon, value_set) |>
-        dplyr::mutate(radius = point_radius)
+      plot_point <- dplyr::select(filtered, g_lat, g_lon, value_set)
 
-      # Reproject points to the basemap's system so markers sit on the tiles
-      # (Amap renders GCJ-02, OSM renders WGS-84).
+      # Reproject points onto the basemap's system (Amap = GCJ-02, OSM = WGS-84).
       target_crs <- if (tile_source == "amap") "GCJ-02" else "WGS-84"
       if (coord != target_crs) {
         xy <- convert_coord(plot_point$g_lon, plot_point$g_lat, from = coord, to = target_crs)
@@ -148,166 +154,82 @@ goodmap <- function(data_file,
         plot_point$g_lat <- xy$lat
       }
 
-      # define colors
-      if (color_type == "factor") {
-        if (!is.null(custom_colors)) {
-          pal_colors <- grDevices::colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
-        } else {
-          pal_colors <- grDevices::colorRampPalette(c("black", "gold"))(length(unique(data_file$value_set)))
-        }
-        type_colors <- leaflet::colorFactor(palette = pal_colors, domain = unique(data_file$value_set))
-      } else {
-        if (!is.null(custom_colors)) {
-          pal_colors <- grDevices::colorRampPalette(c("black", custom_colors))(length(unique(data_file$value_set)))
-        } else {
-          if (exists("gb_pal")) {
-            pal_colors <- gb_pal(palette = "main", reverse = TRUE)(length(unique(data_file$value_set)))
-          } else {
-            pal_colors <- grDevices::topo.colors(length(unique(data_file$value_set)))
-          }
-        }
-        type_colors <- leaflet::colorNumeric(palette = pal_colors, domain = unique(data_file$value_set))
-      }
-      
+      pal <- make_pal(data_file$value_set, reverse = TRUE)
       map <- leaflet::leaflet(plot_point) |>
         add_basemap(tile_source) |>
         leaflet::setView(lng = map_center[2], lat = map_center[1], zoom = zoom_level) |>
         leaflet::addCircleMarkers(
           lng = ~g_lon, lat = ~g_lat,
-          color = ~type_colors(value_set),
+          color = ~ pal(value_set),
           fillOpacity = 1, stroke = FALSE,
-          popup = ~paste("Value:", value_set),
-          radius = ~radius
+          popup = ~ paste("Value:", value_set),
+          radius = point_radius
         ) |>
         leaflet::addLegend(
-          "bottomright", pal = type_colors, values = ~value_set,
-          title = if (!is.null(legend_name)) legend_name else "Value",
-          opacity = legend_opacity
+          "bottomright",
+          pal = pal, values = ~value_set,
+          title = legend_title, opacity = legend_opacity
         )
-      
+    } else {
+      summarised <- filtered |>
+        dplyr::group_by(!!dplyr::sym(key)) |>
+        dplyr::summarise(value = mean(value_set, na.rm = TRUE), .groups = "drop")
 
-    } else if (type == "polygon") {
-      
-      # general color-palette generator
-      get_pal_fun <- function(vals) {
-        n_colors <- length(unique(vals))
-        if (n_colors < 2) n_colors <- 2 
-        
-        if (color_type == "factor") {
-          if (!is.null(custom_colors)) {
-            cols <- grDevices::colorRampPalette(c("black", custom_colors))(n_colors)
-          } else {
-            cols <- grDevices::colorRampPalette(c("black", "gold"))(n_colors)
-          }
-          return(leaflet::colorFactor(palette = cols, domain = vals))
-        } else {
-          if (!is.null(custom_colors)) {
-            cols <- grDevices::colorRampPalette(c("black", custom_colors))(n_colors)
-          } else {
-            if (exists("gb_pal")) {
-              cols <- gb_pal(palette = "main")(n_colors)
-            } else {
-              cols <- grDevices::topo.colors(n_colors)
-            }
-          }
-          return(leaflet::colorNumeric(palette = cols, domain = vals))
-        }
-      }
-      
-      if (level == "province") {
-        plot_prov <- filtered_data |>
-          dplyr::group_by(prov) |>
-          dplyr::summarise(value = mean(value_set, na.rm = TRUE)) |>
-          dplyr::ungroup()
-        
-        map_data <- dplyr::left_join(china_prov_sf, plot_prov, by = c("name" = "prov"))
-        pal_fun <- get_pal_fun(map_data$value)
-        
-        map <- leaflet::leaflet(data = map_data) |>
-          add_basemap(tile_source) |>
-          leaflet::addPolygons(
-            fillColor = ~pal_fun(value), weight = 1, opacity = 1, color = "white",
-            dashArray = "3", fillOpacity = 0.7,
-            highlightOptions = leaflet::highlightOptions(weight = 3, color = "#666", fillOpacity = 0.7, bringToFront = TRUE),
-            label = ~paste0(name, ": ", value),
-            popup = ~paste0("<strong>", name, "</strong><br>Value: ", value)
-          ) |>
-          leaflet::addLegend(pal = pal_fun, values = ~value, opacity = 0.7, title = if (!is.null(legend_name)) legend_name else "Value", position = "bottomright")
-        
-      } else if (level == "city") {
-        plot_city <- filtered_data |>
-          dplyr::select(city, value_set) |>
-          dplyr::group_by(city) |>
-          dplyr::summarise(value = mean(value_set, na.rm = TRUE)) |>
-          dplyr::ungroup()
-        
-        map_data <- dplyr::left_join(china_city_sf, plot_city, by = c("name" = "city"))
-        pal_fun <- get_pal_fun(map_data$value)
-        
-        map <- leaflet::leaflet(data = map_data) |>
-          add_basemap(tile_source) |>
-          leaflet::addPolygons(
-            fillColor = ~pal_fun(value), weight = 1, opacity = 1, color = "white",
-            dashArray = "3", fillOpacity = 0.7,
-            highlightOptions = leaflet::highlightOptions(weight = 3, color = "#666", fillOpacity = 0.7, bringToFront = TRUE),
-            label = ~paste0(name, ": ", value),
-            popup = ~paste0("<strong>", name, "</strong><br>Value: ", value)
-          ) |>
-          leaflet::addLegend(pal = pal_fun, values = ~value, opacity = 0.7, title = if (!is.null(legend_name)) legend_name else "Value", position = "bottomright")
-      }
+      map_data <- dplyr::left_join(boundary_sf, summarised, by = stats::setNames(key, "name"))
+      pal <- make_pal(map_data$value)
+
+      map <- leaflet::leaflet(data = map_data) |>
+        add_basemap(tile_source) |>
+        leaflet::addPolygons(
+          fillColor = ~ pal(value), weight = 1, opacity = 1, color = "white",
+          dashArray = "3", fillOpacity = 0.7,
+          highlightOptions = leaflet::highlightOptions(
+            weight = 3, color = "#666", fillOpacity = 0.7, bringToFront = TRUE
+          ),
+          label = ~ paste0(name, ": ", value),
+          popup = ~ paste0("<strong>", name, "</strong><br>Value: ", value)
+        ) |>
+        leaflet::addLegend(
+          "bottomright",
+          pal = pal, values = ~value,
+          title = legend_title, opacity = legend_opacity
+        )
     }
-    
-    name_prefix <- switch(type, "point" = "point_map", "polygon" = ifelse(level == "province", "province_map", "city_map"), "map")
-    name_file <- if (animate) paste0(name_prefix, "_", input_var_value, ".png") else paste0(name_prefix, ".png")
-    image_file <- file.path(temp_saveDir, name_file)
-    
-    save_leaflet_png(map = map, file = image_file, width = width, height = height)
-    
-    # only display in the Viewer in non-animation mode
-    if (!animate) {
-      print(map)
-    }
-    
-    return(image_file)
+
+    prefix <- if (type == "point") "point_map" else paste0(level, "_map")
+    image_file <- file.path(
+      temp_dir,
+      if (animate) paste0(prefix, "_", frame_value, ".png") else paste0(prefix, ".png")
+    )
+    save_leaflet_png(map, image_file, width = width, height = height)
+    if (!animate) print(map)
+    image_file
   }
-  
-  if (animate) {
-    if (!(animate_var %in% colnames(data_file))) {
-      stop(paste("The specified 'animate_var' column does not exist in the data:", animate_var))
-    }
-    unique_vars <- unique(data_file[[animate_var]])
-    
-    images <- list()
-    for (input_var_value in unique_vars) {
-      map_file <- generate_map(input_var_value)
-      img <- png::readPNG(map_file)
-      images[[length(images) + 1]] <- img
-    }
-    
-    temp_gif_path <- file.path(tempdir(), "animated_map.gif")
-    if (file.exists(temp_gif_path)) file.remove(temp_gif_path)
-    
-    animation::saveGIF({
-      for (img in images) {
-        grid::grid.newpage()
-        grid::grid.raster(img)
-      }
-    }, movie.name = temp_gif_path, interval = 1)
-  } else {
-    generate_map(all_data = TRUE)
+
+  if (!animate) {
+    return(invisible(generate_map()))
   }
-  
-  if (dir.exists("temp_maps")) {
-    unlink("temp_maps", recursive = TRUE)
-  }
+
+  # Animation: one frame per unique value, stitched into a GIF.
+  images <- lapply(unique(data_file[[animate_var]]), function(v) png::readPNG(generate_map(v)))
+  gif_path <- file.path(tempdir(), "animated_map.gif")
+  if (file.exists(gif_path)) file.remove(gif_path)
+  animation::saveGIF(
+    for (img in images) {
+      grid::grid.newpage()
+      grid::grid.raster(img)
+    },
+    movie.name = gif_path, interval = 1
+  )
+  invisible(gif_path)
 }
 
-#' Internal function to add a basemap tile layer
+#' Add a basemap tile layer
 #'
-#' Adds the Gaode/Amap Chinese basemap or OpenStreetMap to a leaflet map.
-#' Amap serves standard XYZ tiles in Web Mercator (its imagery is GCJ-02 encoded),
-#' so it drops straight into leaflet; the `{s}` subdomains spread tile requests
-#' across Amap's four servers for reliability.
+#' Adds the Gaode/Amap Chinese basemap or OpenStreetMap to a leaflet map. Amap
+#' serves standard XYZ tiles in Web Mercator (imagery is GCJ-02 encoded), so it
+#' drops straight into leaflet; the `{s}` subdomains spread tile requests across
+#' Amap's four servers for reliability.
 #' @noRd
 add_basemap <- function(map, tile_source = "amap") {
   if (tile_source == "amap") {
@@ -323,15 +245,4 @@ add_basemap <- function(map, tile_source = "amap") {
   } else {
     leaflet::addTiles(map)
   }
-}
-
-#' Internal function to save leaflet map
-#' @noRd
-save_leaflet_png <- function(map, file, width, height) {
-  tmp_html <- tempfile(fileext = ".html")
-  htmlwidgets::saveWidget(map, tmp_html, selfcontained = FALSE)
-  if (requireNamespace("webshot", quietly = TRUE)) {
-    webshot::webshot(tmp_html, file = file, vwidth = width, vheight = height, cliprect = "viewport")
-  }
-  unlink(tmp_html)
 }

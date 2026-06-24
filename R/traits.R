@@ -33,37 +33,21 @@
 #' @export
 
 traits <- function(survey) {
-  # Check if input is "average"
-  if (is.character(survey) && survey == "average") {
-    return(paste0("Reference: Average shame score is [30.8, 34.7], guilt score is [45.2, 46.8] for Japanese college students; Grit-S is [3.5, 3.7] for pharmacy students in the U.S."))
+  # Magic input: return the reference ranges instead of scoring a survey.
+  if (is.character(survey) && length(survey) == 1L && survey == "average") {
+    return("Reference: Average shame score is [30.8, 34.7], guilt score is [45.2, 46.8] for Japanese college students; Grit-S is [3.5, 3.7] for pharmacy students in the U.S.")
   }
-  
-  
-  # Calculate score_shame using columns that match ".*R(3|5)"
-  # drop = FALSE keeps a single selected column as a data frame so rowSums works
-  score_shame <- survey[, grep(".*R(3|5)", names(survey)), drop = FALSE] |>
-    rowSums(na.rm = TRUE)
-  
-  # Calculate score_guilt using columns that match ".*R(4|6)"
-  score_guilt <- survey[, grep(".*R(4|6)", names(survey)), drop = FALSE] |>
-    rowSums(na.rm = TRUE)
-  
-  # Calculate score_grit using columns that end with ".1"
-  # note: column names such as "Q14|1" are matched by grep ".*1$"
-  score_grit12 <- survey[, grep(".*1$", names(survey)), drop = FALSE] |>
-    rowMeans(na.rm = TRUE)
-  
-  score_grit8 <- survey[, grep("^Q(15|17|18|19|20|21|22|25)", names(survey)), drop = FALSE] |>
-    rowMeans(na.rm = TRUE)
-  
-  # Create a data frame with the results
-  # key fix: dropped name = survey$Q2 because the input may not contain a Q2 column
-  df_result <- data.frame(
-    score_shame = score_shame, 
-    score_guilt = score_guilt, 
-    score_gritO = score_grit12,
-    score_gritS = score_grit8
+
+  # Helper: sum/average the survey columns whose names match `pattern`.
+  # drop = FALSE keeps a single matched column a data frame so the row reducer works.
+  score <- function(pattern, reducer) {
+    reducer(survey[, grep(pattern, names(survey)), drop = FALSE], na.rm = TRUE)
+  }
+
+  data.frame(
+    score_shame = score(".*R(3|5)", rowSums),                      # TOSCA-3SC shame
+    score_guilt = score(".*R(4|6)", rowSums),                      # TOSCA-3SC guilt
+    score_gritO = score(".*1$", rowMeans),                         # Grit-O (12 items)
+    score_gritS = score("^Q(15|17|18|19|20|21|22|25)", rowMeans)   # Grit-S (8 items)
   )
-  
-  return(df_result)
 }

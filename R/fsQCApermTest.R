@@ -46,12 +46,12 @@ fsQCApermTest <- function(y, configs, total.configs, num.iter=10000, my.seed=123
 	if(typeof(configs)!="list"){stop("configs must be a list of the form list(name1=configuration1, name2=configuration2, ...)")}
 	if(is.null(names(configs))){stop("configs must be a list of the form list(name1=configuration1, name2=configuration2, ...)")}
 	if(total.configs < length(configs)){stop("Value of total.configs cannot be less than the length of configs.")}
-	out.mat <- matrix(, nrow = length(configs), ncol = 14)
+	out.mat <- matrix(NA_real_, nrow = length(configs), ncol = 14)
 	permutes.cex <- list()
 	permutes.con <- list()
-	for(j in 1:length(configs)){
-		counterex <- NULL
-		consistency <- NULL
+	for(j in seq_along(configs)){
+		counterex <- numeric(num.iter)
+		consistency <- numeric(num.iter)
 		necessary.condition <- sum(y<configs[[j]])>(length(y)/2)
 		set.seed(my.seed)
 		message(c("Generating permutations for ", names(configs)[j], "..."))
@@ -60,14 +60,14 @@ fsQCApermTest <- function(y, configs, total.configs, num.iter=10000, my.seed=123
 			} else{
 				message("   Upper-triangular configuration detected...")
 				}
-		for(i in 1:num.iter){
+		for(i in seq_len(num.iter)){
 			new.y <- sample(y, size=length(y), replace=F)
 			if(necessary.condition){
-			consistency <- c(consistency, sum(pmin(configs[[j]], new.y))/sum(new.y))
-			counterex <- c(counterex, sum(configs[[j]] < new.y))
+			consistency[i] <- sum(pmin(configs[[j]], new.y))/sum(new.y)
+			counterex[i] <- sum(configs[[j]] < new.y)
 			} else{
-			consistency <- c(consistency, sum(pmin(configs[[j]], new.y))/sum(configs[[j]]))
-			counterex <- c(counterex, sum(configs[[j]] > new.y))
+			consistency[i] <- sum(pmin(configs[[j]], new.y))/sum(configs[[j]])
+			counterex[i] <- sum(configs[[j]] > new.y)
 			}
 			}
 		
@@ -103,7 +103,7 @@ fsQCApermTest <- function(y, configs, total.configs, num.iter=10000, my.seed=123
 	out.mat[,13] <- p.threshold.adjust(total.configs, adj.method)[rank(out.mat[,10])][1:length(configs)]
 	out.mat[,14] <- sqrt((out.mat[,12]*(1-out.mat[,12]))/length(configs[[1]]))
 	
-	for(j in 1:length(configs)){
+	for(j in seq_along(configs)){
 	out.mat[j, 2] <- sort(permutes.cex[[j]])[length(permutes.cex[[j]])*out.mat[j,6]]
 	out.mat[j, 10] <- sort(permutes.con[[j]])[length(permutes.con[[j]])*(1-out.mat[j,13])]
 		}

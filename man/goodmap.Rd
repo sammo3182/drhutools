@@ -2,11 +2,7 @@
 % Please edit documentation in R/goodmap.R
 \name{goodmap}
 \alias{goodmap}
-\title{The \code{goodmap} function is designed to create interactive PNG Map or GIF Map from a provided data file.
-It supports two types of maps: \code{point} and \code{polygon}.
-The function can visualize data by either plotting points based on geographical coordinates
-or highlighting regions polygon based on their administrative boundaries (province or city level).
-Additionally, the function can generate animated that showcase the change of data.}
+\title{Draw a standard map of China from a data frame}
 \usage{
 goodmap(
   data_file,
@@ -28,74 +24,70 @@ goodmap(
 )
 }
 \arguments{
-\item{data_file}{Dataframe.
-When generate point map, \code{data_file} should include required columns such as \code{g_lat} and \code{g_lon}.
-When generate polygon map, \code{data_file} should include required columns such as \code{prov} or \code{city}.
-The \code{prov} columns must be complete, official names rather than any shortened form or abbreviation.
-If there is only incomplete names or geocodes in your data_file, we recommend you to use function \code{regioncode}
-as a one-step solution to these conversion from incomplete names.
-Ensure the file is formatted correctly with appropriate column headers.}
+\item{data_file}{Data frame.
+For point maps it must include \code{g_lat} and \code{g_lon} columns.
+For polygon maps it must include \code{prov} (province level) or
+\code{city} (city level) columns holding the complete, official
+names rather than abbreviations. Use a tool such as
+\code{regioncode} to expand incomplete names beforehand.}
 
-\item{type}{A string specifying the type of map to generate. Options are \code{point}for point maps using \code{g_lat} and \code{g_lon},
-or \code{polygon} for maps with administrative boundaries.}
+\item{type}{A string, \code{point} (default) or \code{polygon}.}
 
-\item{level}{A string specifying the level of administrative boundaries for polygon maps.
-Acceptable values are \code{province} or \code{city}. This parameter is required if \code{type} is \code{polygon}.}
+\item{level}{A string, \code{province} or \code{city}. Required when \code{type = "polygon"}.}
 
-\item{animate}{A logical value indicating whether to generate an animation from the maps. The default is FALSE.
-If animate is FALSE, the whole data will be generated as a PNG file.
-If animate is TRUE, an animation will be generated from all panel data, the animate_var must be assigned.}
+\item{animate}{Logical. Generate an animation across \code{animate_var}? Defaults
+to \code{FALSE}, which draws a single PNG from the whole data.}
 
-\item{animate_var}{A string specifying the variable to animate over.
-The default is \code{NULL}, the whole data will be generated as a PNG file.
-If an animation is needed, \code{data_file} should include required the \code{animate_set} column.
-\code{animate_set} includes a series of unique values that represents year or month, or other categorical variable.
-The frame number of the animation depends on the \code{animate_set}.}
+\item{animate_var}{A string naming the column to animate over. One frame is
+drawn per unique value. Required when \code{animate = TRUE}.}
 
-\item{map_center}{A numeric vector of length 2 specifying the latitude and longitude
-for the center of the map view. Default is \code{c(35.8617, 104.1954)}, which
-is approximately the center of China.}
+\item{map_center}{A length-2 numeric \code{c(lat, lon)} for the map centre.
+Default \code{c(35.8617, 104.1954)}, roughly the centre of China.}
 
-\item{zoom_level}{A numeric value specifying the zoom level for the map. Default is 3.}
+\item{zoom_level}{Numeric initial zoom level. Default \code{4}.}
 
-\item{tile_source}{A string specifying the basemap tile provider. Options are \code{amap}
-for the Gaode/Amap Chinese basemap (default), or \code{osm}
-for OpenStreetMap. Amap offers fuller Chinese labelling and coverage;
-note its tiles use the GCJ-02 coordinate system (see \code{coord}).
-Baidu is not supported because its BD-09 projection is incompatible
-with the standard leaflet tile grid.}
+\item{tile_source}{A string, \code{amap} (Gaode/Amap Chinese basemap, default) or
+\code{osm} (OpenStreetMap). Amap tiles use the GCJ-02 coordinate
+system (see \code{coord}). Baidu is unsupported because its BD-09
+projection is incompatible with the standard leaflet tile grid.}
 
-\item{coord}{A string giving the coordinate system of the \strong{point} input data
-(\code{g_lat}/\code{g_lon}). Options are \code{WGS-84} (default, GPS/international
-geocoders), \code{GCJ-02} (Amap/Gaode/Tencent geocoders), or \code{BD-09} (Baidu
-geocoder). Points are reprojected to match \code{tile_source} so markers align
-with the basemap. This argument is ignored for polygon maps, whose
-boundaries are bundled in GCJ-02 and align with the Amap basemap.}
+\item{coord}{A string giving the coordinate system of the \strong{point} input
+(\code{g_lat}/\code{g_lon}): \code{WGS-84} (default, GPS/international
+geocoders), \code{GCJ-02} (Amap/Gaode/Tencent), or \code{BD-09} (Baidu).
+Points are reprojected to match \code{tile_source}. Ignored for
+polygon maps, whose bundled boundaries are GCJ-02 encoded.}
 
-\item{color_type}{If the data is discrete, such as types or categories, choose \code{factor}.
-If the data is continuous, such as temperature or pressure, choose \code{numeric}. Default is numeric.}
+\item{color_type}{\code{numeric} (default) for continuous values or \code{factor} for
+discrete categories.}
 
-\item{custom_colors}{A vector of colors for customizing the color gradient. Default is \code{NULL},
-which uses the predefined color palette.}
+\item{custom_colors}{Optional vector of colours for the gradient. Default
+\code{NULL} uses the package's gold-black palette.}
 
-\item{point_radius}{A numeric value specifying the radius for point markers on point maps. Default is 5.}
+\item{point_radius}{Numeric marker radius for point maps. Default \code{5}.}
 
-\item{legend_opacity}{A numeric value specifying the opacity of the legend. Default is 0.7.}
+\item{legend_opacity}{Numeric legend opacity. Default \code{0.7}.}
 
-\item{legend_name}{The name of the legend. Default is \code{Value}.}
+\item{legend_name}{Legend title. Default \code{Value}.}
 
-\item{width}{A numeric value specifying the width of the map images. Default is 800.}
+\item{width}{Numeric image width. Default \code{800}.}
 
-\item{height}{A numeric value specifying the height of the map images. Default is 900.}
+\item{height}{Numeric image height. Default \code{900}.}
 }
 \value{
-Image in the viewer.
+The path to the rendered image, invisibly for animations. Called
+mainly for its side effect of displaying the map in the viewer.
 }
 \description{
-If the map type is \code{point}, the color and size of the points will be determined by the
-\code{value_set} column in the data file, which means the different value of each point.
-If the map type is \code{polygon}, the color of the polygons will be determined by the average
-value of the \code{value_set} column for each city or province in the data file.
+\code{goodmap()} creates an interactive PNG (or animated GIF) map from a data
+frame. It supports two map types: \code{point} and \code{polygon}. Point maps plot
+markers from geographic coordinates; polygon maps shade administrative
+regions (province or city level) by the average of a value column. Setting
+\code{animate = TRUE} strings per-frame maps into a GIF.
+}
+\details{
+For point maps the marker colour and size follow the \code{value_set} column. For
+polygon maps each region is shaded by the mean of \code{value_set} for that city
+or province.
 }
 \examples{
 

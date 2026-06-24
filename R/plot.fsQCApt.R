@@ -54,12 +54,12 @@ plot.fsQCApt <- function(x, y=x$config.names, statistic="both", ...){
 	par(mar = c(4,2,2,1))
 	config.num <- match(y, x$config.names)
 	config.num <- config.num[!is.na(config.num)]
-	if(statistic=="both"){
-		par(mfrow=c(length(y),2))
-		}
-		else {
-			par(mfrow=c(length(y),1))
-			}
+	par(mfrow = c(length(y), if (statistic == "both") 2 else 1))
+
+	# Loop-invariant axis limits, computed once.
+	con_min <- min(vapply(x$permutations.con, min, numeric(1)))
+	cex_max <- max(vapply(x$permutations.cex, max, numeric(1)))
+
 	for(m in config.num){
 	if(m==max(config.num)){
 		conlab <- "Consistency"
@@ -69,16 +69,20 @@ plot.fsQCApt <- function(x, y=x$config.names, statistic="both", ...){
 		cexlab <- "   "
 		}
 	if((statistic=="consistency") | (statistic=="both")){
-		pctile <- sort(x$permutations.con[[m]])[length(x$permutations.con[[m]])*(1-x$result.con[m,6])]
-		plot(density(x$permutations.con[[m]], cut=0), axes=FALSE, col="white", xlab=conlab, ylab=" ", xlim=c(min(unlist(lapply(x$permutations.con, FUN=min))), 1), main=x$config.names[m])
+		con <- x$permutations.con[[m]]
+		dens <- density(con, cut=0)
+		pctile <- sort(con)[length(con)*(1-x$result.con[m,6])]
+		upper <- dens$x > pctile
+		plot(dens, axes=FALSE, col="white", xlab=conlab, ylab=" ", xlim=c(con_min, 1), main=x$config.names[m])
 		axis(1)
-		polygon(c(density(x$permutations.con[[m]], cut=0)$x, rev(density(x$permutations.con[[m]], cut=0)$x)), c(density(x$permutations.con[[m]], cut=0)$y, rep(0, length(density(x$permutations.con[[m]], cut=0)$y))), col="#6baed6", border="white", lwd=0.1)
-		polygon(c(density(x$permutations.con[[m]], cut=0)$x[density(x$permutations.con[[m]], cut=0)$x>pctile], rev(density(x$permutations.con[[m]], cut=0)$x[density(x$permutations.con[[m]], cut=0)$x>pctile])), c(density(x$permutations.con[[m]], cut=0)$y[density(x$permutations.con[[m]], cut=0)$x>pctile], rep(0, length(density(x$permutations.con[[m]], cut=0)$y[density(x$permutations.con[[m]], cut=0)$x>pctile]))), col="#08519c", border="white", lwd=0.1)	
+		polygon(c(dens$x, rev(dens$x)), c(dens$y, rep(0, length(dens$y))), col="#6baed6", border="white", lwd=0.1)
+		polygon(c(dens$x[upper], rev(dens$x[upper])), c(dens$y[upper], rep(0, sum(upper))), col="#08519c", border="white", lwd=0.1)
 		points(x$result.con[m,1], par("usr")[3], pch=19, xpd=TRUE)
 	}
 	if((statistic=="counterexamples") | (statistic=="both")){
-		histpct <- sort(x$permutations.cex[[m]])[length(x$permutations.cex[[m]])*(x$result.cex[m,6])]
-		hist(x$permutations.cex[[m]], breaks=seq(0,max(unlist(lapply(x$permutations.cex, FUN=max)))+1,1)-0.5, axes=FALSE, col=c(rep("#08519c", histpct), rep("#6baed6", max(x$permutations.cex[[m]])-histpct+1)), border="white", xlab=cexlab, ylab=" ", xlim=c(-1, max(unlist(lapply(x$permutations.cex, FUN=max)))+1), main=x$config.names[m])
+		cex <- x$permutations.cex[[m]]
+		histpct <- sort(cex)[length(cex)*(x$result.cex[m,6])]
+		hist(cex, breaks=seq(0,cex_max+1,1)-0.5, axes=FALSE, col=c(rep("#08519c", histpct), rep("#6baed6", max(cex)-histpct+1)), border="white", xlab=cexlab, ylab=" ", xlim=c(-1, cex_max+1), main=x$config.names[m])
 		axis(1)
 		points(x$result.cex[m,1], par("usr")[3], pch=19, xpd=TRUE)
 

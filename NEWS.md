@@ -1,5 +1,8 @@
 # drhutools 1.1.2
 
+- `goodmap` polygon maps (province and city level) now draw correctly again; the boundary data are fetched once per call and the point/polygon colour-palette logic is shared.
+- Dropped the unused `htmltools`, `gganimate`, and `magick` dependencies for a lighter installation.
+- Internal clean-up with no change to results: deduplicated the `csQCAbinTest`/`mvQCAbinTest` cores and their summaries, pre-allocated the permutation loop in `fsQCApermTest`, simplified `cdplot`, and removed dead helper code.
 - `folderSystem` now assembles a configurable manuscript template instead of copying a single fixed one. New arguments (each prompts interactively when left `NULL`, and falls back to the first option in non-interactive sessions):
   - `language`: `"english"` writes `paper_en.qmd`; `"chinese"` writes a new `paper_cn.qmd` (Chinese heading numbering, 图/表 cross-references, dual Chinese/English abstract, and an online appendix, modelled on the bundled `organizedParticipation.qmd`).
   - `format`: `"typst"` (PDF) or `"word"` (`.docx`).
