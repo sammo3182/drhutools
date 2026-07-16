@@ -2,8 +2,8 @@
 <!-- badges: start -->
 
 [![CRAN version](http://www.r-pkg.org/badges/version/drhutools)](https://cran.r-project.org/package=drhutools) ![](http://cranlogs.r-pkg.org/badges/grand-total/drhutools)
-
 [![R-CMD-check](https://github.com/sammo3182/drhutools/workflows/R-CMD-check/badge.svg)](https://github.com/sammo3182/drhutools/actions)
+[![R-CMD-check](https://github.com/qiuqiuren-ai/drhutools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/qiuqiuren-ai/drhutools/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 
